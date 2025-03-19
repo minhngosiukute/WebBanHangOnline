@@ -1,0 +1,123 @@
+﻿@model WebBanHangOnline.Models.EF.ReviewProduct
+
+
+<div class="add_review">
+    @using (Ajax.BeginForm("PostReview", "Review", new AjaxOptions
+    {
+        HttpMethod = "POST",
+        UpdateTargetId = "load_review", // ID của vùng hiển thị review
+        OnSuccess = "OnSuccessRE",
+        OnFailure = "OnFailureRE",
+        OnBegin = "OnBeginRE"
+    }, new { @Id = "review_form" }))
+    {
+        <script>
+            function OnBeginRE() {
+                $('#review_submit').attr("disabled", "disabled");
+                $('#load_send').html('<h2>Đang gửi....</h2>');
+            }
+
+            function OnSuccessRE(res) {
+                $('#review_submit').removeAttr("disabled");
+                $('#load_send').html('');
+                if (res.Success) {
+                    // Reset form
+                    $("#review_form")[0].reset();
+
+                    // Tạo HTML cho review mới
+                    var newReviewHtml = `
+                                <div class="user_review_container d-flex flex-column flex-sm-row">
+                                    <div class="user">
+                                        <div class="user_pic"></div>
+                                        <div class="user_rating">
+                                            <ul class="star_rating">` + generateStars(res.Review.Rate) + `</ul>
+                                        </div>
+                                    </div>
+                                    <div class="review">
+                                        <div class="review_date">` + res.Review.CreatedDate + `</div>
+                                        <div class="user_name">` + res.Review.FullName + `</div>
+                                        <p>` + res.Review.Content + `</p>
+                                    </div>
+                                </div>`;
+
+                    // Thêm review mới vào đầu danh sách
+                    $('#load_review').prepend(newReviewHtml);
+
+                    // Cập nhật số lượng review
+                    var currentCount = parseInt($('.reviews_title h4').text().match(/\d+/)[0]);
+                    $('.reviews_title h4').text('Reviews (' + (currentCount + 1) + ')');
+                }
+            }
+
+            function OnFailureRE() {
+                $('#review_submit').removeAttr("disabled");
+                $('#load_send').html('<h2>Lỗi khi gửi!</h2>');
+            }
+
+            // Hàm tạo sao dựa trên rate
+            function generateStars(rate) {
+                var stars = '';
+                for (var i = 1; i <= 5; i++) {
+                    if (i <= rate) {
+                        stars += '<li><i class="fa fa-star" aria-hidden="true"></i></li>';
+                    } else {
+                        stars += '<li><i class="fa fa-star-o" aria-hidden="true"></i></li>';
+                    }
+                }
+                return stars;
+            }
+        </script>
+
+        @Html.AntiForgeryToken()
+        <div>
+            <h1>Thêm đánh giá</h1>
+            @Html.TextBoxFor(x => x.FullName, new { @class = "form_input input_name", @placeholder = "Name*", @id = "review_name" })
+            @Html.TextBoxFor(x => x.Email, new { @class = "form_input input_email", @placeholder = "Email*", @id = "review_email" })
+            @Html.HiddenFor(x => x.UserName)
+            @Html.HiddenFor(x => x.ProductId, new { @Value = ViewBag.ProductId })
+            <input type="text" id="txtRate" name="Rate" value="4" style="visibility:hidden;" />
+        </div>
+        <div>
+            <h1>Đánh giá của bạn:</h1>
+            <ul class="user_star_rating">
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star-o" aria-hidden="true"></i></li>
+            </ul>
+            @Html.TextAreaFor(x => x.Content, new { @class = "input_review", @rows = "4", @placeholder = "nhận xét của bạn " })
+        </div>
+        <div class="text-center">
+            <button id="review_submit" type="submit" class="red_button review_submit_btn trans_300" value="Submit">Gửi</button>
+        </div>
+    }
+</div>
+<script>
+    function OnSuccessRE(res) {
+        $('#review_submit').removeAttr("disabled");
+        $('#load_send').html('');
+        if (res.Success) {
+            $("#review_form")[0].reset();
+
+            var newReviewHtml = `
+                <div class="user_review_container d-flex flex-column flex-sm-row">
+                    <div class="user">
+                        <div class="user_pic" style="background-image: url('` + res.Review.Avatar + `');"></div>
+                        <div class="user_rating">
+                            <ul class="star_rating">` + generateStars(res.Review.Rate) + `</ul>
+                        </div>
+                    </div>
+                    <div class="review">
+                        <div class="review_date">` + res.Review.CreatedDate + `</div>
+                        <div class="user_name">` + res.Review.FullName + `</div>
+                        <p>` + res.Review.Content + `</p>
+                    </div>
+                </div>`;
+
+            $('#load_review').prepend(newReviewHtml);
+            var currentCount = parseInt($('.reviews_title h4').text().match(/\d+/)[0]);
+            $('.reviews_title h4').text('Reviews (' + (currentCount + 1) + ')');
+        }
+    }
+</script>

@@ -1,0 +1,115 @@
+﻿@model PagedList.IPagedList<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Danh sách Quyền";
+}
+
+
+@section naviheader{
+
+    <ul class="navbar-nav ">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/category" class="nav-link">@ViewBag.Title</a>
+        </li>
+    </ul>
+}
+<section class="content aurora-background">
+    <div class="card">
+        <div class="aurora-background  card-header">
+            <h3 class="card-title">Danh sách Quyền</h3>
+            <div class="card-tools">
+                <a href="/admin/role/create" class="btn btn-success">Thêm mới</a>
+            </div>
+        </div>
+        <div class="aurora-background card-body">
+            <div class=" aurora-background table-responsive">
+                <table class="aurora-background table table-hover table-striped ">
+                    <thead class=" aurora-background  text-center ">
+                        <tr>
+                            <th>#</th>
+                            <th>Tên</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+
+                            var i = ((ViewBag.Page - 1) * ViewBag.PageSize) + 1;
+                            foreach (var item in Model)
+                            {
+                                <tr id="row_@item.Id" class="text-center">
+                                    <td>@i</td>
+                                    <td>@item.Name</td>
+                                    <td>
+                                        <a href="/admin/role/edit/@item.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger ml-2 btnDelete" data-id="@item.Id">
+                                            <i class="fas fa-trash-alt"></i> Xóa
+                                        </button>
+
+                                    </td>
+
+
+                                </tr>
+                                i++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class=" aurora-background d-flex justify-content-end">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+        </div>
+    </div>
+</section>
+@section scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Đảm bảo jQuery được tải trước -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Thêm thư viện select2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.btnDelete').click(function () {
+                var id = $(this).data('id');
+
+                // Xác nhận trước khi xóa
+                if (confirm("Bạn có chắc chắn muốn xóa vai trò này không?")) {
+                    $.ajax({
+                        url: '/admin/role/Delete',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (res) {
+                            if (res.success) {
+                                // Xóa thành công, loại bỏ dòng tương ứng khỏi bảng
+                                $('#row_' + id).remove();
+
+                            } else {
+                                // Thông báo lỗi từ server
+                                alert(res.message || "Có lỗi xảy ra. Không thể xóa vai trò.");
+                            }
+                        },
+                        error: function () {
+                            alert("Có lỗi xảy ra trong quá trình gửi yêu cầu. Vui lòng thử lại.");
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+}
+

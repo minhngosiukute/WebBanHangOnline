@@ -1,0 +1,270 @@
+﻿@{
+    ViewBag.Title = "Shop Online";
+    ViewBag.SeoDescription = "Shop Online";
+}
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+<link href="~/Content/assets/styles/Class1.css" rel="stylesheet" />
+
+<!-- CSS cho Banner Quảng Cáo -->
+<style>
+    .advertisement-body {
+        font-family: Arial, sans-serif;
+        background-color: rgba(0, 0, 0, 0.5); /* Nền tối khi banner hiển thị */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999; /* Đảm bảo banner xuất hiện trên mọi nội dung */
+        margin: 0;
+    }
+
+        .advertisement-body .advertisement-banner .banner {
+            width: 400px;
+            background: linear-gradient(135deg, #E81920, #56BABD, #BEFCFD, #458082);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            color: #fff;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .advertisement-body .advertisement-banner .banner .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #000;
+    }
+
+        .advertisement-body .advertisement-banner .banner .close-btn:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+    .advertisement-body .advertisement-banner .banner h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 15px 0;
+        color: #fff;
+    }
+
+    .advertisement-body .advertisement-banner .banner .discount {
+        font-size: 1rem;
+        background: #ffc107;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        display: inline-block;
+        margin: 10px 0;
+    }
+
+    .advertisement-body .advertisement-banner .banner .description {
+        margin: 15px 0;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .advertisement-body .advertisement-banner .banner img {
+        width: 100%;
+        border-radius: 10px;
+        margin: 15px 0;
+    }
+
+    .advertisement-body .advertisement-banner .banner .cta {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #E81920;
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+
+        .advertisement-body .advertisement-banner .banner .cta:hover {
+            background: #D6151B;
+        }
+</style>
+
+<!-- Banner Quảng Cáo -->
+<div class="advertisement-body" id="advertisement-body" style="display: none;">
+    <div class="advertisement-banner">
+        <div class="banner" id="banner">
+            <button class="close-btn" onclick="closeBanner()">&times;</button>
+            <h2>Giảm Giá Đặc Biệt</h2>
+            <p class="discount">Giảm tới 30%</p>
+            <p class="description text-dark">Khám phá các sản phẩm nội thất hiện đại, sang trọng cho ngôi nhà của bạn!</p>
+            <img src="../../uploads/images/phong-khach-voi-sofa-ona.jpg" alt="Banner Nội Thất">
+            <a href="/products/index" class="cta">Mua Ngay</a>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Slider -->
+
+<div class="main_slider" style="background-image: url('../../uploads/images/phong-khach-voi-sofa-ona.jpg');">
+    <div class="container fill_height">
+        <div class="row align-items-center fill_height">
+            <div class="col">
+                @*<div class="main_slider_content">
+                        <h6>Spring / Summer Collection 2017</h6>
+                        <h1>Get up to 30% Off New Arrivals</h1>
+                        <div class="red_button shop_now_button"><a href="#">shop now</a></div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Deal of the week -->
+<!-- Sale Trong Tuần -->
+<div class="deal_ofthe_week">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="main_slider_content">
+                    <h6>Bộ sưu tập mùa hè 2024</h6>
+                    <h1>Sale 30%</h1>
+                    <div class="red_button shop_now_button"><a href="/products/index">Mua ngay</a></div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-right deal_ofthe_week_col">
+                <div class="deal_ofthe_week_content d-flex flex-column align-items-center float-right">
+                    <div class="section_title">
+                        <h2>Sale trong tuần</h2>
+                    </div>
+                    <ul class="timer">
+                        <li class="d-inline-flex flex-column justify-content-center align-items-center">
+                            <div id="day" class="timer_num">03</div>
+                            <div class="timer_unit">Day</div>
+                        </li>
+                        <li class="d-inline-flex flex-column justify-content-center align-items-center">
+                            <div id="hour" class="timer_num">15</div>
+                            <div class="timer_unit">Hours</div>
+                        </li>
+                        <li class="d-inline-flex flex-column justify-content-center align-items-center">
+                            <div id="minute" class="timer_num">45</div>
+                            <div class="timer_unit">Mins</div>
+                        </li>
+                        <li class="d-inline-flex flex-column justify-content-center align-items-center">
+                            <div id="second" class="timer_num">23</div>
+                            <div class="timer_unit">Sec</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Banner -->
+@*@Html.Action("MenuProductCategory", "Menu")*@
+
+<!-- New Arrivals -->
+
+<div class="new_arrivals">
+    <div class="container">
+        @Html.Action("MenuArrivals", "Menu")
+    </div>
+</div>
+
+
+
+<!-- Best Sellers -->
+<!--@Html.Action("Partial_ProductSales", "Products")-->
+<!-- Blogs -->
+@Html.Action("Partial_News_Home", "News")
+<!-- Benefit -->
+
+<div class="benefit">
+    <div class="container">
+        <div class="row benefit_row">
+            <div class="col-lg-3 benefit_col">
+                <div class="benefit_item d-flex flex-row align-items-center">
+                    <div class="benefit_icon"><i class="fa fa-truck" aria-hidden="true"></i></div>
+                    <div class="benefit_content">
+                        <h6>
+                            Miễn phí vận chuyển
+                        </h6>
+                        <p>
+                            Đăng ký
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 benefit_col">
+                <div class="benefit_item d-flex flex-row align-items-center">
+                    <div class="benefit_icon"><i class="fa fa-money" aria-hidden="true"></i></div>
+                    <div class="benefit_content">
+                        <h6>Phương thức gioa hàng</h6>
+                        <p>Internet</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 benefit_col">
+                <div class="benefit_item d-flex flex-row align-items-center">
+                    <div class="benefit_icon"><i class="fa fa-undo" aria-hidden="true"></i></div>
+                    <div class="benefit_content">
+                        <h6>Hoàn trả 45 ngày </h6>
+                        <p>Lưu ý</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 benefit_col">
+                <div class="benefit_item d-flex flex-row align-items-center">
+                    <div class="benefit_icon"><i class="fa fa-clock-o" aria-hidden="true"></i></div>
+                    <div class="benefit_content">
+                        <h6>Mở cửa hàng ngày </h6>
+                        <p>8AM - 09PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Hiển thị banner quảng cáo khi trang được tải
+    window.onload = function () {
+        const bannerBody = document.getElementById("advertisement-body");
+        bannerBody.style.display = "flex"; // Hiển thị banner
+    };
+
+    // Đóng banner quảng cáo
+    function closeBanner() {
+        const banner = document.getElementById("advertisement-body");
+        banner.style.display = "none";
+    }
+</script>
+<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+<df-messenger intent="WELCOME"
+              chat-title="MIHGOSHOP"
+              agent-id="49bcf56b-db41-4eb7-88bf-86c480d64b48"
+              language-code="vi"></df-messenger>

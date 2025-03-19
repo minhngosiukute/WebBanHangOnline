@@ -1,0 +1,204 @@
+﻿@model PagedList.PagedList<WebBanHangOnline.Models.EF.News>
+@using PagedList.Mvc;
+@using PagedList;
+@{
+    ViewBag.Title = "Index";
+}
+
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+
+<style>
+    .news-section {
+        margin-top: 120px;
+        padding: 0 15px;
+    }
+
+    .news-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+
+    .news-item {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+        transition: transform 0.2s ease;
+    }
+
+        .news-item:hover {
+            transform: translateY(-5px);
+        }
+
+    .news-image img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .news-content h3 {
+        margin: 0 0 15px;
+        font-size: 20px;
+        line-height: 1.4;
+    }
+
+    .news-content a {
+        color: #2c3e50;
+        text-decoration: none;
+    }
+
+        .news-content a:hover {
+            color: #007bff;
+        }
+
+    .news-description {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* Style cho phân trang */
+    .pagination-container {
+        margin-top: 30px;
+    }
+
+    .PagedList-pager {
+        display: flex;
+        justify-content: flex-end;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        align-items: center;
+    }
+
+        .PagedList-pager li {
+            margin: 0 5px;
+        }
+
+            .PagedList-pager li a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 10px 15px;
+                min-width: 40px;
+                height: 40px;
+                text-align: center;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                color: #007bff;
+                background-color: #fff;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                font-size: 15px;
+                font-weight: 500;
+            }
+
+                .PagedList-pager li a:hover {
+                    background-color: #007bff;
+                    color: #fff;
+                    border-color: #007bff;
+                    box-shadow: 0 3px 6px rgba(0,123,255,0.2);
+                }
+
+            .PagedList-pager li.disabled a {
+                color: #999;
+                background-color: #f8f9fa;
+                border-color: #e0e0e0;
+                pointer-events: none;
+            }
+
+            .PagedList-pager li.selected a {
+                background-color: #007bff;
+                color: #fff;
+                border-color: #007bff;
+                font-weight: 600;
+            }
+
+        /* Điều chỉnh nút Previous/Next với biểu tượng */
+        .PagedList-pager .previous a,
+        .PagedList-pager .next a {
+            padding: 10px 20px;
+            font-weight: 500;
+            position: relative;
+        }
+
+            .PagedList-pager .previous a:before,
+            .PagedList-pager .next a:after {
+                font-family: 'Arial', sans-serif;
+                font-size: 14px;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            .PagedList-pager .previous a:before {
+                content: '«';
+                left: 10px;
+            }
+
+            .PagedList-pager .next a:after {
+                content: '»';
+                right: 10px;
+            }
+</style>
+
+<div class="container news-section">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="news-title">Tin tức mới nhất</h1>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-12 news-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 col-sm-4">
+                            <div class="news-image">
+                                <a href="/@item.Alias-n@(item.Id)" title="@item.Title">
+                                    <img src="@item.Image" alt="@item.Title" />
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-9 col-sm-8">
+                            <div class="news-content">
+                                <h3>
+                                    <a href="/@item.Alias-n@(item.Id)" title="@item.Title">
+                                        @item.Title
+                                    </a>
+                                </h3>
+                                <div class="news-description">
+                                    @item.Description
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="row pagination-container">
+            <div class="col-6"></div>
+            <div class="col-6" style="text-align:right;">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="text-muted">Hiện tại chưa có bài viết nào.</p>
+            </div>
+        </div>
+    }
+</div>

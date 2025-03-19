@@ -1,0 +1,231 @@
+﻿@model WebBanHangOnline.Models.LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutLogin.cshtml";
+
+
+}
+
+<style>
+    /* Nền gradient chuyển màu động */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(270deg, #89f7fe, #66a6ff, #fbc2eb, #ff9a9e);
+        background-size: 1200% 1200%;
+        animation: gradientBG 10s ease infinite;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Hiệu ứng gradient động */
+    @@keyframes gradientBG {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    /* Đom đóm bay xung quanh */
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.6) 2px, transparent 3px);
+        background-size: 50px 50px; /* Kích thước lưới */
+        opacity: 0.4;
+        animation: fireflies 5s linear infinite;
+        pointer-events: none; /* Không ảnh hưởng đến thao tác người dùng */
+    }
+
+    @@keyframes fireflies {
+        0% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(-10px, 20px);
+        }
+
+        100% {
+            transform: translate(0, 0);
+        }
+    }
+
+    /* Đom đóm ngẫu nhiên */
+    body::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle, rgba(255, 255, 200, 0.8) 2px, transparent 3px);
+        background-size: 100px 100px; /* Kích thước lưới đom đóm thứ hai */
+        opacity: 0.6;
+        animation: fireflies2 7s linear infinite;
+        pointer-events: none;
+    }
+
+    @@keyframes fireflies2 {
+        0% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(15px, -10px);
+        }
+
+        100% {
+            transform: translate(0, 0);
+        }
+    }
+
+
+    /* Hộp đăng nhập */
+    .login-card-body {
+        width: 400px;
+        background: rgba(255, 255, 255, 0.9); /* Nền trắng mờ */
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        backdrop-filter: blur(10px);
+        position: relative;
+    }
+
+    .login-box-msg {
+        font-size: 24px;
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 20px;
+    }
+
+    /* Trường nhập liệu */
+    .form-control {
+        width: 100%;
+        padding: 12px 20px;
+        border-radius: 30px;
+        border: 1px solid #ddd;
+        outline: none;
+        font-size: 16px;
+        background: rgba(255, 255, 255, 0.8);
+        color: #555;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #66a6ff;
+            box-shadow: 0 0 10px rgba(102, 166, 255, 0.5);
+        }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .input-group-text {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #66a6ff;
+        font-size: 18px;
+    }
+
+    .form-control {
+        padding-left: 45px;
+    }
+
+    /* Nút đăng nhập */
+    .btn-primary {
+        background: linear-gradient(to right, #1e90ff, #87cefa); /* Xanh gradient */
+        color: white;
+        padding: 12px 20px;
+        border-radius: 30px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #87cefa, #1e90ff); /* Đảo chiều gradient khi hover */
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+        }
+
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(to right, #fad0c4, #ff9a9e);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+        }
+
+    /* Liên kết */
+    .mb-1 a {
+        color: #66a6ff;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+        .mb-1 a:hover {
+            text-decoration: underline;
+            color: #89f7fe;
+        }
+
+    /* Check box label */
+    .icheck-primary label {
+        font-size: 14px;
+        color: #555;
+    }
+</style>
+
+<div class="card-body login-card-body">
+    <p class="login-box-msg">Đăng nhập tài khoản</p>
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true);
+        <div class="input-group mb-3">
+            <span class="input-group-text"><i class="fas fa-user"></i></span>
+            @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", @placeholder = "Tài khoản" })
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+            @Html.PasswordFor(x => x.Password, new { @class = "form-control", @placeholder = "Mật khẩu" })
+        </div>
+        <div class="row">
+            <div class="col-8 text-start">
+                @Html.CheckBoxFor(x => x.RememberMe)
+                <label for="remember">Ghi nhớ</label>
+            </div>
+            <div class="col-4">
+                <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+            </div>
+        </div>
+    }
+    <p class="mb-1">
+        <a href="#">Quên mật khẩu?</a>
+    </p>
+</div>

@@ -1,0 +1,155 @@
+﻿@using WebBanHangOnline.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log in";
+}
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+<style>
+    /* Background Aurora */
+    .aurora-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(120deg, #ff9a8b, #ff6ec7, #4e54c8, #0dceda, #88d498);
+        background-size: 200% 200%;
+        animation: aurora-animation 8s ease-in-out infinite alternate;
+    }
+
+    @@keyframes aurora-animation {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    /* Scoped CSS for Login Box */
+    .container .login-box {
+        width: 100%;
+        max-width: 360px; /* Giới hạn chiều rộng tối đa */
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 20px 30px;
+        border-radius: 12px;
+        margin: 0 auto; /* Căn giữa khung */
+        position: relative;
+        z-index: 2;
+    }
+
+        .container .login-box h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container .login-box h4 {
+            font-size: 16px;
+            color: #555;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container .login-box input[type="text"],
+        .container .login-box input[type="password"] {
+            display: block;
+            margin: 10px auto;
+            width: 90%; /* Chiều rộng input */
+            text-align: center;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .container .login-box input[type="submit"] {
+            display: block;
+            margin: 20px auto 10px;
+            width: 90%; /* Đồng bộ width */
+            background-color: #4e54c8;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+            .container .login-box input[type="submit"]:hover {
+                background-color: #ff6ec7;
+                transform: scale(1.05);
+                cursor: pointer;
+            }
+
+        .container .login-box .text-decoration-none {
+            color: #4e54c8;
+            font-weight: bold;
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+        }
+
+            .container .login-box .text-decoration-none:hover {
+                text-decoration: underline;
+            }
+
+        .container .login-box .form-check {
+            text-align: center; /* Căn giữa checkbox */
+        }
+</style>
+
+<div class="aurora-bg"></div> <!-- Aurora background -->
+<div class="container" style="margin-top:160px">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="login-box text-center">
+                <h2>Đăng nhập</h2>
+                <section id="loginForm">
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <h4>Sử dụng tài khoản để đăng nhập</h4>
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.UserName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Tên người dùng" })
+                            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Mật khẩu" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-check">
+                            @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
+                            @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
+                        </div>
+
+                        <input type="submit" value="Đăng nhập" />
+
+                        <a href="Register" class="text-decoration-none">Đăng ký</a>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
