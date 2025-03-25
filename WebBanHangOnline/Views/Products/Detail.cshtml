@@ -1,8 +1,8 @@
 ﻿@model WebBanHangOnline.Models.EF.Product
 @{
-    ViewBag.Title = Model.SeoTitle;
-    ViewBag.SeoDescription = Model.SeoDescription ?? Model.Title;
-    ViewBag.SeoKeyWord = Model.SeoKeywords ?? Model.Title;
+    ViewBag.Title =ViewBag.Title;
+    ViewBag.SeoDescription =  Model.Title;
+    ViewBag.SeoKeyWord =  Model.Title;
 }
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/single_styles.css">
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/single_responsive.css">
@@ -92,7 +92,7 @@
                             <span class="plus"><i class="fa fa-plus" aria-hidden="true"></i></span>
                         </div>
                         <div class="red_button add_to_cart_button"><a href="#" class="btnAddToCart" data-id="@Model.Id">Thêm giỏ hàng</a></div>
-                        <div class="product_favorite d-flex flex-column align-items-center justify-content-center"></div>
+                        @*<div class="product_favorite d-flex flex-column align-items-center justify-content-center"></div>*@
                     </div>
                 </div>
             </div>
@@ -107,9 +107,9 @@
                 <div class="col">
                     <div class="tabs_container">
                         <ul class="tabs d-flex flex-sm-row flex-column align-items-left align-items-md-center justify-content-center">
-                            <li class="tab active" data-active-tab="tab_1"><span>Description</span></li>
+                            <li class="tab active" data-active-tab="tab_1"><span>Mô tả </span></li>
                             @*<li class="tab" data-active-tab="tab_2"><span>Additional Information</span></li>*@
-                            <li class="tab" data-active-tab="tab_3"><span>Reviews (@ViewBag.CountReview)</span></li>
+                            <li class="tab" data-active-tab="tab_3"><span>Đánh giá</span></li>
                         </ul>
                     </div>
                 </div>

@@ -1,11 +1,10 @@
 ﻿@model WebBanHangOnline.Models.EF.ReviewProduct
 
-
 <div class="add_review">
     @using (Ajax.BeginForm("PostReview", "Review", new AjaxOptions
     {
         HttpMethod = "POST",
-        UpdateTargetId = "load_review", // ID của vùng hiển thị review
+        UpdateTargetId = "load_review",
         OnSuccess = "OnSuccessRE",
         OnFailure = "OnFailureRE",
         OnBegin = "OnBeginRE"
@@ -24,34 +23,19 @@
                     // Reset form
                     $("#review_form")[0].reset();
 
-                    // Tạo HTML cho review mới
-                    var newReviewHtml = `
-                                <div class="user_review_container d-flex flex-column flex-sm-row">
-                                    <div class="user">
-                                        <div class="user_pic"></div>
-                                        <div class="user_rating">
-                                            <ul class="star_rating">` + generateStars(res.Review.Rate) + `</ul>
-                                        </div>
-                                    </div>
-                                    <div class="review">
-                                        <div class="review_date">` + res.Review.CreatedDate + `</div>
-                                        <div class="user_name">` + res.Review.FullName + `</div>
-                                        <p>` + res.Review.Content + `</p>
-                                    </div>
-                                </div>`;
-
-                    // Thêm review mới vào đầu danh sách
-                    $('#load_review').prepend(newReviewHtml);
-
-                    // Cập nhật số lượng review
-                    var currentCount = parseInt($('.reviews_title h4').text().match(/\d+/)[0]);
-                    $('.reviews_title h4').text('Reviews (' + (currentCount + 1) + ')');
+                    // Hiển thị thông báo chờ duyệt, kiểm tra res.Message để tránh undefined
+                    var message = res.Message || "Đánh giá của bạn đã được gửi và đang chờ duyệt.";
+                    $('#load_send').html('<h2 style="color: green;">' + message + '</h2>');
+                } else {
+                    // Hiển thị thông báo lỗi, kiểm tra res.Message để tránh undefined
+                    var errorMessage = res.Message || 'Lỗi khi gửi!';
+                    $('#load_send').html('<h2 style="color: red;">' + errorMessage + '</h2>');
                 }
             }
 
             function OnFailureRE() {
                 $('#review_submit').removeAttr("disabled");
-                $('#load_send').html('<h2>Lỗi khi gửi!</h2>');
+                $('#load_send').html('<h2 style="color: red;">Lỗi khi gửi!</h2>');
             }
 
             // Hàm tạo sao dựa trên rate
@@ -91,33 +75,6 @@
         <div class="text-center">
             <button id="review_submit" type="submit" class="red_button review_submit_btn trans_300" value="Submit">Gửi</button>
         </div>
+        <div id="load_send"></div>
     }
 </div>
-<script>
-    function OnSuccessRE(res) {
-        $('#review_submit').removeAttr("disabled");
-        $('#load_send').html('');
-        if (res.Success) {
-            $("#review_form")[0].reset();
-
-            var newReviewHtml = `
-                <div class="user_review_container d-flex flex-column flex-sm-row">
-                    <div class="user">
-                        <div class="user_pic" style="background-image: url('` + res.Review.Avatar + `');"></div>
-                        <div class="user_rating">
-                            <ul class="star_rating">` + generateStars(res.Review.Rate) + `</ul>
-                        </div>
-                    </div>
-                    <div class="review">
-                        <div class="review_date">` + res.Review.CreatedDate + `</div>
-                        <div class="user_name">` + res.Review.FullName + `</div>
-                        <p>` + res.Review.Content + `</p>
-                    </div>
-                </div>`;
-
-            $('#load_review').prepend(newReviewHtml);
-            var currentCount = parseInt($('.reviews_title h4').text().match(/\d+/)[0]);
-            $('.reviews_title h4').text('Reviews (' + (currentCount + 1) + ')');
-        }
-    }
-</script>

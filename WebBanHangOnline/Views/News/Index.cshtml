@@ -7,9 +7,11 @@
 
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
 
+
+
 <style>
     .news-section {
-        margin-top: 120px;
+        margin-top: 140px;
         padding: 0 15px;
     }
 
@@ -186,12 +188,29 @@
             }
         </div>
 
-        <div class="row pagination-container">
-            <div class="col-6"></div>
-            <div class="col-6" style="text-align:right;">
-                @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+        <div class="pagination-container d-flex justify-content-center align-items-center flex-column mt-3">
+            <nav>
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
+                    new PagedListRenderOptions
+                    {
+                        MaximumPageNumbersToDisplay = 5,
+                        DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+                        LinkToPreviousPageFormat = "<span class='page-link'>&laquo;</span>",
+                        LinkToNextPageFormat = "<span class='page-link'>&raquo;</span>",
+                        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                        DisplayLinkToLastPage = PagedListDisplayMode.Always
+                    })
+            </nav>
+            <div class="pagination-info text-center mt-3 p-3 border rounded shadow-sm bg-light">
+                <h5 class="fw-bold text-primary">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</h5>
+                <p class="text-secondary mb-0">Tổng cộng <span class="fw-bold">@Model.TotalItemCount</span> bài viết
+           </p>
             </div>
         </div>
+
+
     }
     else
     {

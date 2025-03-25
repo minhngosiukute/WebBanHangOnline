@@ -1,0 +1,213 @@
+﻿@model WebBanHangOnline.Models.EF.ImportOrder
+
+@{
+    ViewBag.Title = "Tạo phiếu nhập hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section naviheader{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/category" class="nav-link">Danh mục</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Thêm mới</a>
+        </li>
+    </ul>
+}
+
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Thêm mới phiếu nhập </h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Danh mục</a></li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card aurora-background">
+        <div class="card-header">
+            <h3 class="card-title"><strong>Thông tin phiếu nhập</strong></h3>
+        </div>
+
+        <div class="card-body">
+            <div class="panel-body">
+                @using (Html.BeginForm("Create", "ImportOrder", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ImportCode, "Mã phiếu nhập", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.ImportCode, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.ImportCode, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SupplierId, "Nhà cung cấp", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownListFor(model => model.SupplierId, (SelectList)ViewBag.Suppliers, "Chọn nhà cung cấp", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.SupplierId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Thông tin nhập hàng</label>
+                        <div class="col-md-10">
+                            <table class="table table-bordered text-center" id="productTable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>Giá nhập</th>
+                                        <th>Số lượng</th>
+                                        <th>Thành tiền</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="product-row">
+                                        <td>
+                                            <select name="ProductIds" class="form-control product-select">
+                                                <option value="">Chọn sản phẩm</option>
+                                                @foreach (var product in ViewBag.Products)
+                                                {
+                                                    <option value="@product.Id" data-import-price="@product.OriginalPrice">@product.Title</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="ImportPrices" class="form-control import-price" min="0" step="0.01" placeholder="Nhập giá mới (nếu có)" />
+                                            <span class="default-price-label" style="display: none;">0</span>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="Quantities" class="form-control quantity" min="1" value="1" />
+                                        </td>
+                                        <td>
+                                            <span class="total-price" style="color: red;">0</span>
+                                        </td>
+
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-outline-success btn-sm" id="addProduct">
+                                <i class="fa fa-plus"></i>Thêm sản phẩm
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fa fa-file-alt"></i> Tạo phiếu nhập
+                            </button>
+                            <a href="@Url.Action("Index")" class="btn btn-outline-danger">
+                                <i class="fa fa-arrow-left"></i> Quay lại
+                            </a>
+                        
+
+                    </div>
+                }
+            </div>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+
+        </div>
+        <!-- /.card-footer-->
+    </div>
+    <!-- /.card -->
+
+</section>
+
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Tính thành tiền
+            function calculateTotalPrice(row) {
+                var quantity = parseInt(row.find(".quantity").val()) || 0;
+                var importPriceInput = row.find(".import-price").val();
+                var importPrice;
+
+                // Nếu người dùng nhập giá mới, sử dụng giá nhập vào, nếu không thì dùng giá mặc định từ sản phẩm
+                if (importPriceInput && parseFloat(importPriceInput) > 0) {
+                    importPrice = parseFloat(importPriceInput);
+                } else {
+                    importPrice = parseFloat(row.find(".default-price-label").text()) || 0;
+                    row.find(".import-price").val(importPrice); // Điền giá mặc định vào ô nhập
+                }
+
+                var totalPrice = quantity * importPrice;
+                row.find(".total-price").text(totalPrice.toLocaleString() + "đ");
+            }
+
+            // Thêm dòng sản phẩm mới
+            $("#addProduct").click(function () {
+                var row = $(".product-row:first").clone();
+                row.find("select").val("");
+                row.find(".import-price").val("");
+                row.find(".default-price-label").text("0").hide();
+                row.find("input.quantity").val("1");
+                row.find(".total-price").text("0");
+                $("#productTable tbody").append(row);
+            });
+
+            // Xóa dòng sản phẩm
+            $(document).on("click", ".remove-row", function () {
+                if ($("#productTable tbody tr").length > 1) {
+                    $(this).closest("tr").remove();
+                } else {
+                    if (typeof toastr !== "undefined") {
+                        toastr.warning("Phải có ít nhất một sản phẩm!");
+                    } else {
+                        alert("Phải có ít nhất một sản phẩm!");
+                    }
+                }
+            });
+
+            // Hiển thị giá mặc định khi chọn sản phẩm
+            $(document).on("change", ".product-select", function () {
+                var importPrice = $(this).find("option:selected").data("import-price") || 0;
+                var row = $(this).closest("tr");
+                row.find(".default-price-label").text(importPrice.toLocaleString()).hide();
+                row.find(".import-price").val(""); // Xóa giá nhập tay để người dùng có thể nhập mới
+                calculateTotalPrice(row);
+            });
+
+            // Tính lại thành tiền khi thay đổi số lượng hoặc giá nhập
+            $(document).on("input", ".quantity, .import-price", function () {
+                var row = $(this).closest("tr");
+                calculateTotalPrice(row);
+            });
+        });
+    </script>
+}

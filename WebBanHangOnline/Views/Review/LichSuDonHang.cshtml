@@ -1,13 +1,19 @@
 ﻿@model IEnumerable<WebBanHangOnline.Models.EF.Order>
-@if (Model != null)
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/contact_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/contact_responsive.css">
+
+@if (Model != null && Model.Any())
 {
     var i = 1;
-    <h2>Lich Su Mua Hang</h2>
-    <table class="table table-bordered">
-        <thead>
+    <h2 class="text-center">Lịch Sử Mua Hàng</h2>
+    <table class="table table-bordered text-center">
+        <thead class="thead-light">
             <tr>
-                <td>STT</td>
-                <td>Mã DH</td>
+                <th>STT</th>
+                <th>Mã ĐH</th>
+                <th>Ngày Đặt</th>
+                <th>Tổng Tiền</th>
+                <th>Trạng Thái</th>
             </tr>
         </thead>
         <tbody>
@@ -15,10 +21,38 @@
             {
                 <tr>
                     <td>@i</td>
-                    <td>@item.Code</td>
+                    <td>
+                        <a href="@Url.Action("View", "Review", new { id = item.Id })">@item.Code</a>
+                    </td>
+                    <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.TotalAmount.ToString("N0") VNĐ</td>
+                    <td>
+                        @switch (item.Status)
+                        {
+                            case 1:
+                                <span class="text-warning">Chờ xử lý</span>
+                                break;
+                            case 2:
+                                <span class="text-info">Đang giao hàng</span>
+                                break;
+                            case 3:
+                                <span class="text-success">Hoàn thành</span>
+                                break;
+                            case 4:
+                                <span class="text-danger">Đã hủy</span>
+                                break;
+                            default:
+                                <span class="text-muted">Không xác định</span>
+                                break;
+                        }
+                    </td>
                 </tr>
                 i++;
             }
         </tbody>
     </table>
+}
+else
+{
+    <p>Bạn chưa có đơn hàng nào.</p>
 }
