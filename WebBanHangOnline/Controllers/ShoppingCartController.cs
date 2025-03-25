@@ -276,15 +276,34 @@ namespace WebBanHangOnline.Controllers
         public ActionResult AddToCart(int id, int quantity)
         {
             var code = new { Success = false, msg = "", code = -1, Count = 0 };
-            var db = new ApplicationDbContext();
             var checkProduct = db.Products.FirstOrDefault(x => x.Id == id);
             if (checkProduct != null)
             {
+                // Kiểm tra số lượng trong kho
+                if (checkProduct.Quantity < quantity)
+                {
+                    code = new { Success = false, msg = $"Số lượng trong kho không đủ! Chỉ còn {checkProduct.Quantity} sản phẩm.", code = -2, Count = 0 };
+                    return Json(code);
+                }
+
                 ShoppingCart cart = (ShoppingCart)Session["Cart"];
                 if (cart == null)
                 {
                     cart = new ShoppingCart();
                 }
+
+                // Kiểm tra số lượng hiện tại trong giỏ hàng
+                var existingItem = cart.Items.FirstOrDefault(x => x.ProductId == id);
+                if (existingItem != null)
+                {
+                    int totalQuantity = existingItem.Quantity + quantity;
+                    if (totalQuantity > checkProduct.Quantity)
+                    {
+                        code = new { Success = false, msg = $"Số lượng trong kho không đủ! Chỉ còn {checkProduct.Quantity} sản phẩm.", code = -2, Count = cart.Items.Count };
+                        return Json(code);
+                    }
+                }
+
                 ShoppingCartItem item = new ShoppingCartItem
                 {
                     ProductId = checkProduct.Id,
@@ -305,7 +324,7 @@ namespace WebBanHangOnline.Controllers
                 item.TotalPrice = item.Quantity * item.Price;
                 cart.AddToCart(item, quantity);
                 Session["Cart"] = cart;
-                code = new { Success = true, msg = "Thêm sản phẩm vào giở hàng thành công!", code = 1, Count = cart.Items.Count };
+                code = new { Success = true, msg = "Thêm sản phẩm vào giỏ hàng thành công!", code = 1, Count = cart.Items.Count };
             }
             return Json(code);
         }
@@ -318,10 +337,21 @@ namespace WebBanHangOnline.Controllers
             ShoppingCart cart = (ShoppingCart)Session["Cart"];
             if (cart != null)
             {
-                cart.UpdateQuantity(id, quantity);
-                return Json(new { Success = true });
+                var checkProduct = db.Products.FirstOrDefault(x => x.Id == id);
+                if (checkProduct != null)
+                {
+                    // Kiểm tra số lượng trong kho
+                    if (quantity > checkProduct.Quantity)
+                    {
+                        return Json(new { Success = false, msg = $"Số lượng trong kho không đủ! Chỉ còn {checkProduct.Quantity} sản phẩm." });
+                    }
+
+                    cart.UpdateQuantity(id, quantity);
+                    return Json(new { Success = true });
+                }
+                return Json(new { Success = false, msg = "Sản phẩm không tồn tại." });
             }
-            return Json(new { Success = false });
+            return Json(new { Success = false, msg = "Giỏ hàng trống." });
         }
 
         [AllowAnonymous]

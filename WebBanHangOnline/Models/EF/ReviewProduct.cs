@@ -23,7 +23,7 @@ namespace WebBanHangOnline.Models.EF
         public int Rate { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Avatar { get; set; }
-
+        public bool IsActive { get; set; } // Thêm trường này để quản lý trạng thái hiển thị
         public virtual Product Product { get; set; }
     }
 }

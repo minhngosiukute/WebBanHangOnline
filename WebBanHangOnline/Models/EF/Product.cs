@@ -17,6 +17,7 @@ namespace WebBanHangOnline.Models.EF
             this.OrderDetails = new HashSet<OrderDetail>();
             this.Reviews = new HashSet<ReviewProduct>();
             this.Wishlists = new HashSet<Wishlist>();
+            this.ImportOrderDetails = new HashSet<ImportOrderDetail>(); // Thêm dòng này
         }
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
@@ -43,23 +44,24 @@ namespace WebBanHangOnline.Models.EF
         public int Quantity { get; set; }
         public int ViewCount { get; set; }
         public bool IsHome { get; set; }
-        public bool IsSale { get; set; }
-        public bool IsFeature { get; set; }
-        public bool IsHot { get; set; }
+        //public bool IsSale { get; set; }
+        //public bool IsFeature { get; set; }
+        //public bool IsHot { get; set; }
         public bool IsActive { get; set; }
         public int ProductCategoryId { get; set; }
 
-        [StringLength(250)]
-        public string SeoTitle { get; set; }
-        [StringLength(500)]
-        public string SeoDescription { get; set; }
-        [StringLength(250)]
-        public string SeoKeywords { get; set; }
+        //[StringLength(250)]
+        //public string SeoTitle { get; set; }
+        //[StringLength(500)]
+        //public string SeoDescription { get; set; }
+        //[StringLength(250)]
+        //public string SeoKeywords { get; set; }
 
         public virtual ProductCategory ProductCategory { get; set; }
         public virtual ICollection<ProductImage> ProductImage { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
         public virtual ICollection<ReviewProduct> Reviews { get; set; }
         public virtual ICollection<Wishlist> Wishlists { get; set; }
+        public virtual ICollection<ImportOrderDetail> ImportOrderDetails { get; set; }
     }
 }

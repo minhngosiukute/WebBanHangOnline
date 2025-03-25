@@ -42,10 +42,10 @@
         }
         <tr>
             <th colspan="6" class="text-right">Tổng: </th>
-            <th class="text-center">@Common.FormatNumber(tongtien, 0)</th>
+            <th class="text-center">@Common.FormatNumber(tongtien, 0)đ</th>
             <th></th>
         </tr>
-    
+
     }
     else
     {
@@ -54,3 +54,7 @@
         </tr>
     }
 </table>
+@section scripts{
+    <script src="~/Content/assets/js/categories_custom.js"></script>
+    
+}

@@ -2,67 +2,372 @@
 @using PagedList.Mvc;
 @using PagedList;
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Sản phẩm yêu thích";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
-<!-- Slider -->
+<!-- Custom Styles -->
 <style>
-    .news_section_container {
-        margin-top: 180px;
+    .wishlist-container {
+        margin-top: 100px;
+        padding: 30px 0;
     }
 
-    .row-item-new {
+    .wishlist-title {
+        font-size: 28px;
+        color: #333;
+        border-bottom: 2px solid #fe4c50;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    .wishlist-item {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+        padding: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .wishlist-item:hover {
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+    }
+
+    .img-container {
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .img-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .product-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 15px 0 10px;
+        height: 50px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .product-title a {
+        color: #333;
+        text-decoration: none;
+    }
+
+    .product-title a:hover {
+        color: #fe4c50;
+    }
+
+    .product-description {
+        color: #777;
+        font-size: 14px;
+        margin-bottom: 15px;
+        height: 60px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    .btn-action {
+        margin-top: 10px;
+    }
+
+    .btn-remove {
+        background-color: #fe4c50;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-remove:hover {
+        background-color: #e04347;
+    }
+
+    .btn-view {
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        margin-right: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-view:hover {
+        background-color: #3367d6;
+    }
+
+    .empty-wishlist {
+        text-align: center;
+        padding: 50px 0;
+    }
+
+    .empty-wishlist i {
+        font-size: 60px;
+        color: #ddd;
         margin-bottom: 20px;
     }
 
-    .title-news {
-        font-size: 24px;
-        border-bottom: 1px solid;
-        padding: 15px 0;
-        margin-bottom: 25px;
+    .empty-wishlist h3 {
+        color: #777;
+        margin-bottom: 20px;
     }
 
-    .img-box img {
-        max-width: 100%;
-        max-height: 100%;
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+
+    /* Bootstrap pagination custom styles */
+    .pagination > li > a,
+    .pagination > li > span {
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+    .pagination > .active > a,
+    .pagination > .active > span {
+        background-color: #fe4c50;
+        border-color: #fe4c50;
+    }
+
+    .pagination > li > a:hover,
+    .pagination > li > span:hover {
+        color: #fe4c50;
+    }
+
+    .price {
+        font-size: 18px;
+        color: #fe4c50;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    /* Loading animation for ajax requests */
+    .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        display: none;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #fe4c50;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .toast-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background: #333;
+        color: #fff;
+        border-radius: 4px;
+        z-index: 10000;
+        display: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .toast-success {
+        background: #4CAF50;
+    }
+
+    .toast-error {
+        background: #F44336;
     }
 </style>
-<div class="container news_section_container">
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="title-news"> Sản phẩm yêu thích</h1>
-        </div>
-    </div>
-    @if (Model != null && Model.Any())
-    {
-        foreach (var item in Model)
+
+<div class="wishlist-container">
+    <div class="container">
+        <h1 class="wishlist-title">
+            <i class="fa fa-heart" style="color: #fe4c50;"></i> Sản phẩm yêu thích
+        </h1>
+
+        @if (Model != null && Model.Any())
         {
-            <div class="row row-item-new">
-                <div class="col-md-3">
-                    <div class="img-box">
-                        <a href="" title="@item.Product.Title"><img src="@item.Product.Image" alt="@item.Product.Title" /></a>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="content-box">
-                       
-                        <h3><a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)" title="@item.Product.Title">@item.Product.Title</a></h3>
-                        <div class="description-box">
-                            @item.Product.Description
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-4 col-sm-6 wishlist-item-container" id="item-@item.Id">
+                        <div class="wishlist-item text-center">
+                            <div class="img-container">
+                                @if (item.Product.PriceSale > 0)
+                                {
+                                    <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center"><span>sale</span></div>
+                                }
+                                <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)" title="@item.Product.Title">
+                                    <img src="@item.Product.Image" alt="@item.Product.Title" />
+                                </a>
+                            </div>
+                           
+                            <div class="product-title">
+                                <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)" title="@item.Product.Title">@item.Product.Title</a>
+                            </div>
+                            @if (item.Product.Price > 0)
+                            {
+                                <div class="price">
+                                    @(item.Product.PriceSale > 0 ? string.Format("{0:N0}", item.Product.PriceSale) : string.Format("{0:N0}", item.Product.Price)) đ
+                                    @if (item.Product.PriceSale > 0)
+                                    {
+                                        <span style="text-decoration: line-through; color: #999; font-size: 14px; margin-left: 10px;">
+                                            @string.Format("{0:N0}", item.Product.Price)đ 
+                                        </span>
+
+                                    }
+                                </div>
+                            }
+                            <div class="product-description">
+                                @Html.Raw(item.Product.Description)
+                            </div>
+                            <div class="btn-action text-center">
+                                <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)" class="btn-view">
+                                    <i class="fa fa-eye"></i> Xem
+                                </a>
+                                <button class="btn-remove btn-delete-wishlist" data-id="@item.Id" data-productid="@item.ProductId">
+                                    <i class="fa fa-trash"></i> Xóa
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-1">
-                    <a href="#" data-id="@item.Id" class="btn btn-danger">Xóa</a>
-                </div>
+                }
+            </div>
+
+            <div class="pagination-container">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
+                    new PagedListRenderOptions
+                        {
+                            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                        LinkToFirstPageFormat = "««",
+                        LinkToPreviousPageFormat = "«",
+                        LinkToNextPageFormat = "»",
+                        LinkToLastPageFormat = "»»",
+                        MaximumPageNumbersToDisplay = 5
+                    })
             </div>
         }
-        <div class="row">
-            <div class="col-6"></div>
-            <div class="col-6" style="text-align:right;">
-                @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+        else
+        {
+            <div class="empty-wishlist">
+                <i class="fa fa-heart-o"></i>
+                <h3>Bạn chưa có sản phẩm yêu thích nào</h3>
+                <a href="/san-pham" class="btn-view">
+                    <i class="fa fa-shopping-bag"></i> Khám phá sản phẩm
+                </a>
             </div>
-        </div>
-    }
-
+        }
+    </div>
 </div>
+
+<!-- Loading spinner -->
+<div class="loading">
+    <div class="spinner"></div>
+</div>
+
+<!-- Toast message for notifications -->
+<div class="toast-message" id="toast-message"></div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Delete wishlist item
+            $('.btn-delete-wishlist').click(function (e) {
+                e.preventDefault();
+
+                var productId = $(this).data('productid');
+                var itemId = $(this).data('id');
+                var container = $('#item-' + itemId);
+
+                if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi danh sách yêu thích?')) {
+                    $('.loading').show();
+
+                    $.ajax({
+                        url: '/Wishlist/PostDeleteWishlist',
+                        type: 'POST',
+                        data: { ProductId: productId },
+                        success: function (rs) {
+                            $('.loading').hide();
+
+                            if (rs.Success) {
+                                // Remove item with animation
+                                container.fadeOut(300, function () {
+                                    $(this).remove();
+
+                                    // Check if wishlist is empty after deletion
+                                    if ($('.wishlist-item-container').length === 0) {
+                                        location.reload(); // Reload to show empty state
+                                    }
+                                });
+
+                                // Show success message
+                                //showToast(rs.Message, 'success');
+                            } else {
+                                showToast(rs.Message, 'error');
+                            }
+                        },
+                        error: function () {
+                            $('.loading').hide();
+                            showToast('Đã xảy ra lỗi. Vui lòng thử lại sau!', 'error');
+                        }
+                    });
+                }
+            });
+
+            // Function to show toast messages
+            function showToast(message, type) {
+                var toast = $('#toast-message');
+                toast.text(message);
+
+                if (type === 'success') {
+                    toast.removeClass('toast-error').addClass('toast-success');
+                } else {
+                    toast.removeClass('toast-success').addClass('toast-error');
+                }
+
+                toast.fadeIn(300);
+
+                // Auto hide after 3 seconds
+                setTimeout(function () {
+                    toast.fadeOut(300);
+                }, 3000);
+            }
+        });
+    </script>
+}

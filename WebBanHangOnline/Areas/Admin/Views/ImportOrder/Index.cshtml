@@ -1,0 +1,223 @@
+﻿@model IEnumerable<WebBanHangOnline.Models.EF.ImportOrder>
+
+@{
+    ViewBag.Title = "Danh sách phiếu nhập hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section naviheader {
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/category" class="nav-link">Danh mục</a>
+        </li>
+    </ul>
+}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Danh sách phiếu nhập hàng</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Danh mục</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Default box -->
+    <div class="card aurora-background">
+        <div class="card-header">
+            <h3 class="card-title text-center">Danh sách phiếu nhập hàng</h3>
+            <div class="card-tools">
+                <h3>
+                    <a href="@Url.Action("Create")" class="btn btn-primary btn-sm">
+                        <i class="fa fa-plus"></i> Tạo phiếu nhập hàng
+                    </a>
+                </h3>
+            </div>
+
+
+
+        </div>
+        <div class="card-body">
+            
+                <table class="table table-bordered table-hover text-center table-striped" id="importOrderTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Mã phiếu nhập</th>
+                            <th class="text-center">Nhà cung cấp</th>
+                            <th class="text-center">Ngày nhập hàng</th>
+                            <th class="text-center">Tổng tiền</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr data-id="@item.Id">
+                                    <td>@item.ImportCode</td>
+                                    <td>@item.Supplier.SupplierName</td>
+                                    <td>@item.ImportDate.ToString("dd/MM/yyyy ")</td>
+                                    <td>@item.TotalAmount.ToString("N0")đ</td>
+                                    <td>
+                                        <span class="badge @(item.IsCompleted ? "badge-success" : "badge-warning")">
+                                            @(item.IsCompleted ? "Hoàn thành" : "Chưa hoàn thành")
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-eye"></i> Xem
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-primary updateStatus ml-2" data-id="@item.Id" data-status="@Json.Encode(item.IsCompleted)">
+                                            <i class="fas fa-sync-alt"></i> Cập nhật
+                                        </button>
+                                        <button type="button" data-id="@item.Id" class="btn btn-sm btn-outline-danger deleteItem ml-2">
+                                            <i class="fas fa-trash-alt"></i> Xóa
+                                        </button>
+                                    </td>
+
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Không có phiếu nhập hàng nào.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer text-center">
+            <!-- Thêm phân trang hoặc thông báo nếu cần -->
+        </div>
+        <!-- /.card-footer-->
+    </div>
+    <!-- /.card -->
+</section>
+<!-- /.content -->
+
+
+
+<!-- Modal cập nhật trạng thái -->
+<div id="updateStatusModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="max-width: 450px; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); margin: 0;">
+        <div class="modal-content" style="border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="border-bottom: 1px solid #eee; padding: 15px 20px;">
+                <h4 class="modal-title" style="font-size: 20px; font-weight: 600; color: #333; margin: 0;">
+                    Cập nhật trạng thái
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" style="font-size: 24px; color: #666; opacity: 0.7;">
+                    ×
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <input type="hidden" id="orderId" />
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="orderStatus" style="font-weight: 500; color: #444; margin-bottom: 8px; display: block;">
+                        Trạng thái
+                    </label>
+                    <select id="orderStatus" class="form-control" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd; font-size: 14px;">
+                        <option value="false">Chưa hoàn thành</option>
+                        <option value="true">Hoàn thành</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #eee; padding: 15px 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="padding: 8px 20px; border-radius: 5px; border: 1px solid #ddd; background: #f5f5f5; color: #666;">
+                    Đóng
+                </button>
+                <button type="button" class="btn btn-success" id="saveStatus" style="padding: 8px 20px; border-radius: 5px; border: none; background: #28a745; color: white; font-weight: 500;">
+                    Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Gán sự kiện click cho nút "Cập nhật"
+        $(document).on("click", ".updateStatus", function () {
+            var orderId = $(this).data("id");
+            var currentStatus = $(this).data("status");
+
+            $("#orderId").val(orderId);
+            $("#orderStatus").val(currentStatus.toString());
+            $("#updateStatusModal").modal("show");
+        });
+
+        // Gửi Ajax khi nhấn "Lưu"
+        $("#saveStatus").click(function () {
+            var orderId = $("#orderId").val();
+            var newStatus = JSON.parse($("#orderStatus").val()); // Chuyển chuỗi thành boolean
+
+            $.ajax({
+                url: "/Admin/ImportOrder/UpdateStatus",
+                type: "POST",
+                data: { id: orderId, isCompleted: newStatus },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert("Lỗi: " + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi Ajax:", error);
+                    alert("Có lỗi xảy ra khi cập nhật trạng thái.");
+                }
+            });
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Giữ nguyên code cập nhật trạng thái ở trên
+
+        // Thêm xử lý cho nút xóa
+        $(document).on("click", ".deleteItem", function () {
+            if (confirm("Bạn có chắc chắn muốn xóa phiếu nhập hàng này không?")) {
+                var id = $(this).data("id");
+                $.ajax({
+                    url: "/Admin/ImportOrder/DeleteConfirmed",
+                    type: "POST",
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.success) {
+                           
+                            location.reload();
+                        } else {
+                            alert("Lỗi: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra khi xóa phiếu nhập hàng!");
+                    }
+                });
+            }
+        });
+    });
+</script>

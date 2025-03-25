@@ -1,0 +1,116 @@
+﻿@model WebBanHangOnline.Models.EF.Order
+
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Thêm CSS để đảm bảo giao diện hiển thị đúng -->
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/contact_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/contact_responsive.css">
+
+<style>
+    /* Đẩy nội dung xuống dưới để tránh bị đè bởi header */
+    .order-details-container {
+        margin-top: 150px; /* Điều chỉnh giá trị này tùy theo chiều cao của header */
+        margin-bottom: 50px;
+    }
+
+    /* Đảm bảo chữ hiển thị rõ ràng */
+    .panel-heading, .panel-body {
+        color: #333; /* Màu chữ tối để dễ đọc */
+        font-size: 16px;
+    }
+
+        .panel-heading h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .panel-body p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .panel-body h3 {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+    /* Định dạng bảng danh sách sản phẩm */
+    .table th, .table td {
+        vertical-align: middle;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .btn-default {
+        margin-top: 20px;
+        background-color: #f8f9fa;
+        border-color: #ddd;
+        color: #333;
+    }
+
+        .btn-default:hover {
+            background-color: #e9ecef;
+        }
+</style>
+
+<div class="container order-details-container">
+    
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Thông tin đơn hàng</h3>
+                </div>
+                <div class="panel-body text-center">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Mã đơn hàng:</strong> @Model.Code</p>
+                            <p><strong>Ngày đặt:</strong> @Model.CreatedDate.ToString("dd/MM/yyyy")</p>
+
+                            <p>
+                                <strong>Trạng thái:</strong>
+                                @switch (Model.Status)
+                                {
+                                    case 1:
+                                        <span class="text-warning">Chờ xử lý</span>
+                                        break;
+                                    case 2:
+                                        <span class="text-info">Đang giao hàng</span>
+                                        break;
+                                    case 3:
+                                        <span class="text-success">Hoàn thành</span>
+                                        break;
+                                    case 4:
+                                        <span class="text-danger">Đã hủy</span>
+                                        break;
+                                    default:
+                                        <span class="text-muted">Không xác định</span>
+                                        break;
+                                }
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Khách hàng:</strong> @Model.CustomerName</p>
+                            <p><strong>Số điện thoại:</strong> @Model.Phone</p>
+                            <p><strong>Địa chỉ:</strong> @Model.Address</p>
+                        </div>
+                    </div>
+
+                    <h3>Danh sách sản phẩm</h3>
+                    @Html.Action("Partial_SanPham", "Review", new { id = Model.Id })
+                </div>
+                <h4 class="text-right"><strong>Tổng tiền:</strong> @Model.TotalAmount.ToString("N0")đ</h4>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <a href="/account/profile" class="btn btn-danger">Quay lại</a>
+    </div>
+</div>

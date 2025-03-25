@@ -73,10 +73,29 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Trạng thái</label>
-                        <p class="form-control">@(Model.TypePayment == 1 ? "Chua thanh toán" : "Đã thanh toán")</p>
+                        
+                        <td class=" form-control text-center">
+                            @if (Model.Status == 1)
+                            {
+                                <span class="badge badge-warning">Chưa thanh toán</span>
+                            }
+                            @if (Model.Status == 2)
+                            {
+                                <span class="badge badge-info">Đã thanh toán</span>
+                            }
+                            @if (Model.Status == 3)
+                            {
+                                <span class="badge badge-success">Hoàn thành</span>
+                            }
+                            @if (Model.Status == 4)
+                            {
+                                <span class="badge badge-danger">Hủy</span>
+                            }
+                        </td>
                     </div>
                 </div>
                 <div class="col-md-6">
+
 
                 </div>
             </div>
@@ -91,6 +110,10 @@
         </div>
         <!-- /.card-body -->
         <div class="card-footer">
+            <div class="form-group">
+                <a href="/admin/order" class="btn btn-danger">Quay lại</a>
+                
+            </div>
 
         </div>
         <!-- /.card-footer-->
