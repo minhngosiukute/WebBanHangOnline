@@ -237,25 +237,27 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteAccount(string user, string id)
         {
-            var code = new { Success = false };//mặc định không xóa thành công.
-            var item = UserManager.FindByName(user);
-            if (item != null)
+            var result = new { Success = false, Message = "Không thể xóa tài khoản đang đăng nhập." };
+            var userToDelete = UserManager.FindByName(user);
+
+            // Kiểm tra nếu tài khoản muốn xóa là tài khoản đang đăng nhập
+            if (userToDelete == null || userToDelete.Id == User.Identity.GetUserId())
             {
-                var rolesForUser = UserManager.GetRoles(id);
-                if (rolesForUser != null)
-                {
-                    foreach (var role in rolesForUser)
-                    {
-                        //roles.Add(role);
-                        await UserManager.RemoveFromRoleAsync(id, role);
-                    }
-
-                }
-
-                var res = await UserManager.DeleteAsync(item);
-                code = new { Success = res.Succeeded };
+                // Trả về lỗi nếu là tài khoản hiện tại hoặc không tìm thấy tài khoản
+                return Json(result);
             }
-            return Json(code);
+
+            // Lấy tất cả vai trò của tài khoản cần xóa
+            var rolesForUser = UserManager.GetRoles(id).ToList();
+            foreach (var role in rolesForUser)
+            {
+                await UserManager.RemoveFromRoleAsync(id, role);
+            }
+
+            // Thực hiện xóa tài khoản
+            var deleteResult = await UserManager.DeleteAsync(userToDelete);
+            result = new { Success = deleteResult.Succeeded, Message = deleteResult.Succeeded ? "Xóa tài khoản thành công." : "Có lỗi xảy ra khi xóa tài khoản." };
+            return Json(result);
         }
 
         private IAuthenticationManager AuthenticationManager

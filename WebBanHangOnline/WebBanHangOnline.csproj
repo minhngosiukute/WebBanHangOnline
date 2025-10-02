@@ -3587,11 +3587,6 @@
     <Content Include="Uploads\images\244994762_2380031152133544_4984166604951804110_n.jpg" />
     <Content Include="Uploads\images\phong-khach-voi-sofa-ona.jpg" />
     <Content Include="Uploads\_thumbs\Images\244994762_2380031152133544_4984166604951804110_n.jpg" />
-    <Content Include="Views\Home\43\ajax.js" />
-    <Content Include="Views\Home\43\cursor-animation.css" />
-    <Content Include="Views\Home\43\cursor-animation.html" />
-    <Content Include="Views\Home\43\cursor-animation.js" />
-    <Content Include="Views\Home\43\gsap.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

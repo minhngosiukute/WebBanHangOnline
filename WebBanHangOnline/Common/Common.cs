@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 using System.Web;
 
 namespace WebBanHangOnline.Common
@@ -48,26 +50,47 @@ namespace WebBanHangOnline.Common
             }
             return rs;
         }
-        public static string FormatNumber(object value, int SoSauDauPhay = 2)
-        {
-            bool isNumber = IsNumeric(value);
-            decimal GT = 0;
-            if (isNumber)
-            {
-                GT = Convert.ToDecimal(value);
-            }
-            string str = "";
-            string thapPhan = "";
-            for (int i = 0; i < SoSauDauPhay; i++)
-            {
-                thapPhan += "#";
-            }
-            if (thapPhan.Length > 0) thapPhan = "." + thapPhan;
-            string snumformat = string.Format("0:#,##0{0}", thapPhan);
-            str = String.Format("{" + snumformat + "}", GT);
 
-            return str;
+        public static string FormatNumber(object value, int SoSauDauPhay = 2, bool useFixedDecimals = false, string culture = "vi-VN")
+        {
+            if (value == null) return "0";
+
+            // Parse mềm dẻo: nhận mọi object chuyển được sang chuỗi số
+            if (!decimal.TryParse(Convert.ToString(value),
+                                  NumberStyles.Any,
+                                  CultureInfo.InvariantCulture,
+                                  out var number))
+            {
+                return "0";
+            }
+
+            // Tạo pattern: "#,##0.##" (mặc định linh hoạt) hoặc "#,##0.00" (cố định)
+            string decimals = new string(useFixedDecimals ? '0' : '#', Math.Max(0, SoSauDauPhay));
+            string pattern = SoSauDauPhay > 0 ? $"#,##0.{decimals}" : "#,##0";
+
+            return number.ToString(pattern, new CultureInfo(culture));
         }
+        //public static string FormatNumber(object value, int SoSauDauPhay = 2)
+        //{
+        //    bool isNumber = IsNumeric(value);
+        //    decimal GT = 0;
+        //    if (isNumber)
+        //    {
+        //        GT = Convert.ToDecimal(value);
+        //    }
+        //    string str = "";
+        //    string thapPhan = "";
+        //    for (int i = 0; i < SoSauDauPhay; i++)
+        //    {
+        //        thapPhan += "#";
+        //    }
+        //    if (thapPhan.Length > 0) thapPhan = "." + thapPhan;
+        //    string snumformat = string.Format("0:#,##0{0}", thapPhan);
+        //    str = String.Format("{" + snumformat + "}", GT);
+
+        //    return str;
+        //}
+
         private static bool IsNumeric(object value)
         {
             return value is sbyte
@@ -83,51 +106,63 @@ namespace WebBanHangOnline.Common
                        || value is decimal;
         }
 
-
         public static string HtmlRate(int rate)
         {
-            var str = "";
-            if (rate == 1)
+            rate = Math.Max(0, Math.Min(5, rate)); // đảm bảo 0..5
+
+            var sb = new StringBuilder(5 * 55); // tối ưu nhẹ dung lượng dự kiến
+            for (int i = 1; i <= 5; i++)
             {
-                str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>";
+                string icon = i <= rate ? "fa-star" : "fa-star-o";
+                sb.Append("<li><i class='fa ").Append(icon)
+                  .Append("' aria-hidden='true'></i></li>");
             }
-            if (rate == 2)
-            {
-                str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>";
-            }
-            if (rate == 3)
-            {
-                str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>";
-            }
-            if (rate == 4)
-            {
-                str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star-o' aria-hidden='true'></i></li>";
-            }
-            if (rate == 5)
-            {
-                str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>
-                    <li><i class='fa fa-star' aria-hidden='true'></i></li>";
-            }
-            return str;
+            return sb.ToString();
         }
+        //public static string HtmlRate(int rate)
+        //{
+        //    var str = "";
+        //    if (rate == 1)
+        //    {
+        //        str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>";
+        //    }
+        //    if (rate == 2)
+        //    {
+        //        str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>";
+        //    }
+        //    if (rate == 3)
+        //    {
+        //        str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>";
+        //    }
+        //    if (rate == 4)
+        //    {
+        //        str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star-o' aria-hidden='true'></i></li>";
+        //    }
+        //    if (rate == 5)
+        //    {
+        //        str = @"<li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>
+        //            <li><i class='fa fa-star' aria-hidden='true'></i></li>";
+        //    }
+        //    return str;
+        //}
     }
 }

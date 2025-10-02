@@ -21,6 +21,26 @@
         </li>
     </ul>
 }
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: auto; /* Tự động chia theo nội dung */
+    }
+
+        /* Header bảng: có thể co chữ lại khi hẹp */
+        table th {
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: clamp(14px, 0.9vw, 14px);
+            /* co chữ khi cần, nhưng không nhỏ hơn 11px */
+        }
+</style>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 <!-- Content Header (Page header) -->
 <section class="content-header">
