@@ -13,18 +13,36 @@
 
     </ul>
 }
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<style>
+    .period-btn.active {
+        background-color: #DB7093 !important; /* Hồng tím đậm */
+        border-color: #DB7093 !important;
+        color: #fff !important;
+    }
+
+    .period-btn.btn-outline-primary {
+        border-color: #DB7093 !important;
+        color: #DB7093 !important;
+    }
+
+        .period-btn.btn-outline-primary:hover {
+            background-color: #DB7093 !important;
+            color: #fff !important;
+        }
+</style>
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Thống kê</h1>
+                <h1>Thống kê doanh thu</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Thống kê</li>
+                    <li class="breadcrumb-item active">Thống kê doanh thu</li>
                 </ol>
             </div>
         </div>
@@ -35,43 +53,53 @@
 <section class="content">
 
     <!-- Default box -->
-    <div class="card">
+    <div class="card aurora-background">
         <div class="card-header">
-            <h3 class="card-title">Thống kê danh thu</h3>
 
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="chart">
-                        <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row mb-3">
+                            <div class="col-md-12 d-flex align-items-center gap-2">
+                                <div class="btn-group" role="group" aria-label="Chọn kỳ">
+                                    <button type="button" class="btn btn-primary period-btn active" data-period="day">Ngày</button>
+                                    <button type="button" class="btn btn-outline-primary period-btn" data-period="week">Tuần</button>
+                                    <button type="button" class="btn btn-outline-primary period-btn" data-period="month">Tháng</button>
+                                    <button type="button" class="btn btn-outline-primary period-btn" data-period="year">Năm</button>
+                                </div>
+
+                                <div class="ml-3 d-flex align-items-center" style="gap:8px;">
+                                    <input id="fromDate" type="text" class="form-control form-control-sm" style="max-width:170px;">
+                                    <input id="toDate" type="text" class="form-control form-control-sm" style="max-width:170px;">
+                                    <button id="btnApply" class="btn btn-sm btn-outline-primary period-btn">Áp dụng</button>
+                                    <button id="btnClear" class="btn btn-sm btn-outline-primary btn-light border">Xóa lọc</button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="chart">
+                            <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row mt-4">
-                <!-- Tạo thêm khoảng cách bằng cách thêm lớp mt-4 -->
-                <div class="col-md-12">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th class="text-center" scope="col">STT</th>
-                                    <th class="text-center" scope="col">Ngày</th>
-                                    <th class="text-center" scope="col">Doanh thu</th>
-                                    <th class="text-center" scope="col">Lợi nhuận</th>
-                                </tr>
-                            </thead>
-                            <tbody id="load_data"></tbody>
-                        </table>
+                <div class="row mt-4">
+                    <!-- Tạo thêm khoảng cách bằng cách thêm lớp mt-4 -->
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" scope="col">STT</th>
+                                        <th class="text-center" scope="col">Ngày</th>
+                                        <th class="text-center" scope="col">Doanh thu</th>
+                                        <th class="text-center" scope="col">Lợi nhuận</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="load_data"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,105 +112,383 @@
 
 </section>
 <!-- /.content -->
-
-
 @section scripts{
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="~/Content/clients/plugins/chart.js/Chart.min.js"></script>
     <script src="~/Content/assets/plugins/moment/moment.min.js"></script>
     <script>
-        $(function () {
-            /* ChartJS
-             * -------
-             * Here we will create a few charts using ChartJS
-             */
+        // ---------------- Datepicker VI ----------------
+        // Khai báo locale tiếng Việt cho jQuery UI (nếu chưa có gói i18n)
+        $.datepicker.regional['vi'] = {
+            closeText: 'Đóng', prevText: 'Trước', nextText: 'Sau', currentText: 'Hôm nay',
+            monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+            monthNamesShort: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
+            dayNames: ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'],
+            dayNamesShort: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+            dayNamesMin: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+            weekHeader: 'Tu', dateFormat: 'dd/mm/yy',
+            firstDay: 1, isRTL: false, showMonthAfterYear: false, yearSuffix: ''
+        };
+        $.datepicker.setDefaults($.datepicker.regional['vi']);
 
-            var arrDoanhThu = [];
-            var arrLoiNhuan = [];
-            var arrDate = [];
+        // ---------------- Helpers ----------------
+        // Chuẩn hóa chuỗi ngày -> DD/MM/YYYY (để match Controller ParseExact("dd/MM/yyyy"))
+        function normalizeToVN(v) {
+            if (!v) return '';
+            var m = moment(v, ['DD/MM/YYYY', 'D/M/YYYY', 'DD/MM/YY', 'YYYY-MM-DD', 'MM/DD/YYYY', 'M/D/YYYY'], true);
+            if (!m.isValid()) return '';
+            return m.format('DD/MM/YYYY');
+        }
+
+        function buildLabel(item) {
+            if (currentPeriod === 'day') {
+                return moment(item.Label, 'YYYY-MM-DD').format('DD/MM/YYYY');
+            }
+            if (currentPeriod === 'month') return item.Label;   // MM/yyyy
+            if (currentPeriod === 'year') return item.Label;   // yyyy
+            if (currentPeriod === 'week') {
+                var start = moment().isoWeekYear(item.Year).isoWeek(item.Week).startOf('isoWeek');
+                var end = moment(start).endOf('isoWeek');
+                return start.format('DD/MM') + ' - ' + end.format('DD/MM');
+            }
+            return item.Label || '';
+        }
+
+        function formatCurrency(number) {
+            try { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number || 0); }
+            catch (e) { return number; }
+        }
+
+        // ---------------- State ----------------
+        var chartRef = null;
+        var currentPeriod = 'day';
+
+        // ---------------- Init ----------------
+        $(function () {
+            // Khởi tạo Datepicker tiếng Việt + format dd/mm/yy
+            $("#fromDate, #toDate").datepicker({
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true
+            });
+
+            // Mặc định: đầu tháng -> hôm nay (đưa trực tiếp vào datepicker để hiện đúng dd/MM/yyyy)
+            var today = new Date();
+            var firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            $('#fromDate').datepicker('setDate', firstOfMonth);
+            $('#toDate').datepicker('setDate', today);
+
+            loadAndRender();
+
+            // Chọn kỳ
+            $('.period-btn').on('click', function () {
+                $('.period-btn').removeClass('active btn-primary').addClass('btn-outline-primary');
+                $(this).addClass('active btn-primary').removeClass('btn-outline-primary');
+                currentPeriod = $(this).data('period');
+                loadAndRender();
+            });
+
+            // Áp dụng lọc ngày
+            $('#btnApply').on('click', function () { loadAndRender(); });
+
+            // Xóa lọc
+            $('#btnClear').on('click', function () {
+                $('#fromDate').val('');
+                $('#toDate').val('');
+                loadAndRender();
+            });
+        });
+
+        // ---------------- Data + Render ----------------
+        function loadAndRender() {
+            var fromDateRaw = $('#fromDate').val() || ''; // đang là dd/MM/yyyy từ datepicker
+            var toDateRaw = $('#toDate').val() || '';
+
+            var fromDate = normalizeToVN(fromDateRaw); // vẫn chuẩn hoá để phòng nhập tay sai
+            var toDate = normalizeToVN(toDateRaw);
+
+            $('#btnApply').prop('disabled', true).text('Đang tải...');
+
             $.ajax({
                 url: '/Statistical/GetStatistical',
                 type: 'GET',
-                data: { fromDate: '', toDate: '' },
+                data: { fromDate: fromDate, toDate: toDate, period: currentPeriod },
                 success: function (rs) {
-
-                    $.each(rs.Data, function (i, item) {
-                        var strDate = moment(item.Date).format('DD/MM/yyyy');
-                        arrDate.push(strDate);
-                        arrDoanhThu.push(item.DoanhThu);
-                        arrLoiNhuan.push(item.LoiNhuan);
-                    });
-                    var areaChartData = {
-                        labels: arrDate,
-                        datasets: [
-                            {
-                                label: 'Lợi nhuận',
-                                backgroundColor: 'rgba(60,141,188,0.9)',
-                                borderColor: 'rgba(60,141,188,0.8)',
-                                pointRadius: false,
-                                pointColor: '#3b8bba',
-                                pointStrokeColor: 'rgba(60,141,188,1)',
-                                pointHighlightFill: '#fff',
-                                pointHighlightStroke: 'rgba(60,141,188,1)',
-                                data: arrLoiNhuan
-                            },
-                            {
-                                label: 'Danh thu',
-                                backgroundColor: 'rgba(210, 214, 222, 1)',
-                                borderColor: 'rgba(210, 214, 222, 1)',
-                                pointRadius: false,
-                                pointColor: 'rgba(210, 214, 222, 1)',
-                                pointStrokeColor: '#c1c7d1',
-                                pointHighlightFill: '#fff',
-                                pointHighlightStroke: 'rgba(220,220,220,1)',
-                                data: arrDoanhThu
-                            },
-                        ]
+                    var arrDoanhThu = [], arrLoiNhuan = [], arrLabels = [];
+                    if (rs && rs.Data && rs.Data.length) {
+                        $.each(rs.Data, function (i, item) {
+                            arrLabels.push(buildLabel(item));
+                            arrDoanhThu.push(item.DoanhThu || 0);
+                            arrLoiNhuan.push(item.LoiNhuan || 0);
+                        });
                     }
-                    //-------------
-                    //- BAR CHART -
-                    //-------------
-                    var barChartCanvas = $('#barChart').get(0).getContext('2d')
-                    var barChartData = $.extend(true, {}, areaChartData)
-                    var temp0 = areaChartData.datasets[0]
-                    var temp1 = areaChartData.datasets[1]
-                    barChartData.datasets[0] = temp1
-                    barChartData.datasets[1] = temp0
-
-                    var barChartOptions = {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        datasetFill: false
-                    }
-
-                    new Chart(barChartCanvas, {
-                        type: 'bar',
-                        data: barChartData,
-                        options: barChartOptions
-                    });
-                    load_data(rs.Data);
+                    renderBarChart(arrLabels, arrDoanhThu, arrLoiNhuan);
+                    load_table(rs.Data || []);
+                },
+                error: function () {
+                    renderBarChart([], [], []);
+                    load_table([]);
+                },
+                complete: function () {
+                    $('#btnApply').prop('disabled', false).text('Áp dụng');
                 }
             });
-
-
-        })
-
-        function formatCurrency(number) {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
         }
 
-        function load_data(data) {
-            var strHtml = "";
+        function renderBarChart(labels, arrDoanhThu, arrLoiNhuan) {
+            var barCtx = $('#barChart').get(0).getContext('2d');
+            var data = {
+                labels: labels,
+                datasets: [
+                    { label: 'Lợi nhuận', backgroundColor: 'rgba(60,141,188,0.9)', borderColor: 'rgba(60,141,188,0.8)', pointRadius: false, data: arrLoiNhuan },
+                    { label: 'Doanh thu', backgroundColor: 'rgba(210, 214, 222, 1)', borderColor: 'rgba(210, 214, 222, 1)', pointRadius: false, data: arrDoanhThu }
+                ]
+            };
+            var options = {
+                responsive: true, maintainAspectRatio: false, datasetFill: false,
+                scales: {
+                    yAxes: [{ ticks: { beginAtZero: true, callback: function (v) { return formatCurrency(v); } } }],
+                    xAxes: [{ ticks: { autoSkip: true, maxRotation: 0 } }]
+                },
+                tooltips: { callbacks: { label: function (t, d) { var ds = d.datasets[t.datasetIndex].label || ''; return ds + ': ' + formatCurrency(t.yLabel); } } },
+                legend: { display: true }
+            };
+            if (chartRef) chartRef.destroy();
+            chartRef = new Chart(barCtx, { type: 'bar', data: data, options: options });
+        }
+
+        function load_table(data) {
+            var html = "";
+            if (!data.length) {
+                html = "<tr><td colspan='4' class='text-center text-muted'>Không có dữ liệu</td></tr>";
+                $('#load_data').html(html); return;
+            }
             $.each(data, function (i, item) {
-                var strDate = moment(item.Date).format('DD/MM/yyyy');
-                strHtml += "<tr>";
-                strHtml += "<td class='text-center'>" + (i + 1) + "</td>";
-                strHtml += "<td class='text-center'>" + strDate + "</td>";
-                strHtml += "<td class='text-center'>" + formatCurrency(item.DoanhThu) + "</td>";
-                strHtml += "<td class='text-center'>" + formatCurrency(item.LoiNhuan) + "</td>";
-                strHtml += "</tr>";
+                var label = buildLabel(item);
+                html += "<tr>";
+                html += "<td class='text-center'>" + (i + 1) + "</td>";
+                html += "<td class='text-center'>" + label + "</td>";
+                html += "<td class='text-center'>" + formatCurrency(item.DoanhThu) + "</td>";
+                html += "<td class='text-center'>" + formatCurrency(item.LoiNhuan) + "</td>";
+                html += "</tr>";
             });
-            $('#load_data').html(strHtml);
+            $('#load_data').html(html);
         }
-
     </script>
+
+    <style>
+        /* Nếu popup lịch bị che, tăng z-index */
+        .ui-datepicker {
+            z-index: 2000 !important;
+        }
+        /* Placeholder gợi ý */
+        #fromDate::placeholder, #toDate::placeholder {
+            color: #aaa;
+        }
+    </style>
 }
+
+
+@*@section scripts{
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+        <script src="~/Content/clients/plugins/chart.js/Chart.min.js"></script>
+        <script src="~/Content/assets/plugins/moment/moment.min.js"></script>
+        <script>
+            $(function () {
+                $("#fromDate, #toDate").datepicker({
+                    dateFormat: "dd/mm/yy",  // format dd/MM/yyyy
+                    changeMonth: true,
+                    changeYear: true
+                });
+            });
+
+            // ---------------- Helpers ----------------
+            // Chuẩn hóa mọi chuỗi ngày (YYYY-MM-DD | DD/MM/YYYY | MM/DD/YYYY) -> DD/MM/YYYY
+            function normalizeToVN(v) {
+                if (!v) return '';
+                var m = moment(v, ['YYYY-MM-DD', 'DD/MM/YYYY', 'MM/DD/YYYY'], true);
+                if (!m.isValid()) return '';
+                return m.format('DD/MM/YYYY');
+            }
+
+            // Tạo nhãn hiển thị theo kỳ (dùng dữ liệu server trả)
+            function buildLabel(item) {
+                if (currentPeriod === 'day') {
+                    // item.Label = 'yyyy-MM-dd'
+                    return moment(item.Label, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                }
+                if (currentPeriod === 'month') {
+                    // item.Label = 'MM/yyyy'
+                    return item.Label;
+                }
+                if (currentPeriod === 'year') {
+                    // item.Label = 'yyyy'
+                    return item.Label;
+                }
+                if (currentPeriod === 'week') {
+                    // Dùng Year + Week ISO để tính khoảng ngày (Thứ 2 -> CN)
+                    var start = moment().isoWeekYear(item.Year).isoWeek(item.Week).startOf('isoWeek');
+                    var end = moment(start).endOf('isoWeek');
+                    return start.format('DD/MM') + ' - ' + end.format('DD/MM');
+                }
+                return item.Label || '';
+            }
+
+            function formatCurrency(number) {
+                try {
+                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number || 0);
+                } catch (e) {
+                    return number;
+                }
+            }
+
+            // ---------------- State ----------------
+            var chartRef = null;
+            var currentPeriod = 'day';
+
+            // ---------------- Init ----------------
+            $(function () {
+                // Mặc định: từ đầu tháng đến hôm nay (để có dữ liệu ngay)
+                var today = moment();
+                var firstOfMonth = moment().startOf('month');
+                $('#fromDate').val(firstOfMonth.format('YYYY-MM-DD'));
+                $('#toDate').val(today.format('YYYY-MM-DD'));
+
+                loadAndRender();
+
+                // Chọn kỳ
+                $('.period-btn').on('click', function () {
+                    $('.period-btn').removeClass('active btn-primary').addClass('btn-outline-primary');
+                    $(this).addClass('active btn-primary').removeClass('btn-outline-primary');
+                    currentPeriod = $(this).data('period');
+                    loadAndRender();
+                });
+
+                // Áp dụng lọc ngày
+                $('#btnApply').on('click', function () {
+                    loadAndRender();
+                });
+
+                // Xóa lọc
+                $('#btnClear').on('click', function () {
+                    $('#fromDate').val('');
+                    $('#toDate').val('');
+                    loadAndRender();
+                });
+            });
+
+            // ---------------- Data + Render ----------------
+            function loadAndRender() {
+                var fromDateRaw = $('#fromDate').val() || '';
+                var toDateRaw = $('#toDate').val() || '';
+
+                // Chuẩn hóa về dd/MM/yyyy để khớp Controller
+                var fromDate = normalizeToVN(fromDateRaw);
+                var toDate = normalizeToVN(toDateRaw);
+
+                // Tránh double-click khi đang tải
+                $('#btnApply').prop('disabled', true).text('Đang tải...');
+
+                $.ajax({
+                    url: '/Statistical/GetStatistical',
+                    type: 'GET',
+                    data: { fromDate: fromDate, toDate: toDate, period: currentPeriod },
+                    success: function (rs) {
+                        var arrDoanhThu = [], arrLoiNhuan = [], arrLabels = [];
+                        if (rs && rs.Data && rs.Data.length) {
+                            $.each(rs.Data, function (i, item) {
+                                arrLabels.push(buildLabel(item));
+                                arrDoanhThu.push(item.DoanhThu || 0);
+                                arrLoiNhuan.push(item.LoiNhuan || 0);
+                            });
+                        }
+
+                        renderBarChart(arrLabels, arrDoanhThu, arrLoiNhuan);
+                        load_table(rs.Data || []);
+                    },
+                    error: function () {
+                        // Clear chart/table nếu lỗi
+                        renderBarChart([], [], []);
+                        load_table([]);
+                    },
+                    complete: function () {
+                        $('#btnApply').prop('disabled', false).text('Áp dụng');
+                    }
+                });
+            }
+
+            function renderBarChart(labels, arrDoanhThu, arrLoiNhuan) {
+                var barCtx = $('#barChart').get(0).getContext('2d');
+
+                var data = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Lợi nhuận',
+                            backgroundColor: 'rgba(60,141,188,0.9)',
+                            borderColor: 'rgba(60,141,188,0.8)',
+                            pointRadius: false,
+                            data: arrLoiNhuan
+                        },
+                        {
+                            label: 'Doanh thu',
+                            backgroundColor: 'rgba(210, 214, 222, 1)',
+                            borderColor: 'rgba(210, 214, 222, 1)',
+                            pointRadius: false,
+                            data: arrDoanhThu
+                        }
+                    ]
+                };
+
+                var options = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    datasetFill: false,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function (value) { return formatCurrency(value); }
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: { autoSkip: true, maxRotation: 0 }
+                        }]
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var dsLabel = data.datasets[tooltipItem.datasetIndex].label || '';
+                                var v = tooltipItem.yLabel;
+                                return dsLabel + ': ' + formatCurrency(v);
+                            }
+                        }
+                    },
+                    legend: { display: true }
+                };
+
+                if (chartRef) chartRef.destroy();
+                chartRef = new Chart(barCtx, { type: 'bar', data: data, options: options });
+            }
+
+            function load_table(data) {
+                var html = "";
+                if (!data.length) {
+                    html = "<tr><td colspan='4' class='text-center text-muted'>Không có dữ liệu</td></tr>";
+                    $('#load_data').html(html);
+                    return;
+                }
+                $.each(data, function (i, item) {
+                    var label = buildLabel(item);
+                    html += "<tr>";
+                    html += "<td class='text-center'>" + (i + 1) + "</td>";
+                    html += "<td class='text-center'>" + label + "</td>";
+                    html += "<td class='text-center'>" + formatCurrency(item.DoanhThu) + "</td>";
+                    html += "<td class='text-center'>" + formatCurrency(item.LoiNhuan) + "</td>";
+                    html += "</tr>";
+                });
+                $('#load_data').html(html);
+            }
+        </script>
+    }*@
+
