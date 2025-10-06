@@ -11,7 +11,7 @@
 
 <style>
     .news-section {
-        margin-top: 140px;
+        margin-top: 160px;
         padding: 0 15px;
     }
 
@@ -148,6 +148,45 @@
                 content: '»';
                 right: 10px;
             }
+
+    /* Gần phân trang với bài viết */
+    .news-item {
+        margin-bottom: 10px;
+    }
+
+        .news-item:last-child {
+            margin-bottom: 6px;
+        }
+
+    /* Container phân trang: sát lên, căn giữa, khoảng cách nhỏ */
+    .pagination-container {
+        margin-top: 8px !important; /* trước 30px */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px; /* khoảng giữa pager & info */
+    }
+
+    /* Pager căn giữa (đừng để flex-end) */
+    .PagedList-pager {
+        justify-content: center !important;
+        margin: 0 !important;
+    }
+
+        /* Nút trang gọn lại một chút cho đỡ cao */
+        .PagedList-pager li a {
+            min-width: 38px;
+            height: 38px;
+            padding: 0 12px;
+            font-size: 14px;
+        }
+
+    /* Box thông tin sát hơn, gọn hơn */
+    .pagination-info {
+        margin-top: 0 !important;
+        padding: 8px 14px;
+        font-size: 14px;
+    }
 </style>
 
 <div class="container news-section">
@@ -205,8 +244,9 @@
             </nav>
             <div class="pagination-info text-center mt-3 p-3 border rounded shadow-sm bg-light">
                 <h5 class="fw-bold text-primary">Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</h5>
-                <p class="text-secondary mb-0">Tổng cộng <span class="fw-bold">@Model.TotalItemCount</span> bài viết
-           </p>
+                <p class="text-secondary mb-0">
+                    Tổng cộng <span class="fw-bold">@Model.TotalItemCount</span> bài viết
+                </p>
             </div>
         </div>
 

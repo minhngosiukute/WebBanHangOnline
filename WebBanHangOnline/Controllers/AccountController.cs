@@ -90,33 +90,65 @@ namespace WebBanHangOnline.Controllers
 
         //
         // POST: /Account/Login
+        //[HttpPost]
+        //[AllowAnonymous]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    // This doesn't count login failures towards account lockout
+        //    // To enable password failures to trigger account lockout, change to shouldLockout: true
+        //    var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+        //    switch (result)
+        //    {
+        //        case SignInStatus.Success:
+        //            return RedirectToLocal(returnUrl);
+        //        case SignInStatus.LockedOut:
+        //            return View("Lockout");
+        //        case SignInStatus.RequiresVerification:
+        //            return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+        //        case SignInStatus.Failure:
+        //        default:
+        //            ModelState.AddModelError("", "Invalid login attempt.");
+        //            return View(model);
+        //    }
+        //}
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+
+            // Tìm user theo UserName (vì bạn login bằng username)
+            var user = await UserManager.FindByNameAsync(model.UserName);
+            if (user != null)
             {
-                return View(model);
+                var confirmed = await UserManager.IsEmailConfirmedAsync(user.Id);
+                if (!confirmed)
+                {
+                    ModelState.AddModelError("", "Tài khoản chưa xác nhận email. Vui lòng kiểm tra hộp thư.");
+                    return View(model);
+                }
             }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(
+                model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+
             switch (result)
             {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
+                case SignInStatus.Success: return RedirectToLocal(returnUrl);
+                case SignInStatus.LockedOut: return View("Lockout");
                 default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
+                    ModelState.AddModelError("", "Đăng nhập không hợp lệ.");
                     return View(model);
             }
         }
+
 
         //
         // GET: /Account/VerifyCode
@@ -161,7 +193,7 @@ namespace WebBanHangOnline.Controllers
             }
         }
 
-        
+
         //
         // GET: /Account/Register
         [AllowAnonymous]
@@ -169,36 +201,93 @@ namespace WebBanHangOnline.Controllers
         {
             return View();
         }
+        //[HttpPost]
+        //[AllowAnonymous]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Register(RegisterViewModel model)
+        //{
+        //    if (!ModelState.IsValid) return View(model);
 
-        //
-        // POST: /Account/Register
+        //    // Chuẩn hóa
+        //    var inputUserName = model.UserName?.Trim();
+        //    var inputEmail = model.Email?.Trim().ToLowerInvariant();
+
+        //    // Kiểm tra trùng
+        //    if (await UserManager.FindByNameAsync(inputUserName) != null)
+        //    {
+        //        ModelState.AddModelError("UserName", "Tài khoản này đã tồn tại.");
+        //        return View(model);
+        //    }
+        //    if (await UserManager.FindByEmailAsync(inputEmail) != null)
+        //    {
+        //        ModelState.AddModelError("Email", "Email này đã được sử dụng.");
+        //        return View(model);
+        //    }
+
+        //    // Tạo user: UserName ≠ Email
+        //    var user = new ApplicationUser
+        //    {
+        //        UserName = inputUserName,   // ← dùng username riêng
+        //        Email = inputEmail
+        //    };
+
+        //    var result = await UserManager.CreateAsync(user, model.Password);
+        //    if (result.Succeeded)
+        //    {
+
+        //        await UserManager.AddToRoleAsync(user.Id, "Customer");
+
+        //        await SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false);
+        //        return RedirectToAction("Index", "Home");
+        //    }
+
+        //    foreach (var e in result.Errors) ModelState.AddModelError("", e);
+        //    return View(model);
+        //}
+
+
+        //POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                    UserManager.AddToRole(user.Id, "Customer");
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+            if (!ModelState.IsValid) return View(model);
 
-                    return RedirectToAction("Index", "Home");
-                }
-                AddErrors(result);
+            var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+            var result = await UserManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                // Tạo token xác nhận email
+                var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+
+                // Link xác nhận
+                var callbackUrl = Url.Action(
+                    "ConfirmEmail", "Account",
+                    new { userId = user.Id, code = code },
+                    protocol: Request.Url.Scheme);
+
+                // Gửi email (dùng hàm có sẵn của bạn)
+                WebBanHangOnline.Common.Common.SendMail(
+                    "ShopOnline",
+                    "Xác nhận tài khoản",
+                    $"Chào {model.UserName}, vui lòng xác nhận tài khoản bằng cách bấm vào <a href='{callbackUrl}'>liên kết này</a>.",
+                    model.Email
+                );
+
+                // Gán role mặc định (nếu bạn muốn gán ngay từ lúc tạo)
+                await UserManager.AddToRoleAsync(user.Id, "Customer");
+
+                ViewBag.SuccessMessage = "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.";
+                ModelState.Clear(); // xóa dữ liệu form
+                return View();
             }
 
-            // If we got this far, something failed, redisplay form
+            AddErrors(result);
             return View(model);
         }
+
 
         //
         // GET: /Account/ConfirmEmail
@@ -230,26 +319,39 @@ namespace WebBanHangOnline.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.Email);
-                var it = (await UserManager.IsEmailConfirmedAsync(user.Id));
+                // ✅ tìm theo Email (vì UserName ≠ Email)
+                var user = await UserManager.FindByEmailAsync(model.Email);
+
+                // ✅ kiểm tra null trước khi dùng user.Id
                 if (user == null)
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
+                    // Không tiết lộ user có tồn tại hay không
                     return View("ForgotPasswordConfirmation");
                 }
 
-                // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                // Send an email with this link
+                // (tuỳ bạn có dùng xác nhận email hay không)
+                var isConfirmed = await UserManager.IsEmailConfirmedAsync(user.Id);
+                // nếu không yêu cầu xác nhận email thì có thể bỏ cả 2 dòng trên
+
+                // Gửi link reset mật khẩu
                 string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                WebBanHangOnline.Common.Common.SendMail("ShopOnline", "Quên mật khẩu", "Bạn click vào <a href='" + callbackUrl + "'>link này</a> để reset mật khẩu", model.Email);
-                // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                var callbackUrl = Url.Action(
+                    "ResetPassword", "Account",
+                    new { userId = user.Id, code = code },
+                    protocol: Request.Url.Scheme);
+
+                WebBanHangOnline.Common.Common.SendMail(
+                    "ShopOnline", "Quên mật khẩu",
+                    "Bạn click vào <a href='" + callbackUrl + "'>link này</a> để reset mật khẩu",
+                    model.Email);
+
                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
-            // If we got this far, something failed, redisplay form
+            // Nếu ModelState không hợp lệ
             return View(model);
         }
+
 
         //
         // GET: /Account/ForgotPasswordConfirmation

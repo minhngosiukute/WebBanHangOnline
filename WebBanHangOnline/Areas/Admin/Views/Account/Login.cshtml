@@ -2,8 +2,6 @@
 @{
     ViewBag.Title = "Login";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutLogin.cshtml";
-
-
 }
 
 <style>
@@ -47,10 +45,10 @@
         width: 100%;
         height: 100%;
         background-image: radial-gradient(circle, rgba(255, 255, 255, 0.6) 2px, transparent 3px);
-        background-size: 50px 50px; /* Kích thước lưới */
+        background-size: 50px 50px;
         opacity: 0.4;
         animation: fireflies 5s linear infinite;
-        pointer-events: none; /* Không ảnh hưởng đến thao tác người dùng */
+        pointer-events: none;
     }
 
     @@keyframes fireflies {
@@ -67,7 +65,6 @@
         }
     }
 
-    /* Đom đóm ngẫu nhiên */
     body::after {
         content: '';
         position: absolute;
@@ -76,7 +73,7 @@
         width: 100%;
         height: 100%;
         background-image: radial-gradient(circle, rgba(255, 255, 200, 0.8) 2px, transparent 3px);
-        background-size: 100px 100px; /* Kích thước lưới đom đóm thứ hai */
+        background-size: 100px 100px;
         opacity: 0.6;
         animation: fireflies2 7s linear infinite;
         pointer-events: none;
@@ -96,17 +93,17 @@
         }
     }
 
-
     /* Hộp đăng nhập */
     .login-card-body {
         width: 400px;
-        background: rgba(255, 255, 255, 0.9); /* Nền trắng mờ */
+        background: rgba(255, 255, 255, 0.9);
         padding: 30px;
         border-radius: 20px;
         box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
         text-align: center;
         backdrop-filter: blur(10px);
         position: relative;
+        z-index: 2;
     }
 
     .login-box-msg {
@@ -153,9 +150,38 @@
         padding-left: 45px;
     }
 
+    /* Biểu tượng con mắt trong ô mật khẩu */
+    /* Biểu tượng con mắt trong ô mật khẩu */
+    .password-group {
+        position: relative;
+    }
+
+        .password-group .form-control {
+            padding-left: 45px; /* cho icon khóa bên trái */
+            padding-right: 45px; /* tạo khoảng trống bên phải cho con mắt */
+            border-radius: 30px; /* giữ bo tròn đều 2 bên */
+        }
+
+    .toggle-password {
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #66a6ff;
+        font-size: 18px;
+        transition: color 0.3s ease, transform 0.2s ease;
+    }
+
+        .toggle-password:hover {
+            color: #1e90ff;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+
     /* Nút đăng nhập */
     .btn-primary {
-        background: linear-gradient(to right, #1e90ff, #87cefa); /* Xanh gradient */
+        background: linear-gradient(to right, #1e90ff, #87cefa);
         color: white;
         padding: 12px 20px;
         border-radius: 30px;
@@ -170,15 +196,8 @@
     }
 
         .btn-primary:hover {
-            background: linear-gradient(to right, #87cefa, #1e90ff); /* Đảo chiều gradient khi hover */
+            background: linear-gradient(to right, #87cefa, #1e90ff);
             transform: translateY(-3px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
-        }
-
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            background: linear-gradient(to right, #fad0c4, #ff9a9e);
             box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
         }
 
@@ -199,22 +218,36 @@
         font-size: 14px;
         color: #555;
     }
+    /* Khôi phục bo tròn cho input khi dùng .input-group có thêm icon bên phải */
+    .input-group.password-group .form-control {
+        border-top-left-radius: 30px !important;
+        border-bottom-left-radius: 30px !important;
+        border-top-right-radius: 30px !important; /* bị Bootstrap reset về 0 */
+        border-bottom-right-radius: 30px !important; /* bị Bootstrap reset về 0 */
+        padding-right: 45px; /* chừa chỗ cho icon con mắt */
+    }
 </style>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <div class="card-body login-card-body">
     <p class="login-box-msg">Đăng nhập tài khoản</p>
     @using (Html.BeginForm("Login", "Account", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(true);
-        <div class="input-group mb-3">
+
+        <div class="input-group mb-3 password-group">
             <span class="input-group-text"><i class="fas fa-user"></i></span>
             @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", @placeholder = "Tài khoản" })
         </div>
-        <div class="input-group mb-3">
+
+        <div class="input-group mb-3 password-group">
             <span class="input-group-text"><i class="fas fa-lock"></i></span>
-            @Html.PasswordFor(x => x.Password, new { @class = "form-control", @placeholder = "Mật khẩu" })
+            @Html.PasswordFor(x => x.Password, new { @class = "form-control", @placeholder = "Mật khẩu", id = "passwordInput" })
+            <span class="toggle-password" onclick="togglePassword()">
+                <i class="fas fa-eye" id="eyeIcon"></i>
+            </span>
         </div>
+
         <div class="row">
             <div class="col-8 text-start">
                 @Html.CheckBoxFor(x => x.RememberMe)
@@ -225,7 +258,23 @@
             </div>
         </div>
     }
-    <p class="mb-1">
-        <a href="#">Quên mật khẩu?</a>
-    </p>
+    @*<p class="mb-1">
+            <a href="#">Quên mật khẩu?</a>
+        </p>*@
 </div>
+@Scripts.Render("~/bundles/jqueryval")
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById("passwordInput");
+        const eyeIcon = document.getElementById("eyeIcon");
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+        }
+    }
+</script>

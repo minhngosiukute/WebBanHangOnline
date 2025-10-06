@@ -105,6 +105,9 @@ namespace WebBanHangOnline.Models
     public class RegisterViewModel
     {
         [Required]
+        [Display(Name = "Tài khoản")]
+        public string UserName { get; set; }   // ← mới
+        [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }

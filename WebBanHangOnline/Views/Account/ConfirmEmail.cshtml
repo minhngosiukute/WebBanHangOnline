@@ -1,10 +1,102 @@
 ﻿@{
-    ViewBag.Title = "Confirm Email";
+    Layout = null;
+    ViewBag.Title = "Xác nhận Email";
 }
 
-<h2>@ViewBag.Title.</h2>
-<div>
-    <p>
-        Thank you for confirming your email. Please @Html.ActionLink("Click here to Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
-    </p>
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+
+<style>
+    /* Aurora background */
+    .aurora-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(120deg, #ff9a8b, #ff6ec7, #4e54c8, #0dceda, #88d498);
+        background-size: 200% 200%;
+        animation: aurora-animation 8s ease-in-out infinite alternate;
+        z-index: -1;
+    }
+
+    @@keyframes aurora-animation {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    /* Center box */
+    .confirm-box {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        padding: 30px;
+        margin: 200px auto 0;
+        text-align: center;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+        .confirm-box h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .confirm-box p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .confirm-box a {
+            color: #4e54c8;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+            .confirm-box a:hover {
+                color: #ff6ec7;
+                text-decoration: underline;
+            }
+
+    .checkmark {
+        font-size: 50px;
+        color: #4CAF50;
+        margin-bottom: 15px;
+        animation: pop 0.5s ease-in-out;
+    }
+
+    @@keyframes pop {
+        0% {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="aurora-bg"></div>
+
+<div class="confirm-box">
+    <div class="checkmark">✔</div>
+    <h2>@ViewBag.Title</h2>
+    <p>Chúc mừng! Bạn đã xác nhận email thành công 🎉</p>
+    <p>Bây giờ bạn có thể <a href="@Url.Action("Login", "Account")">đăng nhập vào tài khoản</a>.</p>
 </div>
