@@ -142,17 +142,27 @@
 
         function buildLabel(item) {
             if (currentPeriod === 'day') {
-                return moment(item.Label, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                return moment(item.Label, ['YYYY-MM-DD', 'DD-MM-YYYY']).format('DD-MM-YYYY');
             }
-            if (currentPeriod === 'month') return item.Label;   // MM/yyyy
-            if (currentPeriod === 'year') return item.Label;   // yyyy
+            if (currentPeriod === 'month') return item.Label;   // "MM/yyyy"
+            if (currentPeriod === 'year') return item.Label;   // "yyyy"
+
             if (currentPeriod === 'week') {
-                var start = moment().isoWeekYear(item.Year).isoWeek(item.Week).startOf('isoWeek');
-                var end = moment(start).endOf('isoWeek');
-                return start.format('DD/MM') + ' - ' + end.format('DD/MM');
+                // nhận cả Year/Week hoặc year/week
+                var y = (item.Year !== undefined ? item.Year : item.year);
+                var w = (item.Week !== undefined ? item.Week : item.week);
+                y = parseInt(y, 10);
+                w = parseInt(w, 10);
+                if (!y || !w) return '';
+
+                var start = moment().isoWeekYear(y).isoWeek(w).startOf('isoWeek');
+                var end = start.clone().endOf('isoWeek');
+                return start.format('DD-MM-YYYY') + ' đến ' + end.format('DD-MM-YYYY');
             }
             return item.Label || '';
         }
+
+
 
         function formatCurrency(number) {
             try { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number || 0); }
@@ -287,208 +297,3 @@
         }
     </style>
 }
-
-
-@*@section scripts{
-        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-        <script src="~/Content/clients/plugins/chart.js/Chart.min.js"></script>
-        <script src="~/Content/assets/plugins/moment/moment.min.js"></script>
-        <script>
-            $(function () {
-                $("#fromDate, #toDate").datepicker({
-                    dateFormat: "dd/mm/yy",  // format dd/MM/yyyy
-                    changeMonth: true,
-                    changeYear: true
-                });
-            });
-
-            // ---------------- Helpers ----------------
-            // Chuẩn hóa mọi chuỗi ngày (YYYY-MM-DD | DD/MM/YYYY | MM/DD/YYYY) -> DD/MM/YYYY
-            function normalizeToVN(v) {
-                if (!v) return '';
-                var m = moment(v, ['YYYY-MM-DD', 'DD/MM/YYYY', 'MM/DD/YYYY'], true);
-                if (!m.isValid()) return '';
-                return m.format('DD/MM/YYYY');
-            }
-
-            // Tạo nhãn hiển thị theo kỳ (dùng dữ liệu server trả)
-            function buildLabel(item) {
-                if (currentPeriod === 'day') {
-                    // item.Label = 'yyyy-MM-dd'
-                    return moment(item.Label, 'YYYY-MM-DD').format('DD/MM/YYYY');
-                }
-                if (currentPeriod === 'month') {
-                    // item.Label = 'MM/yyyy'
-                    return item.Label;
-                }
-                if (currentPeriod === 'year') {
-                    // item.Label = 'yyyy'
-                    return item.Label;
-                }
-                if (currentPeriod === 'week') {
-                    // Dùng Year + Week ISO để tính khoảng ngày (Thứ 2 -> CN)
-                    var start = moment().isoWeekYear(item.Year).isoWeek(item.Week).startOf('isoWeek');
-                    var end = moment(start).endOf('isoWeek');
-                    return start.format('DD/MM') + ' - ' + end.format('DD/MM');
-                }
-                return item.Label || '';
-            }
-
-            function formatCurrency(number) {
-                try {
-                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number || 0);
-                } catch (e) {
-                    return number;
-                }
-            }
-
-            // ---------------- State ----------------
-            var chartRef = null;
-            var currentPeriod = 'day';
-
-            // ---------------- Init ----------------
-            $(function () {
-                // Mặc định: từ đầu tháng đến hôm nay (để có dữ liệu ngay)
-                var today = moment();
-                var firstOfMonth = moment().startOf('month');
-                $('#fromDate').val(firstOfMonth.format('YYYY-MM-DD'));
-                $('#toDate').val(today.format('YYYY-MM-DD'));
-
-                loadAndRender();
-
-                // Chọn kỳ
-                $('.period-btn').on('click', function () {
-                    $('.period-btn').removeClass('active btn-primary').addClass('btn-outline-primary');
-                    $(this).addClass('active btn-primary').removeClass('btn-outline-primary');
-                    currentPeriod = $(this).data('period');
-                    loadAndRender();
-                });
-
-                // Áp dụng lọc ngày
-                $('#btnApply').on('click', function () {
-                    loadAndRender();
-                });
-
-                // Xóa lọc
-                $('#btnClear').on('click', function () {
-                    $('#fromDate').val('');
-                    $('#toDate').val('');
-                    loadAndRender();
-                });
-            });
-
-            // ---------------- Data + Render ----------------
-            function loadAndRender() {
-                var fromDateRaw = $('#fromDate').val() || '';
-                var toDateRaw = $('#toDate').val() || '';
-
-                // Chuẩn hóa về dd/MM/yyyy để khớp Controller
-                var fromDate = normalizeToVN(fromDateRaw);
-                var toDate = normalizeToVN(toDateRaw);
-
-                // Tránh double-click khi đang tải
-                $('#btnApply').prop('disabled', true).text('Đang tải...');
-
-                $.ajax({
-                    url: '/Statistical/GetStatistical',
-                    type: 'GET',
-                    data: { fromDate: fromDate, toDate: toDate, period: currentPeriod },
-                    success: function (rs) {
-                        var arrDoanhThu = [], arrLoiNhuan = [], arrLabels = [];
-                        if (rs && rs.Data && rs.Data.length) {
-                            $.each(rs.Data, function (i, item) {
-                                arrLabels.push(buildLabel(item));
-                                arrDoanhThu.push(item.DoanhThu || 0);
-                                arrLoiNhuan.push(item.LoiNhuan || 0);
-                            });
-                        }
-
-                        renderBarChart(arrLabels, arrDoanhThu, arrLoiNhuan);
-                        load_table(rs.Data || []);
-                    },
-                    error: function () {
-                        // Clear chart/table nếu lỗi
-                        renderBarChart([], [], []);
-                        load_table([]);
-                    },
-                    complete: function () {
-                        $('#btnApply').prop('disabled', false).text('Áp dụng');
-                    }
-                });
-            }
-
-            function renderBarChart(labels, arrDoanhThu, arrLoiNhuan) {
-                var barCtx = $('#barChart').get(0).getContext('2d');
-
-                var data = {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Lợi nhuận',
-                            backgroundColor: 'rgba(60,141,188,0.9)',
-                            borderColor: 'rgba(60,141,188,0.8)',
-                            pointRadius: false,
-                            data: arrLoiNhuan
-                        },
-                        {
-                            label: 'Doanh thu',
-                            backgroundColor: 'rgba(210, 214, 222, 1)',
-                            borderColor: 'rgba(210, 214, 222, 1)',
-                            pointRadius: false,
-                            data: arrDoanhThu
-                        }
-                    ]
-                };
-
-                var options = {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    datasetFill: false,
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                callback: function (value) { return formatCurrency(value); }
-                            }
-                        }],
-                        xAxes: [{
-                            ticks: { autoSkip: true, maxRotation: 0 }
-                        }]
-                    },
-                    tooltips: {
-                        callbacks: {
-                            label: function (tooltipItem, data) {
-                                var dsLabel = data.datasets[tooltipItem.datasetIndex].label || '';
-                                var v = tooltipItem.yLabel;
-                                return dsLabel + ': ' + formatCurrency(v);
-                            }
-                        }
-                    },
-                    legend: { display: true }
-                };
-
-                if (chartRef) chartRef.destroy();
-                chartRef = new Chart(barCtx, { type: 'bar', data: data, options: options });
-            }
-
-            function load_table(data) {
-                var html = "";
-                if (!data.length) {
-                    html = "<tr><td colspan='4' class='text-center text-muted'>Không có dữ liệu</td></tr>";
-                    $('#load_data').html(html);
-                    return;
-                }
-                $.each(data, function (i, item) {
-                    var label = buildLabel(item);
-                    html += "<tr>";
-                    html += "<td class='text-center'>" + (i + 1) + "</td>";
-                    html += "<td class='text-center'>" + label + "</td>";
-                    html += "<td class='text-center'>" + formatCurrency(item.DoanhThu) + "</td>";
-                    html += "<td class='text-center'>" + formatCurrency(item.LoiNhuan) + "</td>";
-                    html += "</tr>";
-                });
-                $('#load_data').html(html);
-            }
-        </script>
-    }*@
-
