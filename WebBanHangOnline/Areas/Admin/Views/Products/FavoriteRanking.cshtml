@@ -1,0 +1,122 @@
+﻿@using PagedList.Mvc
+@using PagedList
+@model IPagedList<WebBanHangOnline.Areas.Admin.Controllers.ProductsController.FavoriteRow>
+@{
+    ViewBag.Title = "FavoriteRanking";
+
+}
+<style>
+    .rank-wrapper {
+        margin-top: 25px;
+    }
+
+    .rank-banner {
+        margin: 15px 0 20px;
+        padding: 14px 18px;
+        background: #fff0f5;
+        border: 1px solid #b6f0c2;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        color: #0f9d58;
+    }
+</style>
+@section naviheader{
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home/" class="nav-link">Trang chủ</a>
+        </li>
+
+    </ul>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Danh sách sản phẩm yêu thích</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Danh sách sản phẩm yêu thích</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card aurora-background">
+
+        <div class="card-body aurora-background">
+            <div class="rank-wrapper container-fluid">
+                @if (!string.IsNullOrWhiteSpace(ViewBag.TopFavoriteMessage as string))
+                {
+                    <div class="rank-banner">@ViewBag.TopFavoriteMessage</div>
+                }
+
+                <div class="card-body">
+
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class=" text-center">
+                                <th style="width:80px">STT</th>
+                                <th>Tên sản phẩm</th>
+                                <th style="width:220px">Danh mục</th>
+                                <th style="width:140px" class="text-center">Số lượt xem</th>
+                                <th style="width:140px" class="text-center">Số lượt thích</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var sttStart = (Model.PageNumber - 1) * Model.PageSize;
+                                var i = 0;
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr class="text-center">
+                                    <td>@(sttStart + (++i))</td>
+                                    <td>@item.Title</td>
+                                    <td>@item.CategoryName</td>
+                                    <td class="text-center">@item.ViewCount</td>
+                                    <td class="text-center">@item.LikeCount</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+
+
+                    <div class="text-right">
+                        @Html.PagedListPager(
+                          Model,
+                          page => Url.Action("FavoriteRanking", "Products", new { area = "Admin", page }),
+                          new PagedListRenderOptions
+                               {
+                            Display = PagedListDisplayMode.IfNeeded,
+                            MaximumPageNumbersToDisplay = 7,
+                            UlElementClasses = new[] { "pagination", "justify-content-end", "mb-0" }
+                          })
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- /.card-body -->
+        <!-- /.card-footer-->
+    </div>
+    <!-- /.card -->
+
+</section>
+<!-- /.content -->

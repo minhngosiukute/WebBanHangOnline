@@ -190,5 +190,41 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
         //    return Json(new { success = false });
         //}
+
+        public class FavoriteRow
+        {
+            public int ProductId { get; set; }
+            public string Title { get; set; }
+            public string CategoryName { get; set; }
+            public int ViewCount { get; set; }
+            public int LikeCount { get; set; }
+        }
+
+        public ActionResult FavoriteRanking(int? page)
+        {
+            var query = db.Products
+                .AsNoTracking()
+                .Select(p => new FavoriteRow
+                {
+                    ProductId = p.Id,
+                    Title = p.Title,
+                    CategoryName = p.ProductCategory.Title,
+                    ViewCount = p.ViewCount,
+                    LikeCount = p.Wishlists.Count()
+                })
+                .OrderByDescending(x => x.LikeCount)
+                .ThenByDescending(x => x.ViewCount);
+
+            var top = query.FirstOrDefault();
+            ViewBag.TopFavoriteMessage = top == null
+                ? null
+                : $"Sản phẩm được yêu thích nhất: {top.Title} (Lượt thích: {top.LikeCount}, Lượt xem: {top.ViewCount})";
+
+            int pageSize = 10;
+            int pageIndex = page ?? 1;
+            var model = query.ToPagedList(pageIndex, pageSize);   // IPagedList<FavoriteRow>
+
+            return View(model);
+        }
     }
 }

@@ -36,16 +36,60 @@
     <script src="~/Content/assets/js/jquery-3.2.1.min.js"></script>
     @Scripts.Render("~/bundles/jqueryval")
 
-<styles>
-    .user_pic {
-    width: 50px;
-    height: 50px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 50%;
-    margin-right: 10px;
-    }
-</styles>
+    <styles>
+        .user_pic {
+        width: 50px;
+        height: 50px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 50%;
+        margin-right: 10px;
+        }
+    </styles>
+    <style>
+
+        /* Kiểu dáng tổng thể cho menu dropdown */
+        ul.account_selection {
+            list-style: none; /* Bỏ dấu đầu dòng */
+            margin: 0; /* Xóa khoảng cách mặc định */
+            padding: 0; /* Xóa padding mặc định */
+            background-color: #fff; /* Đặt màu nền trắng */
+            border: 1px solid #ccc; /* Đặt viền để dễ nhìn */
+            border-radius: 5px; /* Tạo bo tròn cho menu */
+            position: absolute; /* Đặt menu là vị trí tuyệt đối */
+            top: 100%; /* Đặt menu ngay bên dưới mục "Tài khoản" */
+            left: 0; /* Căn lề trái */
+            min-width: 150px; /* Đảm bảo chiều rộng tối thiểu */
+            display: none; /* Ẩn menu khi chưa hover */
+            z-index: 1000; /* Đặt menu phía trước các phần khác */
+        }
+
+        /* Hiển thị menu khi hover vào mục Tài khoản */
+        li.account:hover ul.account_selection {
+            display: block; /* Hiển thị menu khi hover */
+        }
+
+        /* Kiểu dáng từng mục trong menu */
+        ul.account_selection li {
+            display: block; /* Đặt mỗi mục trên một dòng */
+            padding: 10px 15px; /* Tạo khoảng cách giữa nội dung */
+            text-align: left; /* Căn chữ về bên trái */
+        }
+
+            ul.account_selection li a {
+                text-decoration: none; /* Bỏ gạch chân */
+                color: #333; /* Màu chữ */
+                display: flex; /* Hiển thị icon và chữ trên cùng dòng */
+                align-items: center; /* Căn giữa icon và chữ */
+                gap: 10px; /* Khoảng cách giữa icon và chữ */
+            }
+
+                /* Hiệu ứng hover cho từng mục */
+                ul.account_selection li a:hover {
+                    background-color: #f0f0f0; /* Thay đổi màu nền khi hover */
+                    color: #000; /* Đổi màu chữ khi hover */
+                }
+    </style>
 </head>
 <body>
     
