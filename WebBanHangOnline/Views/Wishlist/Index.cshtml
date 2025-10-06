@@ -9,8 +9,8 @@
 <!-- Custom Styles -->
 <style>
     .wishlist-container {
-        margin-top: 100px;
-        padding: 30px 0;
+        margin-top: 140px;
+        padding: 20px 0;
     }
 
     .wishlist-title {
@@ -31,10 +31,10 @@
         transition: all 0.3s ease;
     }
 
-    .wishlist-item:hover {
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        transform: translateY(-3px);
-    }
+        .wishlist-item:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
 
     .img-container {
         height: 200px;
@@ -44,11 +44,11 @@
         overflow: hidden;
     }
 
-    .img-container img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
+        .img-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
 
     .product-title {
         font-size: 18px;
@@ -61,14 +61,14 @@
         -webkit-box-orient: vertical;
     }
 
-    .product-title a {
-        color: #333;
-        text-decoration: none;
-    }
+        .product-title a {
+            color: #333;
+            text-decoration: none;
+        }
 
-    .product-title a:hover {
-        color: #fe4c50;
-    }
+            .product-title a:hover {
+                color: #fe4c50;
+            }
 
     .product-description {
         color: #777;
@@ -95,9 +95,9 @@
         transition: all 0.3s;
     }
 
-    .btn-remove:hover {
-        background-color: #e04347;
-    }
+        .btn-remove:hover {
+            background-color: #e04347;
+        }
 
     .btn-view {
         background-color: #4285f4;
@@ -110,25 +110,25 @@
         transition: all 0.3s;
     }
 
-    .btn-view:hover {
-        background-color: #3367d6;
-    }
+        .btn-view:hover {
+            background-color: #3367d6;
+        }
 
     .empty-wishlist {
         text-align: center;
         padding: 50px 0;
     }
 
-    .empty-wishlist i {
-        font-size: 60px;
-        color: #ddd;
-        margin-bottom: 20px;
-    }
+        .empty-wishlist i {
+            font-size: 60px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
 
-    .empty-wishlist h3 {
-        color: #777;
-        margin-bottom: 20px;
-    }
+        .empty-wishlist h3 {
+            color: #777;
+            margin-bottom: 20px;
+        }
 
     .pagination-container {
         display: flex;
@@ -186,8 +186,13 @@
     }
 
     @@keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 
     .toast-message {
@@ -210,6 +215,121 @@
     .toast-error {
         background: #F44336;
     }
+
+    /* === Wishlist card: nhỏ gọn & tinh tế hơn (override) === */
+    .wishlist-item {
+        padding: 14px !important;
+        margin-bottom: 18px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
+        transition: transform .18s ease, box-shadow .18s ease !important;
+    }
+
+        .wishlist-item:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,.10) !important;
+        }
+
+    /* Ảnh thấp hơn, gọn khung */
+    .img-container {
+        height: 160px !important; /* trước 200px */
+        margin-bottom: 8px !important;
+    }
+
+        .img-container img {
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: contain !important;
+        }
+
+    /* Tiêu đề: chữ nhỏ lại, 2 dòng gọn */
+    .product-title {
+        font-size: 16px !important; /* trước 18px */
+        margin: 10px 0 6px !important;
+        height: 42px !important; /* vừa 2 dòng */
+        line-height: 1.3 !important;
+    }
+
+        .product-title a {
+            color: #222 !important;
+        }
+
+            .product-title a:hover {
+                color: #fe4c50 !important;
+            }
+
+    /* Giá: nhỏ gọn hơn */
+    .price {
+        font-size: 16px !important; /* trước 18px */
+        font-weight: 700 !important;
+        margin: 6px 0 10px !important;
+    }
+
+        .price span {
+            font-size: 13px !important; /* giá gạch */
+            margin-left: 6px !important;
+        }
+
+    /* Mô tả: thu gọn, 2 dòng thôi cho tinh tế */
+    .product-description {
+        font-size: 13px !important;
+        height: 44px !important;
+        -webkit-line-clamp: 2 !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Nút: nhỏ, bo mềm, nằm ngang cân đối */
+    .btn-action {
+        display: flex !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        margin-top: 8px !important;
+    }
+
+    .btn-view, .btn-remove {
+        padding: 6px 12px !important; /* trước 8px 15px */
+        border-radius: 6px !important;
+        font-size: 13px !important;
+        min-width: 110px !important;
+    }
+
+        /* Hiệu ứng nút tinh tế hơn */
+        .btn-view:hover {
+            filter: brightness(.95) !important;
+        }
+
+        .btn-remove:hover {
+            filter: brightness(.95) !important;
+        }
+
+    /* Responsive: trên mobile càng gọn */
+    @@media (max-width: 575.98px) {
+        .img-container {
+            height: 140px !important;
+        }
+
+        .product-title {
+            font-size: 15px !important;
+            height: 40px !important;
+        }
+
+        .price {
+            font-size: 15px !important;
+        }
+
+        .btn-view, .btn-remove {
+            min-width: unset !important;
+            flex: 1 1 auto !important;
+        }
+    }
+    /* Gần phân trang với sản phẩm */
+    .wishlist-item {
+        margin-bottom: 5px !important; /* trước 25px */
+    }
+
+    .pagination-container {
+        margin-top: 5px !important; /* trước 30px */
+    }
 </style>
 
 <div class="wishlist-container">
@@ -223,7 +343,7 @@
             <div class="row">
                 @foreach (var item in Model)
                 {
-                    <div class="col-md-4 col-sm-6 wishlist-item-container" id="item-@item.Id">
+                    <div class="col-md-3 col-sm-6 wishlist-item-container" id="item-@item.Id">
                         <div class="wishlist-item text-center">
                             <div class="img-container">
                                 @if (item.Product.PriceSale > 0)
@@ -234,7 +354,7 @@
                                     <img src="@item.Product.Image" alt="@item.Product.Title" />
                                 </a>
                             </div>
-                           
+
                             <div class="product-title">
                                 <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)" title="@item.Product.Title">@item.Product.Title</a>
                             </div>
@@ -245,7 +365,7 @@
                                     @if (item.Product.PriceSale > 0)
                                     {
                                         <span style="text-decoration: line-through; color: #999; font-size: 14px; margin-left: 10px;">
-                                            @string.Format("{0:N0}", item.Product.Price)đ 
+                                            @string.Format("{0:N0}", item.Product.Price)đ
                                         </span>
 
                                     }
