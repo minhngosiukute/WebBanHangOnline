@@ -220,7 +220,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                 ? null
                 : $"Sản phẩm được yêu thích nhất: {top.Title} (Lượt thích: {top.LikeCount}, Lượt xem: {top.ViewCount})";
 
-            int pageSize = 10;
+            int pageSize = 6;
             int pageIndex = page ?? 1;
             var model = query.ToPagedList(pageIndex, pageSize);   // IPagedList<FavoriteRow>
 
