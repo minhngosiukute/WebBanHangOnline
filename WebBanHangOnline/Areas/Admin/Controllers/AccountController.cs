@@ -55,9 +55,28 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
         // GET: Admin/Account
         public ActionResult Index()
         {
-            var ítems = db.Users.ToList();
-            return View(ítems);
+            var users = db.Users.ToList();
+            var roles = db.Roles.ToList();
+
+            // Map UserId → Danh sách role name
+            var rolesMap = new Dictionary<string, List<string>>();
+
+            foreach (var user in users)
+            {
+                var userRoleIds = user.Roles.Select(r => r.RoleId).ToList();
+                var userRoleNames = roles
+                    .Where(r => userRoleIds.Contains(r.Id))
+                    .Select(r => r.Name)
+                    .ToList();
+
+                rolesMap[user.Id] = userRoleNames;
+            }
+
+            ViewBag.RolesMap = rolesMap;
+            return View(users);
         }
+
+
         //
         // GET: /Account/Login
         [AllowAnonymous]
@@ -111,128 +130,115 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
         [AllowAnonymous]
         public ActionResult Create()
         {
-            ViewBag.Role = new SelectList(db.Roles.ToList(), "Name", "Name");
-            return View();
+            var allRoles = db.Roles.Select(r => r.Name).ToList();
+            ViewBag.AllRoles = allRoles;
+            return View(new CreateAccountViewModel());
         }
+
 
         //
         // POST: /Account/Register
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        
         public async Task<ActionResult> Create(CreateAccountViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = new ApplicationUser
-                {
-                    UserName = model.UserName,
-                    Email = model.Email,
-                    FullName = model.FullName,
-                    Phone = model.Phone
-                };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    if (model.Roles != null)
-                    {
-                        foreach (var r in model.Roles)
-                        {
-                            UserManager.AddToRole(user.Id, r);
-                        }
-                    }
-
-                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-                    return RedirectToAction("Index", "Account");
-                }
-                AddErrors(result);
+                ViewBag.AllRoles = db.Roles.Select(r => r.Name).ToList();
+                return View(model);
             }
-            ViewBag.Role = new SelectList(db.Roles.ToList(), "Name", "Name");
-            // If we got this far, something failed, redisplay form
+
+            var user = new ApplicationUser
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                FullName = model.FullName,
+                Phone = model.Phone
+            };
+
+            var result = await UserManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                var selected = model.Roles ?? new List<string>();
+                if (selected.Any())
+                {
+                    await UserManager.AddToRolesAsync(user.Id, selected.ToArray());
+                }
+                return RedirectToAction("Index");
+            }
+
+            AddErrors(result);
+            ViewBag.AllRoles = db.Roles.Select(r => r.Name).ToList();
             return View(model);
         }
+
 
 
         public ActionResult Edit(string id)
         {
-            var item = UserManager.FindById(id);
-            var newUser = new EditAccountViewModel();
-            if (item != null)
+            var u = UserManager.FindById(id);
+            if (u == null) return HttpNotFound();
+
+            var currentRoles = UserManager.GetRoles(id).ToList();
+            var allRoles = db.Roles.Select(r => r.Name).ToList();
+
+            var model = new EditAccountViewModel
             {
-                var rolesForUser = UserManager.GetRoles(id);
-                var roles = new List<string>();
-                if (rolesForUser != null)
-                {
-                    foreach (var role in rolesForUser)
-                    {
-                        roles.Add(role);
+                UserName = u.UserName,
+                FullName = u.FullName,
+                Email = u.Email,
+                Phone = u.Phone,
+                Roles = currentRoles
+            };
 
-                    }
-
-                }
-                newUser.FullName = item.FullName;
-                newUser.Email = item.Email;
-                newUser.Phone = item.Phone;
-                newUser.UserName = item.UserName;
-                newUser.Roles = roles;
-            }
-            ViewBag.Role = new SelectList(db.Roles.ToList(), "Name", "Name");
-            return View(newUser);
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(EditAccountViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = UserManager.FindByName(model.UserName);
-                user.FullName = model.FullName;
-                user.Phone = model.Phone;
-                user.Email = model.Email;
-                var result = await UserManager.UpdateAsync(user);
-
-                if (result.Succeeded)
-                {
-                    var rolesForUser = UserManager.GetRoles(user.Id);
-                    if (model.Roles != null)
-                    {
-
-                        foreach (var r in model.Roles)
-                        {
-                            var checkRole = rolesForUser.FirstOrDefault(x => x.Equals(r));
-                            if (checkRole == null)
-                            {
-                                UserManager.AddToRole(user.Id, r);
-                            }
-
-                        }
-                    }
-
-                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-                    return RedirectToAction("Index", "Account");
-                }
-                AddErrors(result);
-            }
-            ViewBag.Role = new SelectList(db.Roles.ToList(), "Name", "Name");
-            // If we got this far, something failed, redisplay form
+            ViewBag.AllRoles = allRoles;
             return View(model);
         }
+
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // [AllowAnonymous]  // <-- BỎ ĐI, để Admin thôi
+        public async Task<ActionResult> Edit(EditAccountViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Role = new MultiSelectList(db.Roles.ToList(), "Name", "Name", model.Roles);
+                return View(model);
+            }
+
+            var user = await UserManager.FindByNameAsync(model.UserName); // hoặc FindById nếu bạn gửi Id
+            if (user == null) return HttpNotFound();
+
+            user.FullName = model.FullName;
+            user.Email = model.Email;
+            user.Phone = model.Phone;
+
+            var update = await UserManager.UpdateAsync(user);
+            if (!update.Succeeded)
+            {
+                AddErrors(update);
+                ViewBag.Role = new MultiSelectList(db.Roles.ToList(), "Name", "Name", model.Roles);
+                return View(model);
+            }
+
+            // Đồng bộ roles
+            var currentRoles = await UserManager.GetRolesAsync(user.Id);
+
+            var selected = model.Roles ?? new List<string>();
+            var toAdd = selected.Except(currentRoles).ToArray();
+            var toRemove = currentRoles.Except(selected).ToArray();
+
+            if (toAdd.Any()) await UserManager.AddToRolesAsync(user.Id, toAdd);
+            if (toRemove.Any()) await UserManager.RemoveFromRolesAsync(user.Id, toRemove);
+
+            return RedirectToAction("Index");
+        }
+
 
         [HttpPost]
         public async Task<ActionResult> DeleteAccount(string user, string id)
