@@ -22,13 +22,13 @@
     </ul>
 }
 <style>
+    /* Bảng */
     table {
         width: 100%;
         border-collapse: collapse;
-        table-layout: auto; /* Tự động chia theo nội dung */
+        table-layout: auto
     }
 
-        /* Header bảng: có thể co chữ lại khi hẹp */
         table th {
             text-align: center;
             vertical-align: middle;
@@ -37,10 +37,78 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: clamp(14px, 0.9vw, 14px);
-            /* co chữ khi cần, nhưng không nhỏ hơn 11px */
+            font-size: clamp(14px,.9vw,14px)
         }
+
+    /* Dialog: hiện đại, bo góc, bóng nhẹ, không padding thừa */
+    #dialog {
+        padding: 0
+    }
+
+    .ui-widget-overlay {
+        background: #000;
+        opacity: .25 !important; /* nền mờ dễ nhìn */
+    }
+
+    .ui-dialog {
+        max-width: 95vw;
+        max-height: 90vh;
+        border: 0;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+
+        .ui-dialog .ui-dialog-titlebar {
+            padding: 10px 14px;
+            border: 0;
+            border-radius: 12px 12px 0 0;
+            background: #f6f7fb;
+            font-weight: 600;
+        }
+
+        .ui-dialog .ui-dialog-titlebar-close {
+            border: 0;
+            background: transparent
+        }
+
+        .ui-dialog .ui-dialog-content {
+            padding: 0 !important;
+            overflow: hidden !important;
+            background: #fff;
+            border-radius: 0 0 12px 12px;
+        }
+
+    /* iFrame lấp đầy, không viền trắng */
+    #myIframe {
+        width: 100%;
+        display: block;
+        border: 0;
+        height: auto
+    }
+    #dialog {
+        padding: 0;
+    }
+
+    .ui-dialog {
+        max-width: 70vw; /* ↓ từ 95vw → 70vw */
+        max-height: 70vh; /* ↓ từ 90vh → 70vh */
+        border: 0;
+        border-radius: 10px;
+    }
+
+        .ui-dialog .ui-dialog-content {
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+
+    #myIframe {
+        width: 100%;
+        border: 0;
+        display: block;
+        height: auto;
+    }
 </style>
+
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -88,18 +156,18 @@
                 </div>
             </div>
             @*<div class="row">
-            <div class="col-6">
-                @using (Html.BeginForm("index", "News", FormMethod.Get, new { }))
-                {
-                    <div class="input-group input-group-sm">
-                        @Html.TextBox("Searchtext", new { @class = "form-control" })
-                        <span class="input-group-append">
-                            <button type="submit" class="btn btn-info btn-flat">Tìm kiếm</button>
-                        </span>
+                    <div class="col-6">
+                        @using (Html.BeginForm("index", "News", FormMethod.Get, new { }))
+                        {
+                            <div class="input-group input-group-sm">
+                                @Html.TextBox("Searchtext", new { @class = "form-control" })
+                                <span class="input-group-append">
+                                    <button type="submit" class="btn btn-info btn-flat">Tìm kiếm</button>
+                                </span>
+                            </div>
+                        }
                     </div>
-                }
-            </div>
-        </div>*@
+                </div>*@
             <table class="table table-hover text-center">
                 <thead>
                     <tr>
@@ -110,7 +178,7 @@
                         <th>Danh mục</th>
                         <th>Số lượng</th>
                         <th>Giá</th>
-                        <th>Ngày tạo</th>
+                        @*<th>Ngày tạo</th>*@
                         <th>Ngày cập nhật</th>
                         <th>Home</th>
                         @*<th>Sale</th>*@
@@ -136,19 +204,19 @@
                             <tr id="trow_@item.Id">
                                 @*<td><input type="checkbox" class="cbkItem" value="@item.Id" /></td>*@
                                 <td>@i</td>
-                                <td><img class="imgproduct" data-id="@item.Id" src="@strImg" width="50" /></td>
+                                <td><img class="imgproduct" data-id="@item.Id" src="@strImg" width="80" /></td>
                                 <td>@item.Title</td>
                                 <td>@item.ProductCategory.Title</td>
                                 <td>@item.Quantity</td>
                                 <td>@WebBanHangOnline.Common.Common.FormatNumber(item.Price, 0)đ</td>
-                                <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                @*<td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>*@
                                 <td>@item.ModifiedDate.ToString("dd/MM/yyyy")</td>
                                 <td class="text-center">
                                     <a href='#' data-id="@item.Id" class="btnHome">@Html.Raw(strCheckHome)</a>
                                 </td>
                                 @*<td class="text-center">
-                                <a href='#' data-id="@item.Id" class="btnSale">@Html.Raw(strCheckSale)</a>
-                            </td>*@
+                                        <a href='#' data-id="@item.Id" class="btnSale">@Html.Raw(strCheckSale)</a>
+                                    </td>*@
                                 <td class="text-center">
                                     <a href='#' data-id="@item.Id" class="btnActive">@Html.Raw(strCheck)</a>
                                 </td>
@@ -193,156 +261,150 @@
 @section scripts{
     <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
     <script>
-        $(document).ready(function () {
-            //hiển thị form upload ảnh
+        $(function () {
+
+            // ---- Khởi tạo dialog (1 lần) ----
             $("#dialog").dialog({
                 autoOpen: false,
-                show: "fade",
-                hide: "fade",
                 modal: true,
-                height: '600',
-                width: '700',
                 resizable: true,
-                title: 'Quản lý ảnh sản phẩm',
-                close: function () {
-                    window.location.reload();
-                }
+                draggable: true,
+                title: "Quản lý ảnh sản phẩm",
+                open: function () {
+                    // set kích thước hợp lý lúc mở
+                    resizeDialog();
+                    $(".ui-dialog .ui-dialog-content").css("padding", 0);
+                },
+                close: function () { window.location.reload(); }
             });
-            $('body').on("click", ".imgproduct", function () {
-                var proid = $(this).attr("data-id");
-                $("#dialog #myIframe").attr("src", "/admin/ProductImage/Index?id=" + proid);
-                $('#dialog').dialog('open');
+
+            // ---- Mở dialog khi click ảnh ----
+            $("body").on("click", ".imgproduct", function () {
+                var proid = $(this).data("id");
+                $("#myIframe").attr("src", "/admin/ProductImage/Index?id=" + proid);
+                $("#dialog").dialog("open");
                 return false;
             });
+
+            // ---- Iframe load xong: bỏ margin mặc định & fit chiều cao thật ----
+            $("#myIframe").on("load", function () {
+                try {
+                    var $doc = $(this).contents();
+                    $doc.find("body").css("margin", "0"); // xoá margin 8px mặc định
+                    // (tuỳ chọn) CSS gọn cho thumbnail ở trang con
+                    var css = `
+  /* Thumbnail gọn, không vỡ bố cục */
+  .glImage{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}
+  .glImage li{position:relative;display:inline-block;width:160px}   /* ↓ 220 → 160 */
+  .glImage li img{width:100%;height:120px;object-fit:contain;border-radius:6px;display:block} /* ↓ 180 → 120 */
+  .box-btn{position:absolute;left:6px;bottom:6px;display:flex;gap:6px}
+  .card-body{padding:10px 12px 6px !important}
+  .card-footer{display:none !important}
+  .card{margin-bottom:0 !important}
+`;
+
+                    $doc.find("head").append("<style>" + css + "</style>");
+                } catch (e) { }
+
+                fitToIframe();
+            });
+
+            // ---- Resize theo cửa sổ ----
+            $(window).on("resize", function () {
+                resizeDialog();
+                fitToIframe();
+            });
+
+            // ---------- Helpers ----------
+            function resizeDialog() {
+                var w = Math.min($(window).width() * 0.60, 800);
+                var h = Math.min($(window).height() * 0.60, 600);
+                $("#dialog").dialog("option", { width: w, height: h });
+                $("#myIframe").height(h - titlebarHeight());
+            }
+
+            function fitToIframe() {
+                var maxH = Math.min($(window).height() * 0.50, 650);
+                var innerH = maxH; // fallback
+                try {
+                    var doc = document.getElementById("myIframe").contentWindow.document;
+                    var docH = Math.max(
+                        doc.body.scrollHeight, doc.documentElement.scrollHeight,
+                        doc.body.offsetHeight, doc.documentElement.offsetHeight
+                    );
+                    innerH = Math.min(docH, maxH);
+                } catch (e) { }
+                $("#myIframe").height(innerH);
+                $("#dialog").dialog("option", "height", innerH + titlebarHeight());
+            }
+
+            function titlebarHeight() {
+                var $dlg = $("#dialog").parent();
+                return $dlg.find(".ui-dialog-titlebar").outerHeight() || 0;
+            }
+
+        });
+    </script>
+
+    <!-- Các handler khác GIỮ NGUYÊN (không khởi tạo dialog lần 2) -->
+    <script>
+        $(document).ready(function () {
             $('body').on('click', '#BtnDeleteAll', function (e) {
                 e.preventDefault();
-                var str = "";
+                var str = "", i = 0;
                 var checkbox = $(this).parents('.card').find('tr td input:checkbox');
-                var i = 0;
                 checkbox.each(function () {
-                    if (this.checked) {
-                        var _id = $(this).val();
-                        if (i === 0) {
-                            str += _id;
-                        } else {
-                            str += "," + _id;
-                        }
-                        i++;
-                    } else {
-                        checkbox.attr('selected', '');
-                    }
+                    if (this.checked) { str += (i++ === 0 ? "" : ",") + $(this).val(); }
+                    else { checkbox.attr('selected', ''); }
                 });
-                if (str.length > 0) {
-                    var conf = confirm('Bạn có muốn xóa các bản ghi này hay không?');
-                    if (conf === true) {
-                        $.ajax({
-                            url: '/admin/news/deleteAll',
-                            type: 'POST',
-                            data: { ids: str },
-                            success: function (rs) {
-                                if (rs.success) {
-                                    location.reload();
-                                }
-                            }
-                        });
-                    }
+                if (str.length > 0 && confirm('Bạn có muốn xóa các bản ghi này hay không?')) {
+                    $.ajax({
+                        url: '/admin/news/deleteAll', type: 'POST', data: { ids: str },
+                        success: function (rs) { if (rs.success) location.reload(); }
+                    });
                 }
             });
 
             $('body').on('change', '#SelectAll', function () {
-                var checkStatus = this.checked;
-                var checkbox = $(this).parents('.card-body').find('tr td input:checkbox');
-                checkbox.each(function () {
-                    this.checked = checkStatus;
-                    if (this.checked) {
-                        checkbox.attr('selected', 'checked');
-                    } else {
-                        checkbox.attr('selected', '');
-                    }
-                });
+                var check = this.checked;
+                var cb = $(this).parents('.card-body').find('tr td input:checkbox');
+                cb.each(function () { this.checked = check; cb.attr('selected', check ? 'checked' : ''); });
             });
+
             $('body').on('click', '.btnDelete', function () {
                 var id = $(this).data("id");
-                var conf = confirm('Bạn có muốn xóa bản ghi này không?');
-                if (conf === true) {
+                if (confirm('Bạn có muốn xóa bản ghi này không?')) {
                     $.ajax({
-                        url: '/admin/Products/delete',
-                        type: 'POST',
-                        data: { id: id },
-                        success: function (rs) {
-                            if (rs.success) {
-                                $('#trow_' + id).remove();
-                                location.reload();
-                            }
-                        }
+                        url: '/admin/Products/delete', type: 'POST', data: { id: id },
+                        success: function (rs) { if (rs.success) { $('#trow_' + id).remove(); location.reload(); } }
                     });
                 }
             });
+
             $('body').on('click', '.btnHome', function (e) {
                 e.preventDefault();
-                var btn = $(this);
-                var id = btn.data("id");
-                $.ajax({
-                    url: '/admin/Products/IsHome',
-                    type: 'POST',
-                    data: { id: id },
-                    success: function (rs) {
-                        if (rs.success) {
-                            if (rs.IsHome) {
-                                btn.html("<i class='fa fa-check text-success'></i>");
-                                //$(this).find("i").removeClass("fas fa-times text-danger")
-                                //$(this).find("i").addClass("fa fa-check text-success");
-                            } else {
-                                btn.html("<i class='fas fa-times text-danger'></i>");
-                            }
-                        }
-
-                    }
+                var btn = $(this), id = btn.data("id");
+                $.post('/admin/Products/IsHome', { id: id }, function (rs) {
+                    if (rs.success) btn.html(rs.IsHome ? "<i class='fa fa-check text-success'></i>" :
+                        "<i class='fas fa-times text-danger'></i>");
                 });
             });
 
             $('body').on('click', '.btnSale', function (e) {
                 e.preventDefault();
-                var btn = $(this);
-                var id = btn.data("id");
-                $.ajax({
-                    url: '/admin/Products/IsSale',
-                    type: 'POST',
-                    data: { id: id },
-                    success: function (rs) {
-                        if (rs.success) {
-                            if (rs.IsSale) {
-                                btn.html("<i class='fa fa-check text-success'></i>");
-                                //$(this).find("i").removeClass("fas fa-times text-danger")
-                                //$(this).find("i").addClass("fa fa-check text-success");
-                            } else {
-                                btn.html("<i class='fas fa-times text-danger'></i>");
-                            }
-                        }
-
-                    }
+                var btn = $(this), id = btn.data("id");
+                $.post('/admin/Products/IsSale', { id: id }, function (rs) {
+                    if (rs.success) btn.html(rs.IsSale ? "<i class='fa fa-check text-success'></i>" :
+                        "<i class='fas fa-times text-danger'></i>");
                 });
             });
+
             $('body').on('click', '.btnActive', function (e) {
                 e.preventDefault();
-                var btn = $(this);
-                var id = btn.data("id");
-                $.ajax({
-                    url: '/admin/Products/IsActive',
-                    type: 'POST',
-                    data: { id: id },
-                    success: function (rs) {
-                        if (rs.success) {
-                            if (rs.isAcive) {
-                                btn.html("<i class='fa fa-check text-success'></i>");
-                                //$(this).find("i").removeClass("fas fa-times text-danger")
-                                //$(this).find("i").addClass("fa fa-check text-success");
-                            } else {
-                                btn.html("<i class='fas fa-times text-danger'></i>");
-                            }
-                        }
-
-                    }
+                var btn = $(this), id = btn.data("id");
+                $.post('/admin/Products/IsActive', { id: id }, function (rs) {
+                    if (rs.success) btn.html(rs.isAcive ? "<i class='fa fa-check text-success'></i>" :
+                        "<i class='fas fa-times text-danger'></i>");
                 });
             });
         });
