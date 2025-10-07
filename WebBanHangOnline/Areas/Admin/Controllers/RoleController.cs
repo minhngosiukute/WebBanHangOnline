@@ -31,7 +31,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
         public ActionResult Index(int? page)
         {
-            int pageSize = 6; // Số lượng vai trò trên mỗi trang
+            int pageSize = 5; // Số lượng vai trò trên mỗi trang
             int pageNumber = page ?? 1; // Trang hiện tại, mặc định là trang 1
 
             var roles = db.Roles.OrderBy(r => r.Name).ToPagedList(pageNumber, pageSize);
