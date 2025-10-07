@@ -57,13 +57,7 @@
                     @Html.AntiForgeryToken()
                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.ImportCode, "Mã phiếu nhập", new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            @Html.TextBoxFor(model => model.ImportCode, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.ImportCode, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
+                   
 
                     <div class="form-group">
                         @Html.LabelFor(model => model.SupplierId, "Nhà cung cấp", new { @class = "control-label col-md-2" })
@@ -74,7 +68,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="control-label col-md-2">Thông tin nhập hàng</label>
+                        <label class="control-label col-md-3">Thông tin nhập hàng</label>
                         <div class="col-md-10">
                             <table class="table table-bordered text-center" id="productTable">
                                 <thead class="thead-light">
@@ -124,14 +118,14 @@
                     </div>
 
                     <div class="form-group">
-                        
-                            <button type="submit" class="btn btn-outline-primary">
-                                <i class="fa fa-file-alt"></i> Tạo phiếu nhập
-                            </button>
-                            <a href="@Url.Action("Index")" class="btn btn-outline-danger">
-                                <i class="fa fa-arrow-left"></i> Quay lại
-                            </a>
-                        
+
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fa fa-file-alt"></i> Tạo phiếu nhập
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-danger">
+                            <i class="fa fa-arrow-left"></i> Quay lại
+                        </a>
+
 
                     </div>
                 }
