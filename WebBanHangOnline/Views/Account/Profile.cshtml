@@ -1,69 +1,132 @@
 ﻿@model WebBanHangOnline.Models.CreateAccountViewModel
 @{
-    ViewBag.Title = "Profile";
+    ViewBag.Title = "Hồ sơ cá nhân";
 }
-<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
-<!-- Slider -->
+<link rel="stylesheet" href="~/Content/assets/styles/main_styles.css" />
+
 <style>
-    .news_section_container {
-        margin-top: 180px;
+    /* ---- Profile look ---- */
+    .profile-wrap { padding-top: 140px; padding-bottom: 60px; }
+    .card { border: 0; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.06); }
+    .card-header { background: #fff; border-bottom: 0; padding: 18px 24px; }
+    .card-title { margin: 0; font-weight: 700; letter-spacing: .2px; }
+    .muted { color: #6c757d; }
+    .avatar {
+        width: 96px; height: 96px; border-radius: 50%;
+        object-fit: cover; background: #f4f5f7; border: 2px solid #eee;
+    }
+    .form-control[readonly] {
+        background-color: #f7f7f9; color: #6c757d; cursor: not-allowed;
+    }
+    .input-icon { position: relative; }
+    .input-icon .fa { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); }
+    .input-icon input { padding-left: 38px; }
+    .btn-rounded { border-radius: 999px; padding-left: 22px; padding-right: 22px; }
+    .section-title { font-weight: 800; text-align: center; margin: 14px 0 24px; }
+    .table thead th { border-top: 0; background: #fafbfc; }
+    .badge-link { text-decoration: none; }
+    @@media (max-width: 991.98px){ .profile-wrap { padding-top: 16px; } }
+    .card-body.text-center {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* canh giữa theo chiều dọc */
+        align-items: center; /* canh giữa theo chiều ngang */
+        height: 100%; /* giúp nó chiếm toàn bộ chiều cao card */
+        padding-top: 40px;
+        padding-bottom: 40px;
     }
 
-    .row-item-new {
-        margin-bottom: 20px;
-    }
 
-    .title-news {
-        font-size: 24px;
-        border-bottom: 1px solid;
-        padding: 15px 0;
-        margin-bottom: 25px;
-    }
-
-    .img-box img {
-        max-width: 100%;
-        max-height: 100%;
-    }
 </style>
-<div class="container news_section_container">
-    <div class="row">
 
-        <div class="col-md-12">
-            @using (Html.BeginForm("PostProfile", "Account"))
-            {
-                @Html.ValidationSummary(false)
-                @Html.AntiForgeryToken()
-                <div class="form-group">
-                    <label for="exampleInputEmail1">Full Name</label>
-                    <input type="text" class="form-control" aria-describedby="emailHelp" name="FullName" value="@Model.FullName">
+<div class="container profile-wrap">
+    <div class="row g-4 align-items-stretch">
+        <!-- Sidebar -->
+        <div class="col-lg-4 d-flex">
+            <div class="card w-100 h-100">
+                <div class="card-body text-center">
+                    <!-- Nếu có ảnh đại diện thì đổi src -->
 
+                    <h5 class="mb-1 profile-info-name">@Model.FullName</h5>
+                    <div class="muted mb-3">Username: <strong>@Model.UserName</strong></div>
+
+                    <div class="d-grid gap-2">
+                        <a href="/" class="btn btn-outline-secondary btn-rounded">Về trang chủ</a>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="exampleInputEmail1">Username</label>
-                    <input type="text" class="form-control" aria-describedby="emailHelp"  name="UserName" value="@Model.UserName " readonly>
-
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputEmail1">Phone</label>
-                    <input type="text" class="form-control" aria-describedby="emailHelp" name="Phone" value="@Model.Phone">
-
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputEmail1">Email</label>
-                    <input type="text" class="form-control" aria-describedby="emailHelp"  name="Email" value="@Model.Email" readonly>
-
-                </div>
-                <div class="form-group">
-
-                    <button type="submit" class="btn btn-success">Cập nhật</button>
-
-                </div>}
-        </div>
-        <div class="col-md-12">
-         
-            @Html.Action("LichSuDonHang", "Review")
+            </div>
         </div>
 
+        <!-- Form cập nhật -->
+        <div class="col-lg-8 d-flex">
+            <div class="card w-100 h-100">
+                <div class="card-header">
+                    <h5 class="text-center card-title">Thông tin cá nhân</h5>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("PostProfile", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+                    {
+                        @Html.AntiForgeryToken()
 
+                        if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                            </div>
+                        }
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Họ và tên</label>
+                                <div class="input-icon">
+                                    <i class="fa fa-user muted"></i>
+                                    <input type="text" name="FullName" class="form-control" value="@Model.FullName" placeholder="Nhập họ tên">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Username</label>
+                                <div class="input-icon">
+                                    <i class="fa fa-id-badge muted"></i>
+                                    <input type="text" name="UserName" class="form-control" value="@Model.UserName" readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <div class="input-icon">
+                                    <i class="fa fa-phone muted"></i>
+                                    <input type="text" name="Phone" class="form-control" value="@Model.Phone" placeholder="VD: 09xxxxxxxx">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Email</label>
+                                <div class="input-icon">
+                                    <i class="fa fa-envelope muted"></i>
+                                    <input type="text" name="Email" class="form-control" value="@Model.Email" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-success btn-rounded px-4">
+                                <i class="fa fa-save"></i> Cập nhật
+                            </button>
+                        </div>
+
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Lịch sử mua hàng -->
+        <div class="col-12 mt-4">
+            <div class="card">
+                
+                    @Html.Action("LichSuDonHang", "Review")
+                
+            </div>
+        </div>
     </div>
 </div>

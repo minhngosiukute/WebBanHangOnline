@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -23,15 +24,36 @@ namespace WebBanHangOnline.Controllers
             return PartialView();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Subscribe(Subscribe req)
         {
-            if (ModelState.IsValid)
+            // Chuẩn hóa email (tránh A@B.com ≠ a@b.com trên một số collation)
+            var email = (req?.Email ?? string.Empty).Trim().ToLowerInvariant();
+
+            if (string.IsNullOrEmpty(email))
+                return Json(new { Success = false, Message = "Vui lòng nhập email hợp lệ." });
+
+            // Không cần tự kiểm tra trùng (DB đã có UNIQUE).
+            db.Subscribes.Add(new Subscribe
             {
-                db.Subscribes.Add(new Subscribe { Email = req.Email, CreatedDate = DateTime.Now });
+                Email = email,
+                CreatedDate = DateTime.Now
+            });
+
+            try
+            {
                 db.SaveChanges();
-                return Json(new {Success=true });
+                return Json(new { Success = true, Message = "Đăng ký thành công! Cảm ơn bạn đã theo dõi." });
             }
-            return View("Partial_Subcrice", req);
+            catch (DbUpdateException)
+            {
+                // Vi phạm UNIQUE index => email đã tồn tại
+                return Json(new { Success = false, Message = "Email này đã đăng ký trước đó rồi." });
+            }
+            catch (Exception)
+            {
+                return Json(new { Success = false, Message = "Có lỗi xảy ra. Vui lòng thử lại sau." });
+            }
         }
         public ActionResult About()
         {

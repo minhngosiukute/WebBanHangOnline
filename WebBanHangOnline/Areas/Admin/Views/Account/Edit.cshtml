@@ -71,8 +71,9 @@
                         <label>Quyền</label>
                         <div class="d-flex flex-wrap gap-3">
                             @{
-                                var allRoles = ViewBag.AllRoles as IEnumerable<string>;
+                                var allRoles = (ViewBag.AllRoles as IEnumerable<string>) ?? Enumerable.Empty<string>();
                             }
+
                             @foreach (var role in allRoles)
                             {
                                 bool isChecked = Model.Roles != null && Model.Roles.Contains(role);
