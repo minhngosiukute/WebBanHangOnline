@@ -6,7 +6,7 @@
 
 <style>
     /* Nền gradient chuyển màu động */
-    body {
+/*    body {
         margin: 0;
         padding: 0;
         font-family: 'Poppins', sans-serif;
@@ -19,10 +19,10 @@
         align-items: center;
         position: relative;
         overflow: hidden;
-    }
+    }*/
 
     /* Hiệu ứng gradient động */
-    @@keyframes gradientBG {
+    /*@@keyframes gradientBG {
         0% {
             background-position: 0% 50%;
         }
@@ -34,10 +34,10 @@
         100% {
             background-position: 0% 50%;
         }
-    }
+    }*/
 
     /* Đom đóm bay xung quanh */
-    body::before {
+    /*body::before {
         content: '';
         position: absolute;
         top: 0;
@@ -91,70 +91,87 @@
         100% {
             transform: translate(0, 0);
         }
-    }
-
-    /* Hộp đăng nhập */
-    .login-card-body {
-        width: 400px;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        backdrop-filter: blur(10px);
+    }*/
+    body {
         position: relative;
-        z-index: 2;
+        overflow: hidden;
+        background: linear-gradient(45deg, #b3e5fc, #c5cae9, #f8bbd0, #fff59d); /* Màu pastel đậm hơn */
+        background-size: 200% 200%;
+        animation: aurora 6s ease infinite; /* Hiệu ứng aurora nhẹ nhàng */
     }
+    @@keyframes aurora {
+        0% {
+            background-position: 0% 50%;
+        }
 
-    .login-box-msg {
-        font-size: 24px;
-        font-weight: 600;
-        color: #444;
-        margin-bottom: 20px;
-    }
+        50% {
+            background-position: 100% 50%;
+        }
 
-    /* Trường nhập liệu */
-    .form-control {
-        width: 100%;
-        padding: 12px 20px;
-        border-radius: 30px;
-        border: 1px solid #ddd;
-        outline: none;
-        font-size: 16px;
-        background: rgba(255, 255, 255, 0.8);
-        color: #555;
-        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
+        100% {
+            background-position: 0% 50%;
+        }
     }
+        /* Hộp đăng nhập */
+        .login-card-body {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-box-msg {
+            font-size: 24px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        /* Trường nhập liệu */
+        .form-control {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 1px solid #ddd;
+            outline: none;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #555;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
         .form-control:focus {
             border-color: #66a6ff;
             box-shadow: 0 0 10px rgba(102, 166, 255, 0.5);
         }
 
-    .input-group {
-        position: relative;
-        margin-bottom: 20px;
-    }
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
 
-    .input-group-text {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #66a6ff;
-        font-size: 18px;
-    }
+        .input-group-text {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #66a6ff;
+            font-size: 18px;
+        }
 
-    .form-control {
-        padding-left: 45px;
-    }
-
-    /* Biểu tượng con mắt trong ô mật khẩu */
-    /* Biểu tượng con mắt trong ô mật khẩu */
-    .password-group {
-        position: relative;
-    }
+        .form-control {
+            padding-left: 45px;
+        }
+        /* Biểu tượng con mắt trong ô mật khẩu */
+        /* Biểu tượng con mắt trong ô mật khẩu */
+        .password-group {
+            position: relative;
+        }
 
         .password-group .form-control {
             padding-left: 45px; /* cho icon khóa bên trái */
@@ -162,106 +179,103 @@
             border-radius: 30px; /* giữ bo tròn đều 2 bên */
         }
 
-    .toggle-password {
-        position: absolute;
-        right: 18px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #66a6ff;
-        font-size: 18px;
-        transition: color 0.3s ease, transform 0.2s ease;
-    }
+        .toggle-password {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #66a6ff;
+            font-size: 18px;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
 
         .toggle-password:hover {
             color: #1e90ff;
             transform: translateY(-50%) scale(1.1);
         }
-
-
-    /* Nút đăng nhập */
-    .btn-primary {
-        background: linear-gradient(to right, #1e90ff, #87cefa);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 30px;
-        font-size: 16px;
-        font-weight: bold;
-        border: none;
-        width: 100%;
-        transition: all 0.3s ease;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-        position: relative;
-        overflow: hidden;
-    }
+        /* Nút đăng nhập */
+        .btn-primary {
+            background: linear-gradient(to right, #1e90ff, #87cefa);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
 
         .btn-primary:hover {
             background: linear-gradient(to right, #87cefa, #1e90ff);
             transform: translateY(-3px);
             box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
         }
-
-    /* Liên kết */
-    .mb-1 a {
-        color: #66a6ff;
-        text-decoration: none;
-        font-size: 14px;
-    }
+        /* Liên kết */
+        .mb-1 a {
+            color: #66a6ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
 
         .mb-1 a:hover {
             text-decoration: underline;
             color: #89f7fe;
         }
-
-    /* Check box label */
-    .icheck-primary label {
-        font-size: 14px;
-        color: #555;
-    }
-    /* Khôi phục bo tròn cho input khi dùng .input-group có thêm icon bên phải */
-    .input-group.password-group .form-control {
-        border-top-left-radius: 30px !important;
-        border-bottom-left-radius: 30px !important;
-        border-top-right-radius: 30px !important; /* bị Bootstrap reset về 0 */
-        border-bottom-right-radius: 30px !important; /* bị Bootstrap reset về 0 */
-        padding-right: 45px; /* chừa chỗ cho icon con mắt */
-    }
+        /* Check box label */
+        .icheck-primary label {
+            font-size: 14px;
+            color: #555;
+        }
+        /* Khôi phục bo tròn cho input khi dùng .input-group có thêm icon bên phải */
+        .input-group.password-group .form-control {
+            border-top-left-radius: 30px !important;
+            border-bottom-left-radius: 30px !important;
+            border-top-right-radius: 30px !important; /* bị Bootstrap reset về 0 */
+            border-bottom-right-radius: 30px !important; /* bị Bootstrap reset về 0 */
+            padding-right: 45px; /* chừa chỗ cho icon con mắt */
+        }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-<div class="card-body login-card-body">
-    <p class="login-box-msg">Đăng nhập tài khoản</p>
-    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true);
 
-        <div class="input-group mb-3 password-group">
-            <span class="input-group-text"><i class="fas fa-user"></i></span>
-            @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", @placeholder = "Tài khoản" })
-        </div>
+    <div class="card-body login-card-body  ">
+        <p class="login-box-msg">Đăng nhập tài khoản</p>
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true);
 
-        <div class="input-group mb-3 password-group">
-            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-            @Html.PasswordFor(x => x.Password, new { @class = "form-control", @placeholder = "Mật khẩu", id = "passwordInput" })
-            <span class="toggle-password" onclick="togglePassword()">
-                <i class="fas fa-eye" id="eyeIcon"></i>
-            </span>
-        </div>
-
-        <div class="row">
-            <div class="col-8 text-start">
-                @Html.CheckBoxFor(x => x.RememberMe)
-                <label for="remember">Ghi nhớ</label>
+            <div class="input-group mb-3 password-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                @Html.TextBoxFor(x => x.UserName, new { @class = "form-control", @placeholder = "Tài khoản" })
             </div>
-            <div class="col-4">
-                <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+
+            <div class="input-group mb-3 password-group">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                @Html.PasswordFor(x => x.Password, new { @class = "form-control", @placeholder = "Mật khẩu", id = "passwordInput" })
+                <span class="toggle-password" onclick="togglePassword()">
+                    <i class="fas fa-eye" id="eyeIcon"></i>
+                </span>
             </div>
-        </div>
-    }
-    @*<p class="mb-1">
-            <a href="#">Quên mật khẩu?</a>
-        </p>*@
-</div>
+
+            <div class="row">
+                <div class="col-8 text-start">
+                    @Html.CheckBoxFor(x => x.RememberMe)
+                    <label for="remember">Ghi nhớ</label>
+                </div>
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+                </div>
+            </div>
+        }
+        @*<p class="mb-1">
+                <a href="#">Quên mật khẩu?</a>
+            </p>*@
+    </div>
 @Scripts.Render("~/bundles/jqueryval")
 <script>
     function togglePassword() {

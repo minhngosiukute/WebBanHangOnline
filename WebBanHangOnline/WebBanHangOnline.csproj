@@ -218,6 +218,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202510080857500_TenMigration.cs" />
+    <Compile Include="Migrations\202510080857500_TenMigration.Designer.cs">
+      <DependentUpon>202510080857500_TenMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\CommonAbstract.cs" />
@@ -3631,11 +3635,15 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Views\Adv\" />
-    <Folder Include="Areas\Admin\Views\OMG\" />
     <Folder Include="Content\ckfinder\userfiles\" />
     <Folder Include="Uploads\files\" />
     <Folder Include="Uploads\flash\" />
     <Folder Include="Views\Role\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202510080857500_TenMigration.resx">
+      <DependentUpon>202510080857500_TenMigration.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

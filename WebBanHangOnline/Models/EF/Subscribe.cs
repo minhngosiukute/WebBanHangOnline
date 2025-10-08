@@ -11,11 +11,14 @@ namespace WebBanHangOnline.Models.EF
     public class Subscribe
     {
         [Key]
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [EmailAddress]
-        [Required]
+
+        [Required, EmailAddress]
+        [StringLength(256)]
+        [Index("IX_tb_Subscribe_Email", IsUnique = true)] // <- CHỐT: unique
         public string Email { get; set; }
+
         public DateTime CreatedDate { get; set; }
     }
 }

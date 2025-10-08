@@ -222,7 +222,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
             if (!update.Succeeded)
             {
                 AddErrors(update);
-                ViewBag.Role = new MultiSelectList(db.Roles.ToList(), "Name", "Name", model.Roles);
+                ViewBag.AllRoles = db.Roles.Select(r => r.Name).ToList();
                 return View(model);
             }
 
