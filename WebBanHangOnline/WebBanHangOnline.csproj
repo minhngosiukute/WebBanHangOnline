@@ -3447,9 +3447,6 @@
     <Content Include="Content\ckeditor\skins\moono\readme.md" />
     <Content Include="Content\ckfinder\plugins\fileeditor\codemirror\LICENSE" />
     <Content Include="Areas\Admin\Views\News\Edit.cshtml" />
-    <Content Include="Areas\Admin\Views\Posts\Index.cshtml" />
-    <Content Include="Areas\Admin\Views\Posts\Add.cshtml" />
-    <Content Include="Areas\Admin\Views\Posts\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Products\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Products\Add.cshtml" />
     <Content Include="Areas\Admin\Views\ProductCategory\Index.cshtml" />
