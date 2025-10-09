@@ -1,0 +1,69 @@
+﻿@model WebBanHangOnline.Models.AdvCreateViewModel
+@{
+    ViewBag.Title = "Chỉnh sửa bài quảng cáo";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@section naviheader{
+    <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a></li>
+        <li class="nav-item d-none d-sm-inline-block"><a href="/admin" class="nav-link">Trang chủ</a></li>
+        <li class="nav-item d-none d-sm-inline-block"><a href="/admin/adv" class="nav-link">@ViewBag.Title</a></li>
+    </ul>
+}
+<div class="card">
+    <div class="card-header bg-gradient-pink text-white">
+        <h3 class="card-title"><i class="fas fa-edit"></i> @ViewBag.Title</h3>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                <label for="Title">Tiêu đề</label>
+                @Html.TextBoxFor(m => m.Title, new { @class = "form-control", id = "Title" })
+                @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label for="Description">Mô tả</label>
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 4, @id = "Description" })
+            </div>
+            @*<div class="form-group">
+                    <label for="Image">Hình ảnh (URL)</label>
+                    @Html.TextBoxFor(m => m.Image, new { @class = "form-control", id = "Image" })
+                </div>*@
+                <div class="form-group">
+                    <label for="Link">Liên kết</label>
+                    @Html.TextBoxFor(m => m.Link, new { @class = "form-control", id = "Link" })
+                </div>
+                @*<div class="form-group">
+                    <label for="Type">Loại (Type)</label>
+                    @Html.TextBoxFor(m => m.Type, new { @class = "form-control", id = "Type", type = "number" })
+                </div>*@
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Cập nhật</button>
+                <a href="@Url.Action("Index","Adv", new { area="Admin" })" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại</a>
+            </div>
+        }
+    </div>
+</div>
+@section  scripts{
+    <script>
+        $(document).ready(function () {
+            CKEDITOR.replace('Description', {
+                customConfig: '/content/ckeditor/config.js',
+                extraAllowedContent: 'span',
+            });
+        });
+        function BrowseServer(field) {
+            var finder = new CKFinder();
+            finder.selectActionFunction = function (fileUrl) {
+                document.getElementById(field).value = fileUrl;
+            };
+            finder.popup();
+        }
+
+    </script>
+}
