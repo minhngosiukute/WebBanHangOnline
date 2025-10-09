@@ -217,30 +217,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202510080857500_TenMigration.cs" />
-    <Compile Include="Migrations\202510080857500_TenMigration.Designer.cs">
-      <DependentUpon>202510080857500_TenMigration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202510090202219_Remove_Image_Link_Type_from_Adv.cs" />
-    <Compile Include="Migrations\202510090202219_Remove_Image_Link_Type_from_Adv.Designer.cs">
-      <DependentUpon>202510090202219_Remove_Image_Link_Type_from_Adv.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202510090243195_Remoj.cs" />
-    <Compile Include="Migrations\202510090243195_Remoj.Designer.cs">
-      <DependentUpon>202510090243195_Remoj.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202510090244348_Remojf.cs" />
-    <Compile Include="Migrations\202510090244348_Remojf.Designer.cs">
-      <DependentUpon>202510090244348_Remojf.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202510090300075_Remojfd.cs" />
-    <Compile Include="Migrations\202510090300075_Remojfd.Designer.cs">
-      <DependentUpon>202510090300075_Remojfd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202510090918309_hh.cs" />
-    <Compile Include="Migrations\202510090918309_hh.Designer.cs">
-      <DependentUpon>202510090918309_hh.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdvCreateViewModel.cs" />
@@ -3659,26 +3635,6 @@
     <Folder Include="Uploads\files\" />
     <Folder Include="Uploads\flash\" />
     <Folder Include="Views\Role\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202510080857500_TenMigration.resx">
-      <DependentUpon>202510080857500_TenMigration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202510090202219_Remove_Image_Link_Type_from_Adv.resx">
-      <DependentUpon>202510090202219_Remove_Image_Link_Type_from_Adv.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202510090243195_Remoj.resx">
-      <DependentUpon>202510090243195_Remoj.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202510090244348_Remojf.resx">
-      <DependentUpon>202510090244348_Remojf.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202510090300075_Remojfd.resx">
-      <DependentUpon>202510090300075_Remojfd.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202510090918309_hh.resx">
-      <DependentUpon>202510090918309_hh.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
