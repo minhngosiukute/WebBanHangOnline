@@ -77,9 +77,9 @@
                         @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 6, id = "Description", name = "Description" })
                     </div>
 
-                    <div class="text-right">
-                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Lưu</button>
-                        <a class="btn btn-secondary" href="@Url.Action("Index","Adv", new { area="Admin" })">
+                    <div class="text-left">
+                        <button type="submit" class="btn btn-outline-success"><i class="fas fa-save"></i> Lưu</button>
+                        <a class="btn btn-outline-danger" href="@Url.Action("Index","Adv", new { area="Admin" })">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </a>
                     </div>
