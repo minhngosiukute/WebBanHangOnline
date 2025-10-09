@@ -194,7 +194,6 @@
     <Compile Include="Areas\Admin\Controllers\ImportOrderController.cs" />
     <Compile Include="Areas\Admin\Controllers\NewsController.cs" />
     <Compile Include="Areas\Admin\Controllers\OrderController.cs" />
-    <Compile Include="Areas\Admin\Controllers\PostsController.cs" />
     <Compile Include="Areas\Admin\Controllers\ProductCategoryController.cs" />
     <Compile Include="Areas\Admin\Controllers\ProductImageController.cs" />
     <Compile Include="Areas\Admin\Controllers\ProductsController.cs" />
@@ -206,7 +205,6 @@
     <Compile Include="Common\Common.cs" />
     <Compile Include="Common\SettingHelper.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\ArticleController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -239,6 +237,10 @@
     <Compile Include="Migrations\202510090300075_Remojfd.Designer.cs">
       <DependentUpon>202510090300075_Remojfd.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202510090907124_Remojfdg.cs" />
+    <Compile Include="Migrations\202510090907124_Remojfdg.Designer.cs">
+      <DependentUpon>202510090907124_Remojfdg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdvCreateViewModel.cs" />
@@ -255,7 +257,6 @@
     <Compile Include="Models\EF\News.cs" />
     <Compile Include="Models\EF\Order.cs" />
     <Compile Include="Models\EF\OrderDetail.cs" />
-    <Compile Include="Models\EF\Posts.cs" />
     <Compile Include="Models\EF\Product.cs" />
     <Compile Include="Models\EF\ProductCategory.cs" />
     <Compile Include="Models\EF\ProductImage.cs" />
@@ -3677,6 +3678,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202510090300075_Remojfd.resx">
       <DependentUpon>202510090300075_Remojfd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510090907124_Remojfdg.resx">
+      <DependentUpon>202510090907124_Remojfdg.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
