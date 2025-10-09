@@ -1,0 +1,118 @@
+﻿
+@model WebBanHangOnline.Models.AdvCreateViewModel
+@{
+    ViewBag.Title = "Thêm mới bài quảng cáo";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+
+@section naviheader{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/news" class="nav-link">Tin tức</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Thêm mới</a>
+        </li>
+    </ul>
+}
+
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Thêm mới Tin tức</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Tin tức</a></li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card aurora-background">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin thêm mới Tin tức</h3>
+        </div>
+        <div class="card-body">
+            <div class="bs-stepper-content">
+                @using (Html.BeginForm("Create", "Adv", FormMethod.Post, new { area = "Admin", id = "advCreateForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group">
+                        <label for="Title">Tiêu đề</label>
+                        @Html.TextBoxFor(m => m.Title, new { @class = "form-control", id = "Title", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label for="Link">Link</label>
+                        @Html.TextArea(
+                            "Link",                                   // name
+                            Model.Link ?? "https://localhost:44375/", // value mặc định nếu null
+                            new { @class = "form-control", id = "Link" }
+                        )
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="Description">Nội dung quảng cáo</label>
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 6, id = "Description", name = "Description" })
+                    </div>
+
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Lưu</button>
+                        <a class="btn btn-secondary" href="@Url.Action("Index","Adv", new { area="Admin" })">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                }
+
+            </div>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+
+        </div>
+        <!-- /.card-footer-->
+    </div>
+    <!-- /.card -->
+
+</section>
+<!-- /.content -->
+
+@section scripts{
+    <script>
+        $(function () {
+            // Khởi tạo CKEditor
+            CKEDITOR.replace('Description', {
+                customConfig: '/content/ckeditor/config.js',
+                extraAllowedContent: 'span'
+            });
+
+            // Trước khi submit: đồng bộ dữ liệu từ CKEditor về textarea
+            $('#advCreateForm').on('submit', function () {
+                for (var name in CKEDITOR.instances) {
+                    CKEDITOR.instances[name].updateElement();
+                }
+            });
+        });
+    </script>
+}

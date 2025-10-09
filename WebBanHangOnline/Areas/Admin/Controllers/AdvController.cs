@@ -1,62 +1,98 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using WebBanHangOnline.Models;
 using WebBanHangOnline.Models.EF;
 
 namespace WebBanHangOnline.Areas.Admin.Controllers
 {
-    [Authorize(Roles = "Admin,Employee")]
+    [Authorize(Roles = "Admin")]
     public class AdvController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-        // GET: Admin/Posts
+        private readonly ApplicationDbContext db = new ApplicationDbContext();
+
+        // GET: Admin/Adv
         public ActionResult Index()
         {
-            var items = db.Posts.ToList();
+            var items = db.Advs.OrderByDescending(x => x.CreatedDate).ToList();
             return View(items);
         }
-        public ActionResult Add()
+
+        // GET: Admin/Adv/Create
+        public ActionResult Create()
         {
-            return View();
+            return View(new AdvCreateViewModel());
         }
 
+        // POST: Admin/Adv/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(Adv model)
+        [ValidateInput(false)] // chấp nhận HTML
+        public ActionResult Create(AdvCreateViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+
+            var adv = new Adv
             {
-                model.CreatedDate = DateTime.Now;
-                model.ModifiedDate = DateTime.Now;
-                db.Advs.Add(model);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(model);
+                Title = model.Title,
+                Description = model.Description,
+                Link = model.Link,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now
+            };
+            db.Advs.Add(adv);
+            db.SaveChanges();
+            TempData["ToastrSuccess"] = "Tạo bài quảng cáo thành công!";
+            return RedirectToAction("Index");
         }
 
+        // GET: Admin/Adv/Edit/5
         public ActionResult Edit(int id)
         {
             var item = db.Advs.Find(id);
-            return View(item);
+            if (item == null) return HttpNotFound();
+
+            var vm = new AdvCreateViewModel
+            {
+                Title = item.Title,
+                Description = item.Description,
+                //Image = item.Image,
+                Link = item.Link
+                //Type = item.Type
+            };
+            ViewBag.AdvId = id;
+            return View(vm);
         }
 
+        // POST: Admin/Adv/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Adv model)
+        public ActionResult Edit(int id, AdvCreateViewModel vm)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                model.ModifiedDate = DateTime.Now;
-                db.Advs.Attach(model);
-                db.Entry(model).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                var errs = string.Join(" | ",
+                    ModelState.Where(k => k.Value.Errors.Count > 0)
+                              .Select(k => $"{k.Key}: {string.Join(", ", k.Value.Errors.Select(e => e.ErrorMessage))}"));
+                TempData["ToastrError"] = string.IsNullOrWhiteSpace(errs) ? "Cập nhật thất bại." : errs;
+                ViewBag.AdvId = id;
+                return View(vm);
             }
-            return View(model);
+
+            var item = db.Advs.Find(id);
+            if (item == null) return HttpNotFound();
+
+            item.Title = vm.Title?.Trim();
+            item.Description = vm.Description;
+            //item.Image = vm.Image;
+            item.Link = vm.Link;
+            //item.Type = vm.Type;
+            item.ModifiedDate = DateTime.Now;
+            // item.ModifiedBy = User?.Identity?.Name ?? "system"; // nếu có
+
+            db.SaveChanges();
+            TempData["ToastrSuccess"] = "Cập nhật bài quảng cáo thành công!";
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -67,35 +103,13 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
             {
                 db.Advs.Remove(item);
                 db.SaveChanges();
-                return Json(new { success = true });
+                TempData["ToastrSuccess"] = "Đã xoá bài quảng cáo!";
             }
-
-            return Json(new { success = false });
-        }
-
-       
-        [HttpPost]
-        public ActionResult DeleteAll(string ids)
-        {
-            if (!string.IsNullOrEmpty(ids))
+            else
             {
-                var items = ids.Split(',');
-                if (items != null && items.Any())
-                {
-                    foreach (var item in items)
-                    {
-                        var obj = db.Advs.Find(Convert.ToInt32(item));
-                        db.Advs.Remove(obj);
-                        db.SaveChanges();
-                    }
-                }
-                return Json(new { success = true });
+                TempData["ToastrError"] = "Không tìm thấy bài quảng cáo.";
             }
-            return Json(new { success = false });
-        }
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
+            return RedirectToAction("Index");
         }
     }
 }

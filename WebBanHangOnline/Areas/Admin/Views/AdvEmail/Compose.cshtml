@@ -1,0 +1,112 @@
+﻿@model WebBanHangOnline.Models.AdvEmailViewModel
+@{
+    ViewBag.Title = "Gửi quảng cáo qua email";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section naviheader{
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/advemail/compose" class="nav-link">@ViewBag.Title</a>
+        </li>
+    </ul>
+}
+
+<div class="card-body aurora-background">
+    <div class="card-header bg-gradient-pink text-white">
+        <h3 class="card-title"><i class="fas fa-envelope-open-text"></i> Soạn & gửi quảng cáo</h3>
+    </div>
+
+    <div class="card-body">
+        @using (Html.BeginForm("Send", "AdvEmail", FormMethod.Post, new { area = "Admin" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <!-- Chọn bài quảng cáo -->
+            <div class="form-group mb-4">
+                <label><i class="fas fa-bullhorn"></i> Chọn bài quảng cáo</label>
+                @Html.DropDownListFor(m => m.AdvId, Model.AdvOptions, "-- Chọn bài quảng cáo --", new { @class = "form-control" })
+                @*<small class="text-muted">Các bài quảng cáo được lấy từ bảng <code>tb_Adv</code>.</small>*@
+            </div>
+
+            <!-- Danh sách email -->
+            <div class="form-group mb-3">
+                <label> Chọn email người nhận</label>
+                <input type="text" id="filterEmail" class="form-control mb-2" placeholder="Lọc nhanh email..." onkeyup="filterEmailList()" />
+
+                <div id="email-list" style="max-height:400px; overflow-y:auto; border:1px solid #ddd; border-radius:8px; padding:10px;">
+                    @if (Model.Subscribers != null && Model.Subscribers.Any())
+                    {
+                        for (int i = 0; i < Model.Subscribers.Count; i++)
+                        {
+                            <div class="form-check email-item">
+                                @Html.HiddenFor(m => m.Subscribers[i].Id)
+                                @Html.HiddenFor(m => m.Subscribers[i].Email)
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       name="SelectedSubscriberIds"
+                                       value="@Model.Subscribers[i].Id"
+                                       @(Model.Subscribers[i].Selected ? "checked" : "") />
+                                <label class="form-check-label">@Model.Subscribers[i].Email</label>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Chưa có email nào đăng ký.</p>
+                    }
+                </div>
+
+                <div class="mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleAll(true)">
+                        <i class="fas fa-check-square"></i> Chọn tất cả
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleAll(false)">
+                        <i class="far fa-square"></i> Bỏ chọn
+                    </button>
+                </div>
+            </div>
+
+            <hr />
+
+            <!-- Nút gửi -->
+            <div class="text-left">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="fas fa-paper-plane"></i> Gửi quảng cáo
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Script lọc và chọn email -->
+<script>
+    function toggleAll(state) {
+        document.querySelectorAll('#email-list input[type="checkbox"]').forEach(cb => cb.checked = state);
+    }
+
+    function filterEmailList() {
+        const q = document.getElementById('filterEmail').value.toLowerCase();
+        document.querySelectorAll('#email-list .email-item').forEach(item => {
+            const txt = item.innerText.toLowerCase();
+            item.style.display = txt.indexOf(q) >= 0 ? '' : 'none';
+        });
+    }
+</script>
+
+<style>
+    .bg-gradient-pink {
+        background: linear-gradient(90deg, #db7093, #ff9a9e);
+    }
+
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+</style>
