@@ -201,6 +201,7 @@
     <Compile Include="Areas\Admin\Controllers\RoleController.cs" />
     <Compile Include="Areas\Admin\Controllers\SettingSystemController.cs" />
     <Compile Include="Areas\Admin\Controllers\StatisticalController.cs" />
+    <Compile Include="Areas\Admin\Controllers\StatsController.cs" />
     <Compile Include="Areas\Admin\Controllers\SupplierController.cs" />
     <Compile Include="Common\Common.cs" />
     <Compile Include="Common\SettingHelper.cs" />
@@ -227,6 +228,7 @@
     <Compile Include="Models\AdvEmailViewModel.cs" />
     <Compile Include="Models\CommonAbstract.cs" />
     <Compile Include="Models\Common\Filter.cs" />
+    <Compile Include="Models\Common\ThongKeService.cs" />
     <Compile Include="Models\Common\ThongKeTruyCap.cs" />
     <Compile Include="Models\CustomerViewModel.cs" />
     <Compile Include="Models\EF\Adv.cs" />
@@ -3536,6 +3538,7 @@
     <Content Include="Areas\Admin\Views\Adv\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Adv\Create.cshtml" />
     <Content Include="Areas\Admin\Views\Adv\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Stats\Index.cshtml" />
     <None Include="packages.config" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />

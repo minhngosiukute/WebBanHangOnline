@@ -1,0 +1,260 @@
+﻿@{
+    ViewBag.Title = "Thống kê truy cập";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section naviheader{
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">@ViewBag.Title</a>
+        </li>
+    </ul>
+}
+
+<style>
+    .stat-card {
+        border-radius: 16px;
+        background: linear-gradient(145deg, #ffffff, #f3f3f3);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        padding: 20px;
+        text-align: center;
+        transition: all .2s ease-in-out;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: #db7093;
+    }
+
+    .filter-block {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 3px 8px rgba(0,0,0,.05);
+        padding: 20px;
+    }
+
+        .filter-block h5 {
+            color: #db7093;
+            font-weight: 600;
+        }
+</style>
+
+<section class="content">
+    <div class="container-fluid">
+
+
+        <!-- Tổng quan -->
+        <div class="row text-center mb-4" id="stats-summary">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div><i class="fas fa-calendar-day fa-2x text-primary mb-2"></i></div>
+                    <div>Hôm nay</div>
+                    <div class="stat-value" id="s-today">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div><i class="fas fa-calendar-week fa-2x text-success mb-2"></i></div>
+                    <div>Tuần này</div>
+                    <div class="stat-value" id="s-week">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div><i class="fas fa-calendar-alt fa-2x text-warning mb-2"></i></div>
+                    <div>Tháng này</div>
+                    <div class="stat-value" id="s-month">0</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div><i class="fas fa-user-friends fa-2x text-danger mb-2"></i></div>
+                    <div>Đang online</div>
+                    <div class="stat-value" id="s-online">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ lọc -->
+        <div class="row mt-4">
+            <!-- Theo ngày -->
+            <div class="col-md-6 mb-4">
+                <div class="filter-block">
+                    <h5><i class="fas fa-calendar-week"></i> Xem lượt truy cập theo tuần (chứa ngày đã chọn)</h5>
+                    <div class="form-group">
+                        <label>Chọn 1 ngày:</label>
+                        <input type="date" id="f-week-day" class="form-control" />
+                    </div>
+                    <button class="btn btn-info" id="btn-week"><i class="fas fa-search"></i> Xem</button>
+                    <div class="mt-3">
+                        <strong>Tổng tuần:</strong>
+                        <span id="out-week" class="text-info font-weight-bold">0</span> lượt truy cập
+                        <div id="week-range" class="text-muted small mt-1"></div>
+                    </div>
+                    <canvas id="chart-week" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- Theo tháng -->
+            <div class="col-md-6 mb-4">
+                <div class="filter-block">
+                    <h5><i class="fas fa-calendar-alt"></i> Xem lượt truy cập theo tháng</h5>
+                    <div class="form-row">
+                        <div class="col">
+                            <label>Năm:</label>
+                            <input type="number" id="f-year" class="form-control" placeholder="VD: 2025" />
+                        </div>
+                        <div class="col">
+                            <label>Tháng:</label>
+                            <input type="number" id="f-month" class="form-control" placeholder="1 - 12" min="1" max="12" />
+                        </div>
+                    </div>
+                    <button class="btn btn-success mt-3" id="btn-month"><i class="fas fa-search"></i> Xem</button>
+                    <div class="mt-3">
+                        <strong>Tổng tháng:</strong>
+                        <span id="out-month" class="text-success font-weight-bold">0</span> lượt truy cập
+                    </div>
+                    <canvas id="chart-month" height="115"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function loadSummary() {
+            $.getJSON('/Admin/Stats/Summary', function (r) {
+                $('#s-today').text(r.Today);
+                $('#s-week').text(r.ThisWeek);
+                $('#s-month').text(r.ThisMonth);
+                $('#s-online').text(r.Online);
+            });
+        }
+
+        $('#btn-day').click(function () {
+            const d = $('#f-day').val();
+            $.getJSON('/Admin/Stats/Filter', { mode: 'day', date: d }, function (r) {
+                if (r.ValueText) $('#out-day').text(r.ValueText);
+            });
+        });
+
+        $('#btn-month').click(function () {
+            const y = $('#f-year').val() || new Date().getFullYear();
+            const m = $('#f-month').val() || (new Date().getMonth() + 1);
+            $.getJSON('/Admin/Stats/Filter', { mode: 'month', year: y, month: m }, function (r) {
+                if (r.ValueText) $('#out-month').text(r.ValueText);
+                // ChartJS
+                if (r.Series) {
+                    const labels = r.Series.map(x => x.day);
+                    const data = r.Series.map(x => x.count);
+                    const ctx = document.getElementById('chart-month').getContext('2d');
+                    if (window.monthChart) window.monthChart.destroy();
+                    window.monthChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Lượt truy cập',
+                                data: data,
+                                borderColor: '#DB7093',
+                                fill: true,
+                                backgroundColor: 'rgba(219,112,147,0.15)',
+                                tension: 0.3,
+                                pointRadius: 3
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: { display: true, title: { display: true, text: 'Ngày' } },
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        $('#btn-week').click(function () {
+            const d = $('#f-week-day').val();
+            $.getJSON('/Admin/Stats/Filter', { mode: 'week', date: d }, function (r) {
+                if (r.ValueText) $('#out-week').text(r.ValueText);
+                if (r.WeekStart && r.WeekEnd) {
+                    $('#week-range').text(`Tuần: ${r.WeekStart} → ${r.WeekEnd}`);
+                }
+                if (r.Series) {
+                    const labels = r.Series.map(x => x.day);   // dd-MM-yyyy
+                    const data = r.Series.map(x => x.count);
+
+                    // Tô khác màu cho ngày được chọn
+                    const sel = r.SelectedDate;
+                    const pointBG = labels.map(x => x === sel ? '#ff4d4f' : '#17a2b8');
+                    const pointBR = pointBG; // viền cùng màu
+
+                    const ctx = document.getElementById('chart-week').getContext('2d');
+                    if (window.weekChart) window.weekChart.destroy();
+                    window.weekChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Lượt truy cập (tuần chứa ngày chọn)',
+                                data: data,
+                                borderColor: '#17a2b8',
+                                backgroundColor: 'rgba(23,162,184,0.15)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 4,
+                                pointBackgroundColor: pointBG,
+                                pointBorderColor: pointBR
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: { display: true, title: { display: true, text: 'Ngày (dd-MM-yyyy)' } },
+                                y: { beginAtZero: true }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        title: (items) => `Ngày ${items[0].label}`,
+                                        label: (item) => ` ${item.raw} lượt`
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        // Khởi tạo mặc định
+        $(function () {
+            const today = new Date();
+            const iso = today.toISOString().substring(0, 10);
+            $('#f-week-day').val(iso);
+        });
+
+
+        // Load mặc định khi mở trang
+        $(function () {
+            const today = new Date();
+            $('#f-day').val(today.toISOString().substring(0, 10));
+            $('#f-year').val(today.getFullYear());
+            $('#f-month').val(today.getMonth() + 1);
+            loadSummary();
+        });
+    </script>
+}
