@@ -11,6 +11,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/bootstrap4/bootstrap.min.css">
     <link href="~/Content/assets/plugins/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Font Awesome 4.7 (khớp tên icon đang dùng) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/owl.carousel.css">
     <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/owl.theme.default.css">
     <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/animate.css">
@@ -38,16 +42,16 @@
     <script src="~/Content/assets/js/jquery-3.2.1.min.js"></script>
     @Scripts.Render("~/bundles/jqueryval")
 
-    <styles>
+    <style>
         .user_pic {
-        width: 50px;
-        height: 50px;
-        background-size: cover;
-        background-position: center;
-        border-radius: 50%;
-        margin-right: 10px;
+            width: 50px;
+            height: 50px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            margin-right: 10px;
         }
-    </styles>
+    </style>
     <style>
 
         /* Kiểu dáng tổng thể cho menu dropdown */
@@ -91,6 +95,46 @@
                     background-color: #f0f0f0; /* Thay đổi màu nền khi hover */
                     color: #000; /* Đổi màu chữ khi hover */
                 }
+
+        .footer {
+            background-color: #f8f9fa;
+            color: #444;
+            font-size: 15px;
+        }
+
+            .footer h5, .footer h6 {
+                color: #000;
+            }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+            .footer-links a:hover {
+                color: #DB7093; /* Hồng tím nhạt */
+            }
+
+        .footer_social a {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 18px;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+
+            .footer_social a:hover {
+                color: #DB7093;
+                transform: translateY(-3px);
+            }
+
+        .footer hr {
+            border-top: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
@@ -111,31 +155,7 @@
                             <div class="top_nav_right">
                                 <ul class="top_nav_menu">
 
-                                    <!-- Currency / Language / My Account -->
-                                    @*<li class="currency">
-                                            <a href="#">
-                                                usd
-                                                <i class="fa fa-angle-down"></i>
-                                            </a>
-                                            <ul class="currency_selection">
-                                                <li><a href="#">cad</a></li>
-                                                <li><a href="#">aud</a></li>
-                                                <li><a href="#">eur</a></li>
-                                                <li><a href="#">gbp</a></li>
-                                            </ul>
-                                        </li>*@
-                                    @*<li class="language">
-                                            <a href="#">
-                                                English
-                                                <i class="fa fa-angle-down"></i>
-                                            </a>
-                                            <ul class="language_selection">
-                                                <li><a href="#">French</a></li>
-                                                <li><a href="#">Italian</a></li>
-                                                <li><a href="#">German</a></li>
-                                                <li><a href="#">Spanish</a></li>
-                                            </ul>
-                                        </li>*@
+                                    
                                     <li class="account">
                                         @if (!Request.IsAuthenticated)
                                         {
@@ -202,7 +222,7 @@
                                             </div>
                                         }
                                     </li>
-                                    <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-user" ></i></a></li>
                                     <li class="checkout">
                                         <a href="/gio-hang">
                                             <i class="fa fa-shopping-cart" aria-hidden="true"></i>
@@ -272,42 +292,86 @@
         @RenderBody()
 
         <!-- Newsletter -->
-        @Html.Action("Partial_Subcrice", "Home")
+        @{
+            string currentAction = ViewContext.RouteData.Values["action"].ToString().ToLower();
+            string currentController = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+        }
+
+        @if (!(currentController == "account" && (currentAction == "login" || currentAction == "register")))
+        {
+            <!-- Newsletter -->
+            @Html.Action("Partial_Subcrice", "Home")
+
+           
+        
+        }
+
         <!-- Footer -->
 
-        <footer class="footer">
+        <footer class="footer  pt-5 pb-4 mt-5">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-6">
-                        <div class="footer_nav_container d-flex flex-sm-row flex-column align-items-center justify-content-lg-start justify-content-center text-center">
-                            <ul class="footer_nav">
-                                <li><a href="/news/index">Tin tức </a></li>
-                                <li><a href="#">FAQs</a></li>
-                                <li><a href="contact.html">Contact us</a></li>
-                            </ul>
+
+                    <!-- Cột 1: Giới thiệu -->
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <h5 class="text-uppercase fw-bold mb-3">MIHGO<span class="text-danger">SHOP</span></h5>
+                        <p class="text-muted">
+                            MIHGO chuyên cung cấp nội thất cao cấp cho không gian sống hiện đại – từ phòng khách, phòng ngủ đến văn phòng.
+                            Chúng tôi cam kết mang đến sản phẩm chất lượng và thiết kế tinh tế nhất cho khách hàng.
+                        </p>
+                    </div>
+
+                    <!-- Cột 2: Liên kết nhanh -->
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h6 class="text-uppercase fw-bold mb-3">Liên kết</h6>
+                        <ul class="list-unstyled footer-links">
+                            <li><a href="/" class="text-muted">Trang chủ</a></li>
+                            <li><a href="/san-pham" class="text-muted">Sản phẩm</a></li>
+                            <li><a href="/tin-tuc" class="text-muted">Tin tức</a></li>
+                            <li><a href="/lien-he" class="text-muted">Liên hệ</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Cột 3: Chính sách -->
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <h6 class="text-uppercase fw-bold mb-3">Chính sách</h6>
+                        <ul class="list-unstyled footer-links">
+                            <li><a href="#" class="text-muted">Chính sách bảo hành</a></li>
+                            <li><a href="#" class="text-muted">Chính sách đổi trả</a></li>
+                            <li><a href="#" class="text-muted">Bảo mật thông tin</a></li>
+                            <li><a href="#" class="text-muted">Điều khoản sử dụng</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Cột 4: Liên hệ -->
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <h6 class="text-uppercase fw-bold mb-3">Liên hệ</h6>
+                        <ul class="list-unstyled text-muted mb-3">
+                            <li><i class="fa fa-map-marker me-2 text-danger"></i> 123 Nguyễn Văn Linh, Cần Thơ</li>
+                            <li><i class="fa fa-phone me-2 text-danger"></i> 0909 123 456</li>
+                            <li><i class="fa fa-envelope me-2 text-danger"></i> support@mihgo.vn</li>
+                        </ul>
+
+                        <div class="footer_social">
+                            <a href="#"><i class="fa fa-facebook-f"></i></a>
+                            <a href="#"><i class="fa fa-instagram"></i></a>
+                            <a href="#"><i class="fa fa-youtube"></i></a>
+                            <a href="#"><i class="fa fa-pinterest"></i></a>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="footer_social d-flex flex-row align-items-center justify-content-lg-end justify-content-center">
-                            <ul>
-                                <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-skype" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
+
                 </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="footer_nav_container">
-                            <div class="cr">©2018 All Rights Reserverd. Made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="#">Colorlib</a> &amp; distributed by <a href="https://themewagon.com">ThemeWagon</a></div>
-                        </div>
-                    </div>
+
+                <hr>
+
+                <!-- Bản quyền -->
+                <div class="text-center small text-muted mt-3">
+                    © 2025 <strong>MIHGO SHOP</strong>. All Rights Reserved.
+                    Designed with ❤️ by <a href="#" class="text-danger">MIHGO Team</a>
                 </div>
             </div>
         </footer>
+
 
     </div>
 
