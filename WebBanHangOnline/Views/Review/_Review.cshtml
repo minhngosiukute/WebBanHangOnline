@@ -1,5 +1,13 @@
 ﻿@model WebBanHangOnline.Models.EF.ReviewProduct
 
+<!-- Toastr (có thể bỏ nếu đã thêm ở _Layout) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+<style>
+    #toast-container {
+        z-index: 999999;
+    }
+</style>
+
 <div class="add_review">
     @using (Ajax.BeginForm("PostReview", "Review", new AjaxOptions
     {
@@ -10,35 +18,88 @@
         OnBegin = "OnBeginRE"
     }, new { @Id = "review_form" }))
     {
+        @Html.AntiForgeryToken()
+
+        <div>
+            <h1>Thêm đánh giá</h1>
+            @Html.TextBoxFor(x => x.FullName, new { @class = "form_input input_name", @placeholder = "Name*", @id = "review_name" })
+            @Html.TextBoxFor(x => x.Email, new { @class = "form_input input_email", @placeholder = "Email*", @id = "review_email" })
+            @Html.HiddenFor(x => x.UserName)
+            @Html.HiddenFor(x => x.ProductId, new { @Value = ViewBag.ProductId })
+            <input type="text" id="txtRate" name="Rate" value="4" style="visibility:hidden;" />
+        </div>
+
+        <div>
+            <h1>Đánh giá của bạn:</h1>
+            <ul class="user_star_rating">
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star" aria-hidden="true"></i></li>
+                <li><i class="fa fa-star-o" aria-hidden="true"></i></li>
+            </ul>
+            @Html.TextAreaFor(x => x.Content, new { @class = "input_review", @rows = "4", @placeholder = "Nhận xét của bạn" })
+        </div>
+
+        <div class="text-center">
+            <button id="review_submit" type="submit" class="red_button review_submit_btn trans_300" value="Submit">Gửi</button>
+        </div>
+
+        <div id="load_send"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
         <script>
+            // ===== Cấu hình Toastr =====
+            if (window.toastr) {
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: "3000",
+                    extendedTimeOut: "1500",
+                    preventDuplicates: true
+                };
+            }
+
+            function safeToast(type, message, title, opts) {
+                if (window.toastr && typeof toastr[type] === "function") {
+                    return toastr[type](message || "", title || "", opts || {});
+                } else {
+                    var color = (type === 'success') ? 'green' :
+                        (type === 'error') ? 'red' :
+                            (type === 'warning') ? 'orange' : '#333';
+                    $('#load_send').html('<h2 style="color:' + color + '">' + (message || '') + '</h2>');
+                }
+            }
+
+            // Không hiển thị thông báo "Đang gửi"
             function OnBeginRE() {
                 $('#review_submit').attr("disabled", "disabled");
-                $('#load_send').html('<h2>Đang gửi....</h2>');
             }
 
             function OnSuccessRE(res) {
                 $('#review_submit').removeAttr("disabled");
-                $('#load_send').html('');
-                if (res.Success) {
-                    // Reset form
-                    $("#review_form")[0].reset();
 
-                    // Hiển thị thông báo chờ duyệt, kiểm tra res.Message để tránh undefined
-                    var message = res.Message || "Đánh giá của bạn đã được gửi và đang chờ duyệt.";
-                    $('#load_send').html('<h2 style="color: green;">' + message + '</h2>');
+                var ok = res && res.Success === true;
+                var msg = (res && res.Message)
+                    ? res.Message
+                    : (ok ? "Đánh giá của bạn đã được gửi và đang chờ duyệt."
+                        : "Lỗi khi gửi!");
+
+                if (ok) {
+                    $("#review_form")[0].reset();
+                    safeToast('success', msg, 'Thành công');
                 } else {
-                    // Hiển thị thông báo lỗi, kiểm tra res.Message để tránh undefined
-                    var errorMessage = res.Message || 'Lỗi khi gửi!';
-                    $('#load_send').html('<h2 style="color: red;">' + errorMessage + '</h2>');
+                    safeToast('error', msg, 'Không thành công');
                 }
             }
 
             function OnFailureRE() {
                 $('#review_submit').removeAttr("disabled");
-                $('#load_send').html('<h2 style="color: red;">Lỗi khi gửi!</h2>');
+                safeToast('error', 'Lỗi khi gửi!', 'Thất bại');
             }
 
-            // Hàm tạo sao dựa trên rate
+            // Hàm tạo sao giữ nguyên
             function generateStars(rate) {
                 var stars = '';
                 for (var i = 1; i <= 5; i++) {
@@ -51,30 +112,5 @@
                 return stars;
             }
         </script>
-
-        @Html.AntiForgeryToken()
-        <div>
-            <h1>Thêm đánh giá</h1>
-            @Html.TextBoxFor(x => x.FullName, new { @class = "form_input input_name", @placeholder = "Name*", @id = "review_name" })
-            @Html.TextBoxFor(x => x.Email, new { @class = "form_input input_email", @placeholder = "Email*", @id = "review_email" })
-            @Html.HiddenFor(x => x.UserName)
-            @Html.HiddenFor(x => x.ProductId, new { @Value = ViewBag.ProductId })
-            <input type="text" id="txtRate" name="Rate" value="4" style="visibility:hidden;" />
-        </div>
-        <div>
-            <h1>Đánh giá của bạn:</h1>
-            <ul class="user_star_rating">
-                <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                <li><i class="fa fa-star-o" aria-hidden="true"></i></li>
-            </ul>
-            @Html.TextAreaFor(x => x.Content, new { @class = "input_review", @rows = "4", @placeholder = "nhận xét của bạn " })
-        </div>
-        <div class="text-center">
-            <button id="review_submit" type="submit" class="red_button review_submit_btn trans_300" value="Submit">Gửi</button>
-        </div>
-        <div id="load_send"></div>
     }
 </div>

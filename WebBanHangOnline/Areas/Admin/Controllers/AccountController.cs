@@ -166,8 +166,29 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                 {
                     await UserManager.AddToRolesAsync(user.Id, selected.ToArray());
                 }
+
+                // 👇 THÊM KHỐI NÀY
+                var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+
+                // LƯU Ý area="" để link về AccountController ngoài (không thuộc /Admin)
+                var callbackUrl = Url.Action(
+                    "ConfirmEmail",
+                    "Account",
+                    new { area = "", userId = user.Id, code = code },
+                    protocol: Request.Url.Scheme
+                );
+
+                WebBanHangOnline.Common.Common.SendMail(
+                    "ShopOnline",
+                    "Xác nhận tài khoản",
+                    $"Chào {(user.FullName ?? user.UserName)}, vui lòng xác nhận tài khoản bằng cách bấm vào <a href='{callbackUrl}'>liên kết này</a>.",
+                    user.Email
+                );
+
+                TempData["ToastrSuccess"] = "Tạo tài khoản thành công. Đã gửi email xác thực cho người dùng!";
                 return RedirectToAction("Index");
             }
+
 
             AddErrors(result);
             ViewBag.AllRoles = db.Roles.Select(r => r.Name).ToList();

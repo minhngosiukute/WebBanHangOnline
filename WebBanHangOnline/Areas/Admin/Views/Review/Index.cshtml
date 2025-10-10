@@ -55,7 +55,7 @@
                         <th>Điểm</th>
                         <th>Ngày tạo</th>
                         <th>Trạng thái</th>
-                        <th style="width: 150px;">Thao tác</th>
+                        <th style="width: 90px;">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -75,6 +75,7 @@
                                             data-status="@item.IsActive.ToString().ToLower()">
                                         @(item.IsActive ? "Đã duyệt" : "Chưa duyệt")
                                     </button>
+                                    
                                 </td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-danger deleteItem" data-id="@item.Id">Xóa</a>
