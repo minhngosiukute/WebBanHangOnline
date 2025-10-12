@@ -28,7 +28,7 @@ namespace WebBanHangOnline
         }
         void Session_Start(object sender, EventArgs e)
         {
-            Session.Timeout = 150;
+            Session.Timeout = 60;
             Application.Lock();
             Application["visitors_online"] = Convert.ToInt32(Application["visitors_online"]) + 1;
             Application.UnLock();

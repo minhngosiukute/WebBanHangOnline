@@ -19,7 +19,7 @@
     <script>
         function OnBeginCO() {
             $('#btnCheckOut').attr("disabled", "disabled");
-            $('#load_send').html('<h2>Đang gửi....</h2>');
+            $('#load_send').html('<h2>Tiến hành đặt hàng....</h2>');
         }
         function OnSuccessCO(res) {
             if (res.Success) {
@@ -86,7 +86,7 @@
     <div class="form-group">
         <label>Hình thức thanh toán</label>
         <select class="form-control" name="TypePayment" id="drTypePayment">
-            <option value="1" selected>COD</option>
+            <option value="1" selected>COD(Thanh toán khi nhận hàng)</option>
             <option value="2">Chuyển khoản</option>
         </select>
     </div>
