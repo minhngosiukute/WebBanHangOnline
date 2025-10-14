@@ -32,8 +32,175 @@
             content: "\f004"; /* tim đầy */
             color: #ff5a5f;
         }
+</style>
+<style>
+    /* Lightbox overlay */
+    .lb-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.85);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+    }
+
+    .lb-inner {
+        position: relative;
+        max-width: 92vw;
+        max-height: 92vh;
+    }
+
+    .lb-img {
+        max-width: 92vw;
+        max-height: 92vh;
+        object-fit: contain;
+        box-shadow: 0 10px 30px rgba(0,0,0,.6);
+        border-radius: 10px;
+    }
+
+    .lb-close, .lb-arrow {
+        position: absolute;
+        background: rgba(0,0,0,.4);
+        border: none;
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .lb-close {
+        top: -16px;
+        right: -16px;
+        font-size: 18px
+    }
+
+    .lb-arrow {
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+    }
+
+    .lb-prev {
+        left: -56px
+    }
+
+    .lb-next {
+        right: -56px
+    }
+
+    /* Nếu màn hình hẹp, đẩy mũi tên vào trong */
+    @@media (max-width: 768px) {
+        .lb-prev {
+            left: 8px
+        }
+
+        .lb-next {
+            right: 8px
+        }
+    }
+
+    /* hiệu ứng fade */
+    .lb-overlay.fade-in {
+        animation: lbFade .18s ease-out both
+    }
+
+    @@keyframes lbFade {
+        from {
+            opacity: 0
+        }
+
+        to {
+            opacity: 1
+        }
+    }
+    /* Thêm vào cuối CSS hiện có */
+    .lb-img {
+        transition: opacity .18s ease;
+    }
+</style>
+<style>
+/* === Nút mũi tên thumbnail (đẹp hơn) === */
+.thumbnails_col {
+    position: relative;
+}
+
+/* vùng chứa 2 nút */
+.thumb-nav {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    pointer-events: none; /* để click xuyên qua vùng trống */
+}
+
+/* style nút */
+.thumb-btn {
+    pointer-events: auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.85);
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+/* icon */
+.thumb-btn i {
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* hover đẹp */
+.thumb-btn:hover {
+    background: #ff5a5f;
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+/* active nhỏ lại */
+.thumb-btn:active {
+    transform: scale(0.95);
+}
+
+/* canh nhẹ lên xuống để không đè lên ảnh đầu/cuối */
+.thumb-up {
+    margin-top: -8px;
+}
+
+.thumb-down {
+    margin-bottom: -1px;
+}
+
+/* responsive nhỏ lại một chút */
+@@media (max-width:768px){
+  .thumb-btn{
+    width:28px;height:28px;
+  }
+}
+
 
 </style>
+
+
 @if (Model != null)
 {
     <div class="container single_product_container">
@@ -123,7 +290,8 @@
 
                     <!-- Nút giỏ hàng + tim -->
                     <div class="quantity d-flex flex-column flex-sm-row align-items-sm-center">
-                        <span>Số lượng:</span>
+                        <span style="white-space:nowrap;word-break:keep-all;line-height:38px;margin-right:8px">Số lượng:</span>
+
                         <div class="quantity_selector">
                             <span class="minus"><i class="fa fa-minus" aria-hidden="true"></i></span>
                             <span id="quantity_value">1</span>
@@ -190,4 +358,241 @@
 
 @section scripts{
     <script src="~/Content/assets/js/single_custom.js"></script>
+    <script>
+        (function ($) {
+            // --- Helpers ---
+            function normalizeSrc(src) {
+                if (!src) return '';
+                src = String(src).replace(/["']/g, '').trim(); // bỏ ngoặc kép
+                try {
+                    // ép về absolute và lower-case để so sánh
+                    const abs = new URL(src, window.location.origin).href;
+                    return abs.toLowerCase();
+                } catch (e) {
+                    return src.toLowerCase();
+                }
+            }
+
+            // --- Tạo overlay ---
+            const $overlay = $(`
+                    <div class="lb-overlay" role="dialog" aria-modal="true">
+                      <div class="lb-inner">
+                        <img class="lb-img" alt="">
+                        <button type="button" class="lb-close" title="Đóng" aria-label="Đóng">&times;</button>
+                        <button type="button" class="lb-arrow lb-prev" title="Ảnh trước" aria-label="Ảnh trước">&#10094;</button>
+                        <button type="button" class="lb-arrow lb-next" title="Ảnh sau" aria-label="Ảnh sau">&#10095;</button>
+                      </div>
+                    </div>
+                  `);
+            $('body').append($overlay);
+
+            const $img = $overlay.find('.lb-img');
+            const $btnClose = $overlay.find('.lb-close');
+            const $btnPrev = $overlay.find('.lb-prev');
+            const $btnNext = $overlay.find('.lb-next');
+
+            function collectImages() {
+                const set = new Set();
+
+                // 1) thumbnails
+                $('.single_product_thumbnails img').each(function () {
+                    const raw = $(this).attr('data-image') || $(this).attr('src');
+                    const norm = normalizeSrc(raw);
+                    if (norm) set.add(norm);
+                });
+
+                // 2) ảnh lớn hiện tại (bg) — chỉ add nếu chưa trùng
+                const bg = $('.single_product_image_background').css('background-image');
+                if (bg && bg.startsWith('url(')) {
+                    const raw = bg.slice(4, -1);
+                    const norm = normalizeSrc(raw);
+                    if (norm && !set.has(norm)) {
+                        // cho ưu tiên đứng đầu
+                        const arr = Array.from(set);
+                        set.clear();
+                        set.add(norm);
+                        arr.forEach(x => set.add(x));
+                    }
+                }
+
+                return Array.from(set);
+            }
+
+            let images = collectImages();
+            let current = 0;
+            let animating = false;
+
+            function show(idx) {
+                if (!images.length || animating) return;
+
+                // đảm bảo vòng tròn
+                idx = (idx + images.length) % images.length;
+
+                const nextNorm = images[idx];
+                const curNorm = normalizeSrc($img.attr('src'));
+
+                // nếu ảnh kế trùng ảnh hiện tại -> nhảy thêm 1 bước
+                if (nextNorm && nextNorm === curNorm) {
+                    idx = (idx + 1) % images.length;
+                }
+
+                const finalNorm = images[idx];
+                if (!finalNorm) return;
+
+                animating = true;
+                current = idx;
+
+                // fade out trước
+                $img.stop(true, true).css('opacity', 0);
+
+                const loader = new Image();
+                loader.onload = function () {
+                    $img.attr('src', finalNorm);
+                    requestAnimationFrame(function () {
+                        $img.css('opacity', 1);
+                        animating = false;
+                    });
+                    // preload hai bên
+                    const pre1 = new Image(); pre1.src = images[(current + 1) % images.length];
+                    const pre2 = new Image(); pre2.src = images[(current - 1 + images.length) % images.length];
+                };
+                loader.onerror = function () { animating = false; };
+                loader.src = finalNorm;
+            }
+
+            function openAt(index) {
+                images = collectImages();        // thu lại (đã loại trùng)
+                if (!images.length) return;
+                // nếu index vượt phạm vi thì đưa về 0
+                index = (index >= 0 && index < images.length) ? index : 0;
+                // gán src hiện tại = rỗng để lần đầu chắc chắn đổi ảnh
+                $img.attr('src', '');
+                show(index);
+                $overlay.addClass('fade-in').css('display', 'flex');
+                $('body').css('overflow', 'hidden');
+            }
+
+            function close() {
+                $overlay.hide().removeClass('fade-in');
+                $('body').css('overflow', '');
+            }
+
+            function findIndexBySrc(src) {
+                const norm = normalizeSrc(src);
+                const i = images.indexOf(norm);
+                return i >= 0 ? i : 0;
+            }
+
+            // --- Bind mở từ ảnh lớn ---
+            $('.single_product_image').on('click', '.single_product_image_background', function (e) {
+                e.preventDefault();
+                const bg = $(this).css('background-image');
+                let url = '';
+                if (bg && bg.startsWith('url(')) url = bg.slice(4, -1);
+                openAt(findIndexBySrc(url));
+            });
+
+            // --- Bind mở từ thumbnail ---
+            $('.single_product_thumbnails').on('click', 'img', function (e) {
+                e.preventDefault();
+                const src = $(this).attr('data-image') || $(this).attr('src');
+                openAt(findIndexBySrc(src));
+            });
+
+            // --- Điều khiển ---
+            $btnClose.on('click', function (e) { e.preventDefault(); e.stopPropagation(); close(); });
+            $btnPrev.on('click', function (e) { e.preventDefault(); e.stopPropagation(); show(current - 1); });
+            $btnNext.on('click', function (e) { e.preventDefault(); e.stopPropagation(); show(current + 1); });
+
+            $overlay.on('click', function (e) {
+                if (e.target === this) close();
+            });
+
+            $(document).on('keydown', function (e) {
+                if ($overlay.is(':visible')) {
+                    if (e.key === 'Escape') close();
+                    else if (e.key === 'ArrowLeft') { e.preventDefault(); show(current - 1); }
+                    else if (e.key === 'ArrowRight') { e.preventDefault(); show(current + 1); }
+                }
+            });
+
+            // Vuốt
+            let startX = 0, endX = 0;
+            $overlay.on('touchstart', function (e) { startX = e.originalEvent.touches[0].clientX; });
+            $overlay.on('touchmove', function (e) { endX = e.originalEvent.touches[0].clientX; });
+            $overlay.on('touchend', function () {
+                const dx = endX - startX;
+                if (Math.abs(dx) > 40) {
+                    if (dx > 0) show(current - 1); else show(current + 1);
+                }
+            });
+        })(jQuery);
+    </script>
+
+    <script>
+        (function ($) {
+            // tạo 2 nút mũi tên trong cột thumbnail
+            const $col = $('.thumbnails_col');
+            if (!$col.find('.thumb-nav').length) {
+                $col.append(`
+              <div class="thumb-nav">
+                <button type="button" class="thumb-btn thumb-up"  title="Ảnh trước"><i class="fa fa-chevron-up"></i></button>
+                <button type="button" class="thumb-btn thumb-down" title="Ảnh sau"><i class="fa fa-chevron-down"></i></button>
+              </div>
+            `);
+            }
+
+            const $ul = $('.single_product_thumbnails ul');
+            const $items = $ul.find('li');
+            if (!$items.length) return;
+
+            // xác định index đang active
+            function currentIndex() {
+                const i = $ul.find('li.active').index();
+                return i >= 0 ? i : 0;
+            }
+            // lấy src từ 1 li
+            function srcOf($li) {
+                const $img = $li.find('img');
+                return $img.attr('data-image') || $img.attr('src');
+            }
+            // set active + đổi ảnh lớn + cuộn thumbnail vào vùng nhìn thấy
+            function activateAt(idx) {
+                idx = (idx + $items.length) % $items.length;
+                $ul.find('li').removeClass('active').eq(idx).addClass('active');
+
+                const src = srcOf($ul.find('li').eq(idx));
+                $('.single_product_image_background').css('background-image', 'url(' + src + ')');
+
+                // cuộn thumbnail mượt
+                const el = $ul.find('li').get(idx);
+                if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+
+                return idx;
+            }
+
+            // click lên/xuống
+            $('.thumb-up').on('click', function (e) {
+                e.preventDefault(); e.stopPropagation();
+                activateAt(currentIndex() - 1);
+            });
+            $('.thumb-down').on('click', function (e) {
+                e.preventDefault(); e.stopPropagation();
+                activateAt(currentIndex() + 1);
+            });
+
+            // đồng bộ khi click trực tiếp vào thumbnail (nếu người dùng bấm hình)
+            $ul.on('click', 'li', function (e) {
+                e.preventDefault();
+                const idx = $(this).index();
+                activateAt(idx);
+            });
+
+            // đồng bộ lần đầu (nếu chưa có active)
+            if ($ul.find('li.active').length === 0) activateAt(0);
+
+        })(jQuery);
+    </script>
+
+
 }
