@@ -43,6 +43,30 @@
     @Scripts.Render("~/bundles/jqueryval")
 
     <style>
+        /* Nút Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            background: #db7093; /* hồng tím cho hợp giao diện MihoShop */
+            color: #fff;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            text-align: center;
+            line-height: 45px;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            display: none;
+            z-index: 9999;
+        }
+
+            .back-to-top:hover {
+                background: #c15882;
+                transform: translateY(-3px);
+            }
+
         .user_pic {
             width: 50px;
             height: 50px;
@@ -378,6 +402,23 @@
 
     @*@Scripts.Render("~/bundles/jquery")*@
 
+    <script>
+        // Hiện nút khi cuộn xuống
+        window.addEventListener('scroll', function () {
+            const btn = document.getElementById('backToTop');
+            if (document.documentElement.scrollTop > 200) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        });
+
+        // Cuộn mượt lên đầu trang
+        document.getElementById('backToTop').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
 
     <script src="~/Content/assets/styles/bootstrap4/popper.js"></script>
     <script src="~/Content/assets/styles/bootstrap4/bootstrap.min.js"></script>
@@ -392,5 +433,10 @@
     @*@Scripts.Render("~/bundles/bootstrap")*@
     <script src="~/Scripts/jsShopping.js"></script>
     @RenderSection("scripts", required: false)
+    <!-- Nút quay lại đầu trang -->
+    <a href="#" id="backToTop" class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+    </a>
+
 </body>
 </html>
