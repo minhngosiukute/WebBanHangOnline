@@ -10,12 +10,25 @@
         {
             strImge = img.Image;
         }
+        var wishlist = item.Wishlists.FirstOrDefault(x => x.UserName == User.Identity.Name);
+        var isWishlist = false;
+        if (wishlist != null)
+        {
+            isWishlist = true;
+        }
         <div class="product-item @item.ProductCategory.Alias">
             <div class="product discount product_filter">
                 <div class="product_image">
                     <img src="@strImge" alt="@item.Title">
                 </div>
-                <div data-id="@item.Id" class="favorite favorite_left"></div>
+                @if (isWishlist == true)
+                {
+                    <div data-id="@item.Id" class="favorite favorite_left active"></div>
+                }
+                else
+                {
+                    <div data-id="@item.Id" class="favorite favorite_left"></div>
+                }
                 @if (item.PriceSale > 0)
                 {
                     <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center"><span>sale</span></div>

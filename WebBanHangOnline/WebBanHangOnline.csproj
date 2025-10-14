@@ -514,6 +514,7 @@
     <Content Include="Content\assets\styles\bootstrap4\popper.js" />
     <Content Include="Content\assets\styles\categories_responsive.css" />
     <Content Include="Content\assets\styles\categories_styles.css" />
+    <Content Include="Content\assets\styles\Class1.css" />
     <Content Include="Content\assets\styles\contact_responsive.css" />
     <Content Include="Content\assets\styles\contact_styles.css" />
     <Content Include="Content\assets\styles\main_styles.css" />
