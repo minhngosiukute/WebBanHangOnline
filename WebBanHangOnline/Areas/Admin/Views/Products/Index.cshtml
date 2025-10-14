@@ -189,7 +189,11 @@
                 <tbody>
                     @if (Model != null && Model.Any())
                     {
-                        var i = ((ViewBag.Page - 1) * ViewBag.PageSize) + 1;
+                        int page = ViewBag.Page != null ? (int)ViewBag.Page : 1;
+                        int pageSize = ViewBag.PageSize != null ? (int)ViewBag.PageSize : 5;
+                        int i = ((page - 1) * pageSize) + 1;
+
+
                         foreach (var item in Model)
                         {
                             var strCheck = item.IsActive ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";

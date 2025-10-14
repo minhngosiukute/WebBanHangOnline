@@ -16,29 +16,44 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
         // GET: Admin/Products
         public ActionResult Index(string searchText, int? page)
         {
-            IEnumerable<Product> items = db.Products.OrderByDescending(x => x.Id);
+            // vẫn giữ IQueryable để OrderBy/AsNoTracking thực thi trên SQL
+            var query = db.Products
+                          .AsNoTracking()
+                          .OrderByDescending(x => x.Id);
 
-            // Search filter
-            if (!string.IsNullOrEmpty(searchText))
+            IEnumerable<Product> items = query; // giữ nguyên kiểu IEnumerable cho PagedList
+
+            if (!string.IsNullOrWhiteSpace(searchText))
             {
-                searchText = searchText.ToLower();
-                items = items.Where(x => x.Title.ToLower().Contains(searchText) ||
-                                        x.ProductCategory.Title.ToLower().Contains(searchText) ||
-                                        x.Alias.ToLower().Contains(searchText));
-                ViewBag.SearchText = searchText;
+                // chuẩn hóa từ khóa: bỏ dấu + thường
+                var normalizedSearch = WebBanHangOnline.Models.Common.Filter
+                                         .FilterChar(searchText).ToLower();
+
+                // materialize 1 lần để lọc không dấu trong bộ nhớ (không đụng SQL)
+                var list = query.ToList();
+
+                items = list.Where(x =>
+                    WebBanHangOnline.Models.Common.Filter.FilterChar(x.Title ?? "")
+                        .ToLower().Contains(normalizedSearch)
+                    || WebBanHangOnline.Models.Common.Filter.FilterChar(x.ProductCategory.Title ?? "")
+                        .ToLower().Contains(normalizedSearch)
+                    || WebBanHangOnline.Models.Common.Filter.FilterChar(x.Alias ?? "")
+                        .ToLower().Contains(normalizedSearch)
+                );
+
+                ViewBag.SearchText = searchText; // giữ lại từ khóa cho view
             }
 
-            var pageSize = 5;
-            if (page == null)
-            {
-                page = 1;
-            }
-            var pageIndex = page.HasValue ? Convert.ToInt32(page) : 1;
-            items = items.ToPagedList(pageIndex, pageSize);
+            int pageSize = 5;
+            int pageIndex = page ?? 1;
+
+            var model = items.ToPagedList(pageIndex, pageSize); // GIỮ Y NGUYÊN phân trang cũ
             ViewBag.PageSize = pageSize;
             ViewBag.Page = page;
-            return View(items);
+
+            return View(model);
         }
+
 
         public ActionResult Add()
         {
