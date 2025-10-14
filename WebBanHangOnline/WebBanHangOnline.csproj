@@ -222,14 +222,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202510090935447_x.cs" />
-    <Compile Include="Migrations\202510090935447_x.Designer.cs">
-      <DependentUpon>202510090935447_x.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202510131943519_oo.cs" />
-    <Compile Include="Migrations\202510131943519_oo.Designer.cs">
-      <DependentUpon>202510131943519_oo.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdvCreateViewModel.cs" />
@@ -3654,14 +3646,6 @@
     <Folder Include="Uploads\flash\" />
     <Folder Include="Views\Presence\" />
     <Folder Include="Views\Role\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202510090935447_x.resx">
-      <DependentUpon>202510090935447_x.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202510131943519_oo.resx">
-      <DependentUpon>202510131943519_oo.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
