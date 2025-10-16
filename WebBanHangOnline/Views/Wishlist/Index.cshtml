@@ -1,179 +1,91 @@
-﻿@model PagedList.PagedList<WebBanHangOnline.Models.EF.Wishlist>
-@using PagedList.Mvc;
-@using PagedList;
+﻿@model IEnumerable<WebBanHangOnline.Models.EF.Wishlist>
+@using WebBanHangOnline.Common
 @{
     ViewBag.Title = "Sản phẩm yêu thích";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
-<!-- Custom Styles -->
+
 <style>
-    .wishlist-container {
-        margin-top: 140px;
-        padding: 20px 0;
+    /* Kéo trang lên bớt để không che nút Add to cart */
+    .wishlist-slider-section {
+        margin-top: 90px;
     }
-
-    .wishlist-title {
-        font-size: 28px;
-        color: #333;
-        border-bottom: 2px solid #fe4c50;
-        padding-bottom: 15px;
-        margin-bottom: 30px;
-        font-weight: 700;
-    }
-
-    .wishlist-item {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        margin-bottom: 25px;
-        padding: 15px;
-        transition: all 0.3s ease;
-    }
-
-        .wishlist-item:hover {
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transform: translateY(-3px);
+    /* trước 140px */
+    @@media (max-width: 575.98px) {
+        .wishlist-slider-section {
+            margin-top: 70px;
         }
-
-    .img-container {
-        height: 200px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
     }
 
-        .img-container img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-    .product-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin: 15px 0 10px;
-        height: 50px;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+    .wishlist-slider-section .section_title {
+        margin-bottom: 6px;
     }
 
-        .product-title a {
-            color: #333;
-            text-decoration: none;
-        }
-
-            .product-title a:hover {
-                color: #fe4c50;
-            }
-
-    .product-description {
-        color: #777;
-        font-size: 14px;
-        margin-bottom: 15px;
-        height: 60px;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
+    .product_slider_container {
+        position: relative;
     }
 
-    .btn-action {
-        margin-top: 10px;
+    .product-item .red_button a {
+        text-transform: none;
     }
 
-    .btn-remove {
-        background-color: #fe4c50;
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-        .btn-remove:hover {
-            background-color: #e04347;
-        }
-
-    .btn-view {
-        background-color: #4285f4;
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 4px;
-        margin-right: 10px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-        .btn-view:hover {
-            background-color: #3367d6;
-        }
-
-    .empty-wishlist {
+    .wishlist-empty {
         text-align: center;
-        padding: 50px 0;
+        padding: 60px 0;
     }
 
-        .empty-wishlist i {
+        .wishlist-empty i {
             font-size: 60px;
             color: #ddd;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
-        .empty-wishlist h3 {
-            color: #777;
-            margin-bottom: 20px;
+    /* Thu gọn info để nút Add to cart không bị trôi xuống dưới fold */
+    .product_info {
+        padding-bottom: 0;
+    }
+
+        .product_info .product_name {
+            margin-bottom: 6px;
         }
 
-    .pagination-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 30px;
+    .product_price {
+        margin-top: 4px;
     }
 
-    /* Bootstrap pagination custom styles */
-    .pagination > li > a,
-    .pagination > li > span {
-        color: #333;
-        border: 1px solid #ddd;
+        .product_price span {
+            margin-left: 8px;
+        }
+
+    /* Nút xóa */
+    .btn-wl-remove {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fe4c50;
+        color: #fff;
+        border-radius: 4px;
+        padding: 6px 10px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
     }
 
-    .pagination > .active > a,
-    .pagination > .active > span {
-        background-color: #fe4c50;
-        border-color: #fe4c50;
-    }
+        .btn-wl-remove:hover {
+            filter: brightness(.95);
+        }
 
-    .pagination > li > a:hover,
-    .pagination > li > span:hover {
-        color: #fe4c50;
-    }
-
-    .price {
-        font-size: 18px;
-        color: #fe4c50;
-        font-weight: 600;
-        margin-bottom: 15px;
-    }
-
-    /* Loading animation for ajax requests */
+    /* Loading + Toast */
     .loading {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255,255,255,0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
+        inset: 0;
+        background: rgba(255,255,255,.7);
         display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
     }
 
     .spinner {
@@ -186,11 +98,7 @@
     }
 
     @@keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
+        to {
             transform: rotate(360deg);
         }
     }
@@ -199,13 +107,13 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        padding: 15px 25px;
+        padding: 14px 20px;
         background: #333;
         color: #fff;
         border-radius: 4px;
-        z-index: 10000;
         display: none;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 10000;
+        box-shadow: 0 2px 10px rgba(0,0,0,.2);
     }
 
     .toast-success {
@@ -216,278 +124,164 @@
         background: #F44336;
     }
 
-    /* === Wishlist card: nhỏ gọn & tinh tế hơn (override) === */
-    .wishlist-item {
-        padding: 14px !important;
-        margin-bottom: 18px !important;
-        border-radius: 12px !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
-        transition: transform .18s ease, box-shadow .18s ease !important;
+    /* Một chút khoảng cách để thấy rõ nút Add to cart */
+    .product-item .red_button {
+        margin-top: 6px;
     }
+    /* Đẩy nội dung xuống vừa khung header */
+.wishlist-slider-section { margin-top: 90px; }
+@@media (max-width: 575.98px){
+  .wishlist-slider-section { margin-top: 70px; }
+}
 
-        .wishlist-item:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 8px 20px rgba(0,0,0,.10) !important;
-        }
+/* Card sản phẩm dạng cột, ghim nút xuống đáy */
+.product_slider_item { height: 100%; }
+.product-item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.product-item .product {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+.product_info { margin-top: auto; padding-bottom: 0; }
+.product_info .product_name { margin-bottom: 6px; }
+.product_price { margin-top: 4px; }
+.product_price span { margin-left: 8px; }
 
-    /* Ảnh thấp hơn, gọn khung */
-    .img-container {
-        height: 160px !important; /* trước 200px */
-        margin-bottom: 8px !important;
-    }
+/* Nút Add to cart nằm trong thẻ */
+.product-item .red_button {
+  margin-top: 10px;              /* khoảng cách nhỏ phía trên */
+}
+.product-item .red_button a {
+  display: block;
+  width: 100%;
+  text-transform: none;
+}
 
-        .img-container img {
-            max-width: 100% !important;
-            max-height: 100% !important;
-            object-fit: contain !important;
-        }
+/* (tuỳ chọn) giúp tất cả item cao bằng nhau trong Owl */
+#wishlist_slider .owl-stage { display: flex; }
+#wishlist_slider .owl-item { display: flex; }
+#wishlist_slider .owl-item .product_slider_item { display: flex; width: 100%; }
 
-    /* Tiêu đề: chữ nhỏ lại, 2 dòng gọn */
-    .product-title {
-        font-size: 16px !important; /* trước 18px */
-        margin: 10px 0 6px !important;
-        height: 42px !important; /* vừa 2 dòng */
-        line-height: 1.3 !important;
-    }
-
-        .product-title a {
-            color: #222 !important;
-        }
-
-            .product-title a:hover {
-                color: #fe4c50 !important;
-            }
-
-    /* Giá: nhỏ gọn hơn */
-    .price {
-        font-size: 16px !important; /* trước 18px */
-        font-weight: 700 !important;
-        margin: 6px 0 10px !important;
-    }
-
-        .price span {
-            font-size: 13px !important; /* giá gạch */
-            margin-left: 6px !important;
-        }
-
-    /* Mô tả: thu gọn, 2 dòng thôi cho tinh tế */
-    .product-description {
-        font-size: 13px !important;
-        height: 44px !important;
-        -webkit-line-clamp: 2 !important;
-        margin-bottom: 10px !important;
-    }
-
-    /* Nút: nhỏ, bo mềm, nằm ngang cân đối */
-    .btn-action {
-        display: flex !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        margin-top: 8px !important;
-    }
-
-    .btn-view, .btn-remove {
-        padding: 6px 12px !important; /* trước 8px 15px */
-        border-radius: 6px !important;
-        font-size: 13px !important;
-        min-width: 110px !important;
-    }
-
-        /* Hiệu ứng nút tinh tế hơn */
-        .btn-view:hover {
-            filter: brightness(.95) !important;
-        }
-
-        .btn-remove:hover {
-            filter: brightness(.95) !important;
-        }
-
-    /* Responsive: trên mobile càng gọn */
-    @@media (max-width: 575.98px) {
-        .img-container {
-            height: 140px !important;
-        }
-
-        .product-title {
-            font-size: 15px !important;
-            height: 40px !important;
-        }
-
-        .price {
-            font-size: 15px !important;
-        }
-
-        .btn-view, .btn-remove {
-            min-width: unset !important;
-            flex: 1 1 auto !important;
-        }
-    }
-    /* Gần phân trang với sản phẩm */
-    .wishlist-item {
-        margin-bottom: 5px !important; /* trước 25px */
-    }
-
-    .pagination-container {
-        margin-top: 5px !important; /* trước 30px */
-    }
 </style>
 
-<div class="wishlist-container">
+<div class="wishlist-slider-section">
     <div class="container">
-        <h1 class="wishlist-title">
-            <i class="fa fa-heart" style="color: #fe4c50;"></i> Sản phẩm yêu thích
-        </h1>
+        <div class="row">
+            <div class="col text-center">
+                <div class="section_title new_arrivals_title">
+                    <h2><i class="fa fa-heart" style="color:#fe4c50"></i> Sản phẩm yêu thích</h2>
+                </div>
+            </div>
+        </div>
 
         @if (Model != null && Model.Any())
         {
             <div class="row">
-                @foreach (var item in Model)
-                {
-                    <div class="col-md-3 col-sm-6 wishlist-item-container" id="item-@item.Id">
-                        <div class="wishlist-item text-center">
-                            <div class="img-container">
-                                @if (item.Product.PriceSale > 0)
-                                {
-                                    <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center"><span>sale</span></div>
-                                }
-                                <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)" title="@item.Product.Title">
-                                    <img src="@item.Product.Image" alt="@item.Product.Title" />
-                                </a>
-                            </div>
+                <div class="col">
+                    <div class="product_slider_container">
+                        <div id="wishlist_slider" class="owl-carousel owl-theme product_slider">
 
-                            <div class="product-title">
-                                <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)" title="@item.Product.Title">@item.Product.Title</a>
-                            </div>
-                            @if (item.Product.Price > 0)
+                            @foreach (var w in Model)
                             {
-                                <div class="price">
-                                    @(item.Product.PriceSale > 0 ? string.Format("{0:N0}", item.Product.PriceSale) : string.Format("{0:N0}", item.Product.Price)) đ
-                                    @if (item.Product.PriceSale > 0)
-                                    {
-                                        <span style="text-decoration: line-through; color: #999; font-size: 14px; margin-left: 10px;">
-                                            @string.Format("{0:N0}", item.Product.Price)đ
-                                        </span>
+                                var p = w.Product;
+                                var img = p?.ProductImage?.FirstOrDefault(x => x.IsDefault);
+                                var strImg = img != null ? img.Image : (p?.Image ?? "/Content/assets/images/no-image.png");
+                                var wishlist = p.Wishlists.FirstOrDefault(x => x.UserName == User.Identity.Name);
+                                var isWishlist = false;
+                                if (wishlist != null)
+                                {
+                                    isWishlist = true;
+                                }
 
-                                    }
+                                <div class="owl-item product_slider_item" id="wl-@w.Id" data-wlid="@w.Id" data-pid="@p.Id">
+                                    <div class="product-item @p.ProductCategory.Alias">
+                                        <div class="product discount product_filter">
+                                            <div class="product_image">
+                                                <a href="@Url.Action("Detail","Products", new { alias = p.Alias, id = p.Id })" title="@p.Title">
+                                                    <img src="@strImg" alt="@p.Title" />
+                                                </a>
+                                            </div>
+
+                                            @if (isWishlist == true)
+                                            {
+                                                <div data-id="@p.Id" class="favorite favorite_left active"></div>
+                                            }
+                                            else
+                                            {
+                                                <div data-id="@p.Id" class="favorite favorite_left"></div>
+                                            }
+
+                                            @if (p.PriceSale > 0)
+                                            {
+                                                <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center">
+                                                    <span>sale</span>
+                                                </div>
+                                            }
+
+                                            <div class="product_info">
+                                                <h6 class="product_name">
+                                                    <a href="@Url.Action("Detail","Products", new { alias = p.Alias, id = p.Id })">@p.Title</a>
+                                                </h6>
+
+                                                @if (p.PriceSale > 0)
+                                                {
+                                                    <div class="product_price">
+                                                        @Common.FormatNumber(p.PriceSale, 0)đ
+                                                        <span>@Common.FormatNumber(p.Price, 0)</span>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="product_price">@Common.FormatNumber(p.Price, 0)đ</div>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <!-- NÚT ADD TO CART PHẢI Ở TRONG .product-item -->
+                                        <div class="red_button add_to_cart_button">
+                                            <a href="#" class="btnAddToCart" data-id="@p.Id">Thêm giỏ hàng</a>
+                                        </div>
+                                    </div>
                                 </div>
                             }
-                            <div class="product-description">
-                                @Html.Raw(item.Product.Description)
-                            </div>
-                            <div class="btn-action text-center">
-                                <a href="/chi-tiet/@item.Product.Alias-p@(item.ProductId)" class="btn-view">
-                                    <i class="fa fa-eye"></i> Xem
-                                </a>
-                                <button class="btn-remove btn-delete-wishlist" data-id="@item.Id" data-productid="@item.ProductId">
-                                    <i class="fa fa-trash"></i> Xóa
-                                </button>
-                            </div>
+
+
+                        </div>
+
+                        <!-- Navigation -->
+                        <div id="wishlist_nav_left" class="product_slider_nav_left product_slider_nav d-flex align-items-center justify-content-center flex-column">
+                            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                        </div>
+                        <div id="wishlist_nav_right" class="product_slider_nav_right product_slider_nav d-flex align-items-center justify-content-center flex-column">
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
                         </div>
                     </div>
-                }
-            </div>
-
-            <div class="pagination-container">
-                @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
-                    new PagedListRenderOptions
-                        {
-                            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
-                        DisplayLinkToLastPage = PagedListDisplayMode.Always,
-                        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
-                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
-                        LinkToFirstPageFormat = "««",
-                        LinkToPreviousPageFormat = "«",
-                        LinkToNextPageFormat = "»",
-                        LinkToLastPageFormat = "»»",
-                        MaximumPageNumbersToDisplay = 5
-                    })
+                </div>
             </div>
         }
         else
         {
-            <div class="empty-wishlist">
+            <div class="wishlist-empty">
                 <i class="fa fa-heart-o"></i>
                 <h3>Bạn chưa có sản phẩm yêu thích nào</h3>
-                <a href="/san-pham" class="btn-view">
-                    <i class="fa fa-shopping-bag"></i> Khám phá sản phẩm
+                <a href="/san-pham" class="red_button" style="display:inline-block;padding:10px 16px;border-radius:4px;">
+                    <span style="color:#fff">Khám phá sản phẩm</span>
                 </a>
             </div>
         }
     </div>
 </div>
 
-<!-- Loading spinner -->
-<div class="loading">
-    <div class="spinner"></div>
-</div>
-
-<!-- Toast message for notifications -->
+<!-- Loading & Toast -->
+<div class="loading"><div class="spinner"></div></div>
 <div class="toast-message" id="toast-message"></div>
 
-@section scripts {
-    <script>
-        $(document).ready(function () {
-            // Delete wishlist item
-            $('.btn-delete-wishlist').click(function (e) {
-                e.preventDefault();
-
-                var productId = $(this).data('productid');
-                var itemId = $(this).data('id');
-                var container = $('#item-' + itemId);
-
-                if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi danh sách yêu thích?')) {
-                    $('.loading').show();
-
-                    $.ajax({
-                        url: '/Wishlist/PostDeleteWishlist',
-                        type: 'POST',
-                        data: { ProductId: productId },
-                        success: function (rs) {
-                            $('.loading').hide();
-
-                            if (rs.Success) {
-                                // Remove item with animation
-                                container.fadeOut(300, function () {
-                                    $(this).remove();
-
-                                    // Check if wishlist is empty after deletion
-                                    if ($('.wishlist-item-container').length === 0) {
-                                        location.reload(); // Reload to show empty state
-                                    }
-                                });
-
-                                // Show success message
-                                //showToast(rs.Message, 'success');
-                            } else {
-                                showToast(rs.Message, 'error');
-                            }
-                        },
-                        error: function () {
-                            $('.loading').hide();
-                            showToast('Đã xảy ra lỗi. Vui lòng thử lại sau!', 'error');
-                        }
-                    });
-                }
-            });
-
-            // Function to show toast messages
-            function showToast(message, type) {
-                var toast = $('#toast-message');
-                toast.text(message);
-
-                if (type === 'success') {
-                    toast.removeClass('toast-error').addClass('toast-success');
-                } else {
-                    toast.removeClass('toast-success').addClass('toast-error');
-                }
-
-                toast.fadeIn(300);
-
-                // Auto hide after 3 seconds
-                setTimeout(function () {
-                    toast.fadeOut(300);
-                }, 3000);
-            }
-        });
-    </script>
+@section scripts{
+    
+        <script src="~/Content/assets/js/categories_custom.js"></script>
+    
 }

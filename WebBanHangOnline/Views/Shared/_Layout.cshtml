@@ -41,6 +41,62 @@
     @Scripts.Render("~/bundles/modernizr")
     <script src="~/Content/assets/js/jquery-3.2.1.min.js"></script>
     @Scripts.Render("~/bundles/jqueryval")
+    <style>
+        .image-search {
+            position: relative;
+        }
+
+        .img-dropzone {
+            border: 2px dashed #e3e3e3;
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            background: #fafafa;
+            cursor: pointer;
+            transition: .2s;
+            position: relative;
+            min-height: 140px;
+        }
+
+            .img-dropzone:hover {
+                border-color: #db7093;
+                background: #fff;
+            }
+
+        .dz-instructions {
+            color: #666;
+        }
+
+            .dz-instructions i {
+                font-size: 28px;
+                color: #db7093;
+                margin-bottom: 6px;
+                display: block;
+            }
+
+        .dz-preview {
+            max-height: 220px;
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.07);
+        }
+
+        .dz-clear {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        }
+    </style>
 
     <style>
         /* Nút Back to Top */
@@ -160,6 +216,42 @@
             border-top: 1px solid #ddd;
         }
     </style>
+    <style>
+.image-search-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+.image-search-popup .popup-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 25px 30px;
+  width: 420px;
+  max-width: 90%;
+  position: relative;
+  animation: fadeIn .3s ease;
+}
+.image-search-popup .close-btn {
+  position: absolute;
+  right: 14px; top: 10px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+}
+.image-search-popup .close-btn:hover { color: #000; }
+
+@@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+    </style>
+
 </head>
 <body>
 
@@ -235,17 +327,21 @@
                                 @Html.Action("MenuTop", "Menu")
                                 <ul class="navbar_user">
                                     <li style="position: relative;">
-                                        <!-- Form tìm kiếm -->
-                                        @using (Html.BeginForm("Search", "Products", FormMethod.Get))
-                                        {
-                                            <div class="search-bar d-flex align-items-center" style="background-color: #f2f2f2; border-radius: 20px; padding: 5px 15px;">
-                                                <input type="text" name="keyword" placeholder="Tìm sản phẩm" class="form-control border-0" style="background: transparent; font-size: 16px; width: 150px;" />
+                                        <div class="search-bar d-flex align-items-center" style="background-color: #f2f2f2; border-radius: 20px; padding: 5px 10px;">
+                                            <form id="textSearchForm" action="/products/search" method="get" class="d-flex align-items-center mb-0 w-100">
+                                                <input type="text" name="keyword" placeholder="Tìm sản phẩm" class="form-control border-0" style="background: transparent; font-size: 16px; width: 160px;" />
                                                 <button type="submit" class="btn btn-link text-dark p-0 ml-2">
                                                     <i class="fa fa-search"></i>
                                                 </button>
-                                            </div>
-                                        }
+                                            </form>
+
+                                            <!-- nút chuyển sang tìm hình -->
+                                            <button id="toggleImageSearch" type="button" class="btn btn-link p-0 ml-2" title="Tìm bằng hình ảnh">
+                                                <i class="fa fa-camera" style="font-size: 18px; color: #db7093;"></i>
+                                            </button>
+                                        </div>
                                     </li>
+
                                     <li><a href="#"><i class="fa fa-user"></i></a></li>
                                     <li class="checkout">
                                         <a href="/gio-hang">
@@ -263,7 +359,38 @@
                 </div>
             </div>
 
+
         </header>
+        <!-- Popup tìm hình ảnh -->
+        <div id="imageSearchPopup" class="image-search-popup" style="display:none;">
+            <div class="popup-content">
+                <button type="button" class="close-btn">&times;</button>
+                <h5 class="text-center mb-3"><i class="fa fa-camera"></i> Tìm kiếm bằng hình ảnh</h5>
+
+                <form id="imgSearchForm" action="/search/image" method="post" enctype="multipart/form-data">
+                    <div id="dropzone" class="img-dropzone">
+                        <div class="dz-instructions">
+                            <i class="fa fa-image"></i>
+                            <div><strong>Kéo & thả</strong> hoặc <strong>Ctrl + V</strong> để dán ảnh</div>
+                            <small>hoặc bấm để chọn ảnh từ máy</small>
+                        </div>
+                        <img id="preview" alt="" class="dz-preview" style="display:none;" />
+                        <button type="button" id="btnClear" class="btn btn-sm btn-outline-secondary dz-clear" style="display:none;">Xóa ảnh</button>
+                    </div>
+
+                    <input id="fileInput" type="file" name="file" accept="image/*" hidden />
+
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <button type="button" id="btnPick" class="btn btn-light">
+                            <i class="fa fa-folder-open"></i> Chọn ảnh
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search"></i> Tìm bằng hình
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <div class="fs_menu_overlay"></div>
         <div class="hamburger_menu">
@@ -313,6 +440,7 @@
                 </ul>
             </div>
         </div>
+
         @RenderBody()
 
         <!-- Newsletter -->
@@ -401,6 +529,124 @@
 
 
     @*@Scripts.Render("~/bundles/jquery")*@
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const popup = document.getElementById('imageSearchPopup');
+            if (!popup) return;
+
+            // Toggle popup
+            const toggleBtn = document.getElementById('toggleImageSearch');
+            const closeBtn = popup.querySelector('.close-btn');
+            toggleBtn?.addEventListener('click', () => popup.style.display = 'flex');
+            closeBtn?.addEventListener('click', () => popup.style.display = 'none');
+
+            // Elements
+            const form = popup.querySelector('#imgSearchForm');
+            const dropzone = popup.querySelector('#dropzone');
+            const fileInput = popup.querySelector('#fileInput');
+            const preview = popup.querySelector('#preview');
+            const btnPick = popup.querySelector('#btnPick');
+            const btnClear = popup.querySelector('#btnClear');
+
+            if (!form || !dropzone || !fileInput || !preview || !btnPick || !btnClear) return;
+
+            let pickedFile = null; // file từ paste/drag/drop/chọn
+
+            function showPreview(file) {
+                const url = URL.createObjectURL(file);
+                preview.src = url;
+                preview.style.display = 'block';
+                btnClear.style.display = 'inline-block';
+                dropzone.classList.add('has-image');
+            }
+            function clearPreview() {
+                preview.src = '';
+                preview.style.display = 'none';
+                pickedFile = null;
+                fileInput.value = '';
+                btnClear.style.display = 'none';
+                dropzone.classList.remove('has-image');
+            }
+
+            // Chọn file (reset value để chọn cùng file vẫn kích hoạt change)
+            btnPick.addEventListener('click', () => {
+                fileInput.value = '';       // <--- quan trọng
+                fileInput.click();
+            });
+            dropzone.addEventListener('click', () => {
+                if (!pickedFile && !fileInput.files.length) {
+                    fileInput.value = '';     // <--- quan trọng
+                    fileInput.click();
+                }
+            });
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files && fileInput.files[0]) {
+                    pickedFile = fileInput.files[0];
+                    showPreview(pickedFile);
+                }
+            });
+
+            // Kéo & thả
+            ['dragenter', 'dragover'].forEach(ev =>
+                dropzone.addEventListener(ev, e => {
+                    e.preventDefault(); e.stopPropagation();
+                    dropzone.style.borderColor = '#db7093';
+                })
+            );
+            ['dragleave', 'drop'].forEach(ev =>
+                dropzone.addEventListener(ev, e => {
+                    e.preventDefault(); e.stopPropagation();
+                    dropzone.style.borderColor = '#e3e3e3';
+                })
+            );
+            dropzone.addEventListener('drop', e => {
+                const f = e.dataTransfer.files && e.dataTransfer.files[0];
+                if (f && f.type.startsWith('image/')) {
+                    pickedFile = f;
+                    fileInput.value = '';
+                    showPreview(f);
+                }
+            });
+
+            // Dán ảnh (Ctrl+V)
+            window.addEventListener('paste', (e) => {
+                if (!e.clipboardData) return;
+                for (const item of e.clipboardData.items) {
+                    if (item.type.startsWith('image/')) {
+                        const f = item.getAsFile();
+                        if (f) {
+                            pickedFile = new File([f], 'pasted-image.png', { type: f.type || 'image/png' });
+                            fileInput.value = '';
+                            showPreview(pickedFile);
+                            e.preventDefault();
+                            break;
+                        }
+                    }
+                }
+            });
+
+            // Xóa ảnh
+            btnClear.addEventListener('click', (e) => { e.preventDefault(); clearPreview(); });
+
+            // Submit: đưa pickedFile (nếu có) vào input file rồi để trình duyệt submit bình thường
+            form.addEventListener('submit', (e) => {
+                if (!pickedFile && !(fileInput.files && fileInput.files[0])) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn hoặc dán một ảnh.');
+                    return;
+                }
+                if (pickedFile) {
+                    const dt = new DataTransfer();
+                    dt.items.add(pickedFile);
+                    fileInput.files = dt.files;
+                    // không preventDefault: để form POST tới /search/image
+                }
+            });
+        });
+    </script>
+
+
 
     <script>
         // Hiện nút khi cuộn xuống
