@@ -6,25 +6,22 @@ using System.Web;
 using System.Web.Mvc;
 using WebBanHangOnline.Models;
 using WebBanHangOnline.Models.EF;
-
+using System.Data.Entity; // để Include()
 namespace WebBanHangOnline.Controllers
 {
     [Authorize]
     public class WishlistController : Controller
     {
         // GET: Wishlist
-        public ActionResult Index(int? page)
+        public ActionResult Index()
         {
-            var pageSize = 4;
-            if (page == null)
-            {
-                page = 1;
-            }
-            IEnumerable<Wishlist> items = db.Wishlists.Where(x => x.UserName == User.Identity.Name).OrderByDescending(x => x.CreatedDate);
-            var pageIndex = page.HasValue ? Convert.ToInt32(page) : 1;
-            items = items.ToPagedList(pageIndex, pageSize);
-            ViewBag.PageSize = pageSize;
-            ViewBag.Page = page;
+            // Trả về view trang Wishlist, phần slider sẽ load ngay trong view (không phân trang)
+            var items = db.Wishlists
+                .Include(w => w.Product.ProductImage)
+                .Where(w => w.UserName == User.Identity.Name)
+                .OrderByDescending(w => w.CreatedDate)
+                .ToList();
+
             return View(items);
         }
 

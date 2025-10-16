@@ -217,6 +217,7 @@
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\ReviewController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\ShoppingCartController.cs" />
     <Compile Include="Controllers\WishlistController.cs" />
     <Compile Include="Global.asax.cs">
@@ -253,6 +254,7 @@
     <Compile Include="Models\OrderViewModel.cs" />
     <Compile Include="Models\Payments\VnPayLibrary.cs" />
     <Compile Include="Models\ReviewListViewModel.cs" />
+    <Compile Include="Models\SearchItem.cs" />
     <Compile Include="Models\SettingSystemViewModel.cs" />
     <Compile Include="Models\ShoppingCart.cs" />
     <Compile Include="Models\ThongKeViewModel.cs" />
@@ -3647,6 +3649,7 @@
     <Folder Include="Uploads\flash\" />
     <Folder Include="Views\Presence\" />
     <Folder Include="Views\Role\" />
+    <Folder Include="Views\Search\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
