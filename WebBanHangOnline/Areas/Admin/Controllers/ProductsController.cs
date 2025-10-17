@@ -213,6 +213,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
             public string CategoryName { get; set; }
             public int ViewCount { get; set; }
             public int LikeCount { get; set; }
+            public string Image { get; set; } // thêm dòng này
         }
 
         public ActionResult FavoriteRanking(int? page)
@@ -225,7 +226,8 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                     Title = p.Title,
                     CategoryName = p.ProductCategory.Title,
                     ViewCount = p.ViewCount,
-                    LikeCount = p.Wishlists.Count()
+                    LikeCount = p.Wishlists.Count(),
+                    Image = p.Image // thêm dòng này
                 })
                 .OrderByDescending(x => x.LikeCount)
                 .ThenByDescending(x => x.ViewCount);
@@ -241,5 +243,47 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
             return View(model);
         }
+        // ======================= TOP SẢN PHẨM BÁN CHẠY =======================
+        public class BestSellingRow
+        {
+            public int ProductId { get; set; }
+            public string Title { get; set; }
+            public string CategoryName { get; set; }
+            public string Image { get; set; }
+            public int TotalSold { get; set; }
+            public decimal Price { get; set; }
+        }
+
+        public ActionResult BestSelling(int? page)
+        {
+            var query = db.OrderDetails
+                .Include("Product.ProductCategory") // nạp cả thông tin product và category
+                .GroupBy(x => x.ProductId)
+                .Select(g => new BestSellingRow
+                {
+                    ProductId = g.Key,
+                    Title = g.FirstOrDefault().Product.Title,
+                    CategoryName = g.FirstOrDefault().Product.ProductCategory.Title,
+                    Image = g.FirstOrDefault().Product.Image,
+                    TotalSold = g.Sum(x => x.Quantity),
+                    Price = g.FirstOrDefault().Product.Price
+                })
+                .OrderByDescending(x => x.TotalSold);
+
+            int pageSize = 8;
+            int pageIndex = page ?? 1;
+            var model = query.ToPagedList(pageIndex, pageSize);
+
+            ViewBag.PageSize = pageSize;
+            ViewBag.Page = pageIndex;
+
+            var top = query.FirstOrDefault();
+            ViewBag.TopBestSelling = top == null
+                ? null
+                : $"🔥 Sản phẩm bán chạy nhất: {top.Title} ({top.TotalSold} lượt mua)";
+
+            return View(model);
+        }
+
     }
 }

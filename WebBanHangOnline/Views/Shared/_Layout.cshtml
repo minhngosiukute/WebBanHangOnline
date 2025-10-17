@@ -217,42 +217,89 @@
         }
     </style>
     <style>
-.image-search-popup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.55);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
-}
-.image-search-popup .popup-content {
-  background: #fff;
-  border-radius: 16px;
-  padding: 25px 30px;
-  width: 420px;
-  max-width: 90%;
-  position: relative;
-  animation: fadeIn .3s ease;
-}
-.image-search-popup .close-btn {
-  position: absolute;
-  right: 14px; top: 10px;
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: #666;
-  cursor: pointer;
-}
-.image-search-popup .close-btn:hover { color: #000; }
+        .image-search-popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
 
-@@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+            .image-search-popup .popup-content {
+                background: #fff;
+                border-radius: 16px;
+                padding: 25px 30px;
+                width: 420px;
+                max-width: 90%;
+                position: relative;
+                animation: fadeIn .3s ease;
+            }
+
+            .image-search-popup .close-btn {
+                position: absolute;
+                right: 14px;
+                top: 10px;
+                background: none;
+                border: none;
+                font-size: 28px;
+                color: #666;
+                cursor: pointer;
+            }
+
+                .image-search-popup .close-btn:hover {
+                    color: #000;
+                }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <style>
+  /* Spinner tròn nhỏ dùng cho nút */
+  .btn-spinner {
+    display:inline-block;
+    width:18px;height:18px;
+    border:2px solid rgba(255,255,255,.35);
+    border-top-color: currentColor;
+    border-radius:50%;
+    margin-right:8px;
+    vertical-align:-3px;
+    animation: spin .8s linear infinite;
+  }
+  @@keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Trạng thái đang loading cho nút */
+  .btn-loading {
+    pointer-events:none;
+    opacity:.9;
+  }
+
+  /* Spinner lớn cho overlay */
+  .overlay-spinner {
+    width:38px;height:38px;
+    border:3px solid rgba(0,0,0,.15);
+    border-top-color:#db7093;
+    border-radius:50%;
+    animation: spin .9s linear infinite;
+    margin:auto;
+  }
+
+  /* Hiệu ứng “ấn xuống” rất nhẹ khi click */
+  .btn:active { transform: translateY(1px); }
     </style>
 
 </head>
+
 <body>
 
     <div class="super_container">
@@ -384,7 +431,7 @@
                         <button type="button" id="btnPick" class="btn btn-light">
                             <i class="fa fa-folder-open"></i> Chọn ảnh
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-outline-danger">
                             <i class="fa fa-search"></i> Tìm bằng hình
                         </button>
                     </div>
@@ -629,20 +676,44 @@
             // Xóa ảnh
             btnClear.addEventListener('click', (e) => { e.preventDefault(); clearPreview(); });
 
-            // Submit: đưa pickedFile (nếu có) vào input file rồi để trình duyệt submit bình thường
+            // Submit: đưa pickedFile (nếu có) + bật hiệu ứng loading
             form.addEventListener('submit', (e) => {
+                // Kiểm tra có ảnh chưa
                 if (!pickedFile && !(fileInput.files && fileInput.files[0])) {
                     e.preventDefault();
                     alert('Vui lòng chọn hoặc dán một ảnh.');
                     return;
                 }
+
+                // Gắn file từ clipboard/drag-drop nếu có
                 if (pickedFile) {
                     const dt = new DataTransfer();
                     dt.items.add(pickedFile);
                     fileInput.files = dt.files;
-                    // không preventDefault: để form POST tới /search/image
                 }
+
+                // Hiệu ứng cho nút submit + chặn double-submit
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.classList.add('btn-loading');
+                    // lưu html gốc để phòng khi cần khôi phục (ví dụ AJAX lỗi…)
+                    submitBtn.dataset.originalHtml = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span>Đang tìm…';
+                    submitBtn.disabled = true;
+                }
+
+                // Bật overlay toàn trang
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) overlay.style.display = 'flex';
+
+                // LƯU Ý: Form sẽ POST và điều hướng sang trang kết quả, nên không cần tắt overlay theo code.
+                // Nếu sau này bạn chuyển sang AJAX, khi nhận response chỉ cần:
+                //   submitBtn.disabled = false;
+                //   submitBtn.classList.remove('btn-loading');
+                //   submitBtn.innerHTML = submitBtn.dataset.originalHtml || '<i class="fa fa-search"></i> Tìm bằng hình';
+                //   overlay.style.display = 'none';
             });
+
         });
     </script>
 
@@ -683,6 +754,13 @@
     <a href="#" id="backToTop" class="back-to-top">
         <i class="fa fa-arrow-up"></i>
     </a>
+    <!-- Overlay loading toàn trang (ẩn mặc định) -->
+    <div id="loadingOverlay" class="loading-overlay" style="display:none;">
+        <div style="text-align:center;">
+            <div class="overlay-spinner"></div>
+            <div style="margin-top:10px;color:#333;font-weight:600;">Đang tìm…</div>
+        </div>
+    </div>
 
 </body>
 </html>

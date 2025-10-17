@@ -63,51 +63,79 @@
                     <div class="rank-banner">@ViewBag.TopFavoriteMessage</div>
                 }
 
-                <div class="card-body">
+            <div class="card-body">
 
 
-                    <table class="table table-hover">
-                        <thead>
-                            <tr class=" text-center">
-                                <th style="width:100px">Xếp hạng</th>
-                                <th>Tên sản phẩm</th>
-                                <th style="width:220px">Danh mục</th>
-                                <th style="width:140px" class="text-center">Số lượt xem</th>
-                                <th style="width:140px" class="text-center">Số lượt thích</th>
+                <table class="table table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th style="width:100px">Xếp hạng</th>
+                            <th style="width:130px">Ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th style="width:220px">Danh mục</th>
+                            <th style="width:140px">Số lượt xem</th>
+                            <th style="width:140px">Số lượt thích</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var sttStart = (Model.PageNumber - 1) * Model.PageSize;
+                            var i = 0;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            i++;
+                            var rank = sttStart + i;
+                            <tr>
+                                <td>
+                                    @if (rank == 1)
+                                    {
+                                        <span style="color:gold;font-weight:bold">🥇 @rank</span>
+                                    }
+                                    else if (rank == 2)
+                                    {
+                                        <span style="color:silver;font-weight:bold">🥈 @rank</span>
+                                    }
+                                    else if (rank == 3)
+                                    {
+                                        <span style="color:#cd7f32;font-weight:bold">🥉 @rank</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@rank</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <img src="@(!string.IsNullOrEmpty(item.Image) ? item.Image : Url.Content("~/Uploads/images/no-image.png"))"
+                                         alt="@item.Title"
+                                         style="width:90px;height:80px;object-fit:cover;border-radius:6px" />
+                                </td>
+
+                                <td>@item.Title</td>
+                                <td>@item.CategoryName</td>
+                                <td>@item.ViewCount</td>
+                                <td>@item.LikeCount</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                var sttStart = (Model.PageNumber - 1) * Model.PageSize;
-                                var i = 0;
-                            }
-                            @foreach (var item in Model)
-                            {
-                                <tr class="text-center">
-                                    <td>@(sttStart + (++i))</td>
-                                    <td>@item.Title</td>
-                                    <td>@item.CategoryName</td>
-                                    <td class="text-center">@item.ViewCount</td>
-                                    <td class="text-center">@item.LikeCount</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                        }
+                    </tbody>
+                </table>
 
 
 
-                    <div class="text-right">
-                        @Html.PagedListPager(
-                          Model,
-                          page => Url.Action("FavoriteRanking", "Products", new { area = "Admin", page }),
-                          new PagedListRenderOptions
-                               {
-                            Display = PagedListDisplayMode.IfNeeded,
-                            MaximumPageNumbersToDisplay = 7,
-                            UlElementClasses = new[] { "pagination", "justify-content-end", "mb-0" }
-                          })
-                    </div>
+
+                <div class="text-right">
+                    @Html.PagedListPager(
+                      Model,
+                      page => Url.Action("FavoriteRanking", "Products", new { area = "Admin", page }),
+                      new PagedListRenderOptions
+                           {
+                        Display = PagedListDisplayMode.IfNeeded,
+                        MaximumPageNumbersToDisplay = 7,
+                        UlElementClasses = new[] { "pagination", "justify-content-end", "mb-0" }
+                      })
                 </div>
+            </div>
             </div>
 
 

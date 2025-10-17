@@ -1,0 +1,343 @@
+﻿@model IEnumerable<WebBanHangOnline.Models.EF.Product>
+@using WebBanHangOnline.Common
+
+@if (Model != null && Model.Any())
+{
+    var sliderId = "related_slider";
+
+    <style>
+        :root {
+            --rel-card-h: 440px;
+            --rel-img-h: 220px;
+            --rel-name-h: 48px;
+            --rel-price-h: 58px;
+        }
+
+        #related-section {
+            margin-top: 36px;
+            text-align: center; /* căn giữa toàn bộ section */
+        }
+
+            /* ===== Tiêu đề ===== */
+            #related-section .section_title {
+                margin-bottom: 20px;
+                position: relative;
+                text-align: center; /* căn giữa tiêu đề */
+            }
+
+                #related-section .section_title h3 {
+                    font-size: 26px;
+                    font-weight: 700;
+                    margin: 0 0 10px;
+                    display: inline-block;
+                }
+
+                #related-section .section_title::after {
+                    content: "";
+                    display: block;
+                    width: 64px;
+                    height: 4px;
+                    border-radius: 4px;
+                    background: #fe4c50;
+                    margin: 6px auto 0; /* căn giữa gạch đỏ */
+                }
+
+            /* ===== Nút điều hướng ===== */
+            #related-section .product_slider_container {
+                position: relative;
+            }
+
+            #related-section .product_slider_nav_left,
+            #related-section .product_slider_nav_right {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 36px;
+                height: 60px;
+                border-radius: 8px;
+                background: rgba(0,0,0,.05);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                z-index: 7;
+                transition: background .18s ease, opacity .18s ease;
+                opacity: .85;
+            }
+
+                #related-section .product_slider_nav_left:hover,
+                #related-section .product_slider_nav_right:hover {
+                    background: rgba(0,0,0,.08);
+                    opacity: 1;
+                }
+
+            #related-section .product_slider_nav_left {
+                left: -12px;
+            }
+
+            #related-section .product_slider_nav_right {
+                right: -12px;
+            }
+
+            /* ===== Card ===== */
+            #related-section .product-item {
+                height: var(--rel-card-h);
+                border: 1px solid #eee;
+                border-radius: 14px;
+                background: #fff;
+                overflow: hidden;
+                transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+                display: flex;
+                flex-direction: column;
+            }
+
+                #related-section .product-item:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 12px 28px rgba(0,0,0,.06);
+                    border-color: #e9e9e9;
+                }
+
+            #related-section .product {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+            }
+
+            /* Ảnh */
+            #related-section .product_image {
+                padding: 20px 20px 8px;
+            }
+
+                #related-section .product_image a {
+                    display: block;
+                }
+
+                #related-section .product_image img {
+                    width: 100%;
+                    height: var(--rel-img-h);
+                    object-fit: contain;
+                    display: block;
+                    background: #fff;
+                }
+
+            /* --- SALE bubble: style mới, giống hình mẫu --- */
+            #related-section .product_bubble {
+                position: absolute !important;
+                pointer-events: none;
+                z-index: 8;
+            }
+
+            #related-section .product_bubble_red {
+                top: 10px !important;
+                right: 12px !important;
+                /* reset mấy class d-flex bị theme chèn vào */
+                display: inline-block !important;
+                align-items: initial !important;
+                justify-content: initial !important;
+                background: #fe4c50;
+                color: #fff;
+                padding: 6px 12px;
+                border-radius: 8px;
+                line-height: 1; /* chữ ôm gọn nền */
+                font-size: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                box-shadow: 0 4px 12px rgba(254,76,80,.35);
+            }
+
+                /* “đuôi” của bubble (tam giác hướng xuống) */
+                #related-section .product_bubble_red::after {
+                    content: "";
+                    position: absolute;
+                    left: 16px; /* dịch vị trí đuôi */
+                    bottom: -6px; /* chìa ra dưới */
+                    width: 0;
+                    height: 0;
+                    border-style: solid;
+                    border-width: 6px 6px 0 6px; /* tam giác hướng xuống */
+                    border-color: #fe4c50 transparent transparent transparent;
+                }
+
+            /* nếu có bubble màu khác thì ẩn đuôi (an toàn) */
+            #related-section .product_bubble:not(.product_bubble_red)::after {
+                display: none;
+            }
+
+
+            /* Info + căn giữa toàn bộ chữ */
+            #related-section .product_info {
+                padding: 6px 16px 14px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            #related-section .product_name {
+                height: var(--rel-name-h);
+                margin-bottom: 8px;
+                overflow: hidden;
+            }
+
+                #related-section .product_name a {
+                    font-size: 16px;
+                    line-height: 1.35;
+                    color: #000000;
+                    text-decoration: none;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                    #related-section .product_name a:hover {
+                        text-decoration: underline;
+                    }
+
+            /* Giá: cố định 2 dòng và căn giữa */
+            #related-section .price_block {
+                height: var(--rel-price-h);
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                gap: 4px;
+                margin-bottom: 12px;
+                align-items: center;
+            }
+
+            #related-section .price_current {
+                color: #fe4c50;
+                font-weight: 700;
+                font-size: 17px;
+                line-height: 1.1;
+            }
+
+            #related-section .price_old {
+                font-weight: 500;
+                font-size: 13px;
+                color: #b8b8c3;
+                text-decoration: line-through;
+                line-height: 1.1;
+            }
+
+                #related-section .price_old.is-hidden {
+                    visibility: hidden;
+                }
+
+            /* Nút full width và căn giữa */
+            #related-section .add_to_cart_button {
+                margin: 0 16px 16px;
+                border-radius: 8px;
+            }
+
+                #related-section .add_to_cart_button a {
+                    display: block;
+                    width: 70%;
+                    text-align: center;
+                }
+
+            /* Carousel spacing */
+            #related-section #related_slider .owl-stage {
+                padding: 6px 0;
+            }
+
+            #related-section #related_slider .owl-item {
+                padding: 12px;
+            }
+            #related-section #related_slider .owl-item {
+                padding: 10px; /* khoảng cách giữa các thẻ */
+            }
+
+            #related-section .product-item {
+                min-width: 216px; /* đảm bảo thẻ không bị bóp quá nhỏ */
+                max-width: 280px;
+                margin: 0 auto;
+            }
+
+    </style>
+
+    <section id="related-section">
+        <div class="section_title">
+            <h3>Sản phẩm cùng loại</h3>
+        </div>
+
+        <div class="product_slider_container">
+            <div id="related_slider" class="owl-carousel owl-theme product_slider">
+                @foreach (var item in Model)
+                {
+                    var img = item.ProductImage?.FirstOrDefault(x => x.IsDefault) ?? item.ProductImage?.FirstOrDefault();
+                    var strImage = img?.Image ?? "";
+                    var link = $"/chi-tiet/{item.Alias}-p{item.Id}";
+                    bool hasSale = item.PriceSale > 0;
+
+                    <div class="product-item @item.ProductCategory.Alias">
+                        <div class="product @(hasSale ? "discount" : "") product_filter">
+                            <div class="product_image">
+                                <a href="@link" title="@item.Title">
+                                    <img src="@strImage" alt="@item.Title" />
+                                </a>
+                            </div>
+
+                            @if (hasSale)
+                            {
+
+                                <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center">
+                                    <span>sale</span>
+                                </div>
+
+                            }
+
+                            <div class="product_info">
+                                <h6 class="product_name">
+                                    <a href="@link" title="@item.Title">@item.Title</a>
+                                </h6>
+
+                                <div class="price_block">
+                                    <div class="price_current">
+                                        @(hasSale ? Common.FormatNumber(item.PriceSale, 0) : Common.FormatNumber(item.Price, 0))đ
+                                    </div>
+                                    <div class="price_old @(hasSale ? "" : "is-hidden")">
+                                        @Common.FormatNumber(item.Price, 0)đ
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class=" red_button add_to_cart_button">
+                            <a href="#" class="btnAddToCart" data-id="@item.Id">Thêm giỏ hàng</a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="product_slider_nav_left"><i class="fa fa-angle-left"></i></div>
+            <div class="product_slider_nav_right"><i class="fa fa-angle-right"></i></div>
+        </div>
+    </section>
+
+    <script>
+        (function () {
+            var $slider = $('#@sliderId');
+            if ($slider.data('owl-inited')) return;
+            $slider.data('owl-inited', true);
+
+            $slider.owlCarousel({
+                loop: @((Model.Count() > 3).ToString().ToLower()),
+                nav: false, dots: false, autoplay: false,
+                smartSpeed: 500, margin: 12, stagePadding: 12,
+                responsive: {
+                    0: { items: 1 },   // mobile
+                    576: { items: 2 },   // tablet nhỏ
+                    992: { items: 3 },   // tablet lớn / laptop nhỏ
+                    1200: { items: 4 }    // desktop hiển thị 4 thẻ
+                }
+
+            });
+
+            $('#related-section .product_slider_nav_left').on('click', function () { $slider.trigger('prev.owl.carousel'); });
+            $('#related-section .product_slider_nav_right').on('click', function () { $slider.trigger('next.owl.carousel'); });
+        })();
+    </script>
+}
