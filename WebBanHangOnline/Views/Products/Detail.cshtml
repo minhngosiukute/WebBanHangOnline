@@ -125,79 +125,79 @@
     }
 </style>
 <style>
-/* === Nút mũi tên thumbnail (đẹp hơn) === */
-.thumbnails_col {
-    position: relative;
-}
+    /* === Nút mũi tên thumbnail (đẹp hơn) === */
+    .thumbnails_col {
+        position: relative;
+    }
 
-/* vùng chứa 2 nút */
-.thumb-nav {
-    position: absolute;
-    top: 0; left: 50%;
-    transform: translateX(-50%);
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 0;
-    pointer-events: none; /* để click xuyên qua vùng trống */
-}
+    /* vùng chứa 2 nút */
+    .thumb-nav {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+        pointer-events: none; /* để click xuyên qua vùng trống */
+    }
 
-/* style nút */
-.thumb-btn {
-    pointer-events: auto;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.85);
-    color: #333;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
+    /* style nút */
+    .thumb-btn {
+        pointer-events: auto;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255,255,255,0.85);
+        color: #333;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
 
-/* icon */
-.thumb-btn i {
-    font-size: 16px;
-    line-height: 1;
-}
+        /* icon */
+        .thumb-btn i {
+            font-size: 16px;
+            line-height: 1;
+        }
 
-/* hover đẹp */
-.thumb-btn:hover {
-    background: #ff5a5f;
-    color: #fff;
-    transform: scale(1.05);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-}
+        /* hover đẹp */
+        .thumb-btn:hover {
+            background: #ff5a5f;
+            color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+        }
 
-/* active nhỏ lại */
-.thumb-btn:active {
-    transform: scale(0.95);
-}
+        /* active nhỏ lại */
+        .thumb-btn:active {
+            transform: scale(0.95);
+        }
 
-/* canh nhẹ lên xuống để không đè lên ảnh đầu/cuối */
-.thumb-up {
-    margin-top: -8px;
-}
+    /* canh nhẹ lên xuống để không đè lên ảnh đầu/cuối */
+    .thumb-up {
+        margin-top: -8px;
+    }
 
-.thumb-down {
-    margin-bottom: -1px;
-}
+    .thumb-down {
+        margin-bottom: -1px;
+    }
 
-/* responsive nhỏ lại một chút */
-@@media (max-width:768px){
-  .thumb-btn{
-    width:28px;height:28px;
-  }
-}
-
-
+    /* responsive nhỏ lại một chút */
+    @@media (max-width:768px) {
+        .thumb-btn {
+            width: 28px;
+            height: 28px;
+        }
+    }
 </style>
 
 
@@ -354,6 +354,11 @@
             </div>
         </div>
     </div>
+    <div class="container">
+        @Html.Action("Partial_RelatedProducts", "Products", new { id = Model.Id, take = 8 })
+    </div>
+    
+
 }
 
 @section scripts{
@@ -375,15 +380,15 @@
 
             // --- Tạo overlay ---
             const $overlay = $(`
-                    <div class="lb-overlay" role="dialog" aria-modal="true">
-                      <div class="lb-inner">
-                        <img class="lb-img" alt="">
-                        <button type="button" class="lb-close" title="Đóng" aria-label="Đóng">&times;</button>
-                        <button type="button" class="lb-arrow lb-prev" title="Ảnh trước" aria-label="Ảnh trước">&#10094;</button>
-                        <button type="button" class="lb-arrow lb-next" title="Ảnh sau" aria-label="Ảnh sau">&#10095;</button>
-                      </div>
-                    </div>
-                  `);
+                        <div class="lb-overlay" role="dialog" aria-modal="true">
+                          <div class="lb-inner">
+                            <img class="lb-img" alt="">
+                            <button type="button" class="lb-close" title="Đóng" aria-label="Đóng">&times;</button>
+                            <button type="button" class="lb-arrow lb-prev" title="Ảnh trước" aria-label="Ảnh trước">&#10094;</button>
+                            <button type="button" class="lb-arrow lb-next" title="Ảnh sau" aria-label="Ảnh sau">&#10095;</button>
+                          </div>
+                        </div>
+                      `);
             $('body').append($overlay);
 
             const $img = $overlay.find('.lb-img');
@@ -535,11 +540,11 @@
             const $col = $('.thumbnails_col');
             if (!$col.find('.thumb-nav').length) {
                 $col.append(`
-              <div class="thumb-nav">
-                <button type="button" class="thumb-btn thumb-up"  title="Ảnh trước"><i class="fa fa-chevron-up"></i></button>
-                <button type="button" class="thumb-btn thumb-down" title="Ảnh sau"><i class="fa fa-chevron-down"></i></button>
-              </div>
-            `);
+                  <div class="thumb-nav">
+                    <button type="button" class="thumb-btn thumb-up"  title="Ảnh trước"><i class="fa fa-chevron-up"></i></button>
+                    <button type="button" class="thumb-btn thumb-down" title="Ảnh sau"><i class="fa fa-chevron-down"></i></button>
+                  </div>
+                `);
             }
 
             const $ul = $('.single_product_thumbnails ul');

@@ -63,6 +63,28 @@ namespace WebBanHangOnline.Controllers
         //    return PartialView(items);
         //}
         // Thêm action Search
+
+        // Gợi ý sản phẩm cùng loại (không hiện chính nó)
+        [ChildActionOnly] // dùng với Html.Action trong View
+        public ActionResult Partial_RelatedProducts(int id, int take = 8)
+        {
+            var product = db.Products.Find(id);
+            if (product == null) return new EmptyResult();
+
+            var cateId = product.ProductCategoryId;
+
+            var items = db.Products
+                .Where(x => x.ProductCategoryId == cateId
+                            && x.IsActive
+                            && x.Id != id)
+                .OrderByDescending(x => x.ViewCount) // ưu tiên sản phẩm xem nhiều
+                .ThenByDescending(x => x.Id)
+                .Take(take)
+                .ToList();
+
+            return PartialView("Partial_RelatedProducts", items);
+        }
+
         public ActionResult Search(string keyword)
         {
             if (string.IsNullOrEmpty(keyword))

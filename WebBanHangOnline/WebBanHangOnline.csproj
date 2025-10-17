@@ -3542,6 +3542,7 @@
     <Content Include="Areas\Admin\Views\Adv\Create.cshtml" />
     <Content Include="Areas\Admin\Views\Adv\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Stats\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Products\BestSelling.cshtml" />
     <None Include="packages.config" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -3640,6 +3641,7 @@
     <Content Include="Views\Review\Partial_SanPham.cshtml" />
     <Content Include="Scripts\jquery-3.7.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.1.min.map" />
+    <Content Include="Views\Products\Partial_RelatedProducts.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
