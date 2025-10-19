@@ -227,6 +227,10 @@
     <Compile Include="Migrations\202510190629471_xoasp.Designer.cs">
       <DependentUpon>202510190629471_xoasp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202510190706504_CreateAccessStats.cs" />
+    <Compile Include="Migrations\202510190706504_CreateAccessStats.Designer.cs">
+      <DependentUpon>202510190706504_CreateAccessStats.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdvCreateViewModel.cs" />
@@ -236,6 +240,7 @@
     <Compile Include="Models\Common\ThongKeService.cs" />
     <Compile Include="Models\Common\ThongKeTruyCap.cs" />
     <Compile Include="Models\CustomerViewModel.cs" />
+    <Compile Include="Models\EF\AccessStats.cs" />
     <Compile Include="Models\EF\Adv.cs" />
     <Compile Include="Models\EF\Category.cs" />
     <Compile Include="Models\EF\Contact.cs" />
@@ -3659,6 +3664,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202510190629471_xoasp.resx">
       <DependentUpon>202510190629471_xoasp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510190706504_CreateAccessStats.resx">
+      <DependentUpon>202510190706504_CreateAccessStats.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

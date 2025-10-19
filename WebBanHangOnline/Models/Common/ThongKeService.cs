@@ -25,14 +25,14 @@ namespace WebBanHangOnline.Models.Common
         public static void IncrementToday(ApplicationDbContext db)
         {
             var today = DateTime.Today;
-            var tk = db.ThongKes.FirstOrDefault(x => DbFunctions.TruncateTime(x.ThoiGian) == today);
+            var tk = db.AccessStats.FirstOrDefault(x => DbFunctions.TruncateTime(x.Time) == today);
             if (tk == null)
             {
-                db.ThongKes.Add(new ThongKe { ThoiGian = today, SoTruyCap = 1 });
+                db.AccessStats.Add(new AccessStat { Time = today, VisitCount = 1 });
             }
             else
             {
-                tk.SoTruyCap += 1;
+                tk.VisitCount += 1;
             }
             db.SaveChanges();
         }
@@ -50,19 +50,19 @@ namespace WebBanHangOnline.Models.Common
             var firstDayThisMonth = new DateTime(today.Year, today.Month, 1);
             var monthEnd = firstDayThisMonth.AddMonths(1); // tính sẵn ở ngoài
 
-            long todayCount = db.ThongKes
-                .Where(x => DbFunctions.TruncateTime(x.ThoiGian) == today)
-                .Select(x => (long?)x.SoTruyCap).FirstOrDefault() ?? 0;
+            long todayCount = db.AccessStats
+                .Where(x => DbFunctions.TruncateTime(x.Time) == today)
+                .Select(x => (long?)x.VisitCount).FirstOrDefault() ?? 0;
 
-            long weekCount = db.ThongKes
-                .Where(x => DbFunctions.TruncateTime(x.ThoiGian) >= monday
-                         && DbFunctions.TruncateTime(x.ThoiGian) < weekEnd)
-                .Select(x => (long?)x.SoTruyCap).Sum() ?? 0;
+            long weekCount = db.AccessStats
+                .Where(x => DbFunctions.TruncateTime(x.Time) >= monday
+                         && DbFunctions.TruncateTime(x.Time) < weekEnd)
+                .Select(x => (long?)x.VisitCount).Sum() ?? 0;
 
-            long monthCount = db.ThongKes
-                .Where(x => DbFunctions.TruncateTime(x.ThoiGian) >= firstDayThisMonth
-                         && DbFunctions.TruncateTime(x.ThoiGian) < monthEnd)
-                .Select(x => (long?)x.SoTruyCap).Sum() ?? 0;
+            long monthCount = db.AccessStats
+                .Where(x => DbFunctions.TruncateTime(x.Time) >= firstDayThisMonth
+                         && DbFunctions.TruncateTime(x.Time) < monthEnd)
+                .Select(x => (long?)x.VisitCount).Sum() ?? 0;
 
             return new StatsSummaryVM
             {
@@ -76,9 +76,9 @@ namespace WebBanHangOnline.Models.Common
         public static long GetByDay(ApplicationDbContext db, DateTime day)
         {
             var d = day.Date;
-            return db.ThongKes
-                .Where(x => DbFunctions.TruncateTime(x.ThoiGian) == d)
-                .Select(x => (long?)x.SoTruyCap).FirstOrDefault() ?? 0;
+            return db.AccessStats
+                .Where(x => DbFunctions.TruncateTime(x.Time) == d)
+                .Select(x => (long?)x.VisitCount).FirstOrDefault() ?? 0;
         }
 
         // Tổng view theo tháng (year + month)
@@ -86,10 +86,10 @@ namespace WebBanHangOnline.Models.Common
         {
             var start = new DateTime(year, month, 1);
             var end = start.AddMonths(1); // tính sẵn ở ngoài
-            return db.ThongKes
-                .Where(x => DbFunctions.TruncateTime(x.ThoiGian) >= start
-                         && DbFunctions.TruncateTime(x.ThoiGian) < end)
-                .Select(x => (long?)x.SoTruyCap).Sum() ?? 0;
+            return db.AccessStats
+                .Where(x => DbFunctions.TruncateTime(x.Time) >= start
+                         && DbFunctions.TruncateTime(x.Time) < end)
+                .Select(x => (long?)x.VisitCount).Sum() ?? 0;
         }
 
         // Chuỗi daily cho 1 tháng (để vẽ chart nếu cần)
@@ -98,13 +98,13 @@ namespace WebBanHangOnline.Models.Common
             var start = new DateTime(year, month, 1);
             var end = start.AddMonths(1); // tính sẵn ở ngoài
 
-            var raw = db.ThongKes
-                .Where(x => DbFunctions.TruncateTime(x.ThoiGian) >= start
-                         && DbFunctions.TruncateTime(x.ThoiGian) < end)
-                .Select(x => new { Day = DbFunctions.TruncateTime(x.ThoiGian), x.SoTruyCap })
+            var raw = db.AccessStats
+                .Where(x => DbFunctions.TruncateTime(x.Time) >= start
+                         && DbFunctions.TruncateTime(x.Time) < end)
+                .Select(x => new { Day = DbFunctions.TruncateTime(x.Time), x.VisitCount })
                 .ToList()
                 .GroupBy(x => x.Day.Value)
-                .Select(g => new DayCountVM { Day = g.Key, Count = g.Sum(z => (long)z.SoTruyCap) })
+                .Select(g => new DayCountVM { Day = g.Key, Count = g.Sum(z => (long)z.VisitCount) })
                 .ToList();
 
             // fill thiếu ngày
@@ -123,13 +123,13 @@ namespace WebBanHangOnline.Models.Common
             var monday = today.AddDays(dow == 0 ? -6 : 1 - dow);
             var weekEnd = monday.AddDays(7);
 
-            var raw = db.ThongKes
-                .Where(x => DbFunctions.TruncateTime(x.ThoiGian) >= monday
-                         && DbFunctions.TruncateTime(x.ThoiGian) < weekEnd)
-                .Select(x => new { Day = DbFunctions.TruncateTime(x.ThoiGian), x.SoTruyCap })
+            var raw = db.AccessStats
+                .Where(x => DbFunctions.TruncateTime(x.Time) >= monday
+                         && DbFunctions.TruncateTime(x.Time) < weekEnd)
+                .Select(x => new { Day = DbFunctions.TruncateTime(x.Time), x.VisitCount })
                 .ToList()
                 .GroupBy(x => x.Day.Value)
-                .Select(g => new DayCountVM { Day = g.Key, Count = g.Sum(z => (long)z.SoTruyCap) })
+                .Select(g => new DayCountVM { Day = g.Key, Count = g.Sum(z => (long)z.VisitCount) })
                 .ToList();
 
             var days = new List<DayCountVM>();
