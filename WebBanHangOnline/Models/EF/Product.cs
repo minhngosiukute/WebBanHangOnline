@@ -29,12 +29,12 @@ namespace WebBanHangOnline.Models.EF
         [StringLength(250)]
         public string Alias { get; set; }
 
-        [StringLength(50)]
-        public string ProductCode { get; set; }
+        //[StringLength(50)]
+        //public string ProductCode { get; set; }
         public string Description { get; set; }
 
-        [AllowHtml]
-        public string Detail { get; set; }
+        //[AllowHtml]
+        //public string Detail { get; set; }
 
         [StringLength(250)]
         public string Image { get; set; }

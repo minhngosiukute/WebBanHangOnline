@@ -223,6 +223,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202510190629471_xoasp.cs" />
+    <Compile Include="Migrations\202510190629471_xoasp.Designer.cs">
+      <DependentUpon>202510190629471_xoasp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdvCreateViewModel.cs" />
@@ -3625,7 +3629,6 @@
     <Content Include="Views\ShoppingCart\Partial_Item_ThanhToan.cshtml" />
     <Content Include="Views\ShoppingCart\Partial_CheckOut.cshtml" />
     <Content Include="Views\ShoppingCart\CheckOutSuccess.cshtml" />
-    <Content Include="Views\Home\Refresh.cshtml" />
     <Content Include="Views\News\Partial_News_Home.cshtml" />
     <Content Include="Views\Home\Partial_Subcrice.cshtml" />
     <Content Include="Views\News\Index.cshtml" />
@@ -3652,6 +3655,11 @@
     <Folder Include="Views\Presence\" />
     <Folder Include="Views\Role\" />
     <Folder Include="Views\Search\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202510190629471_xoasp.resx">
+      <DependentUpon>202510190629471_xoasp.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
