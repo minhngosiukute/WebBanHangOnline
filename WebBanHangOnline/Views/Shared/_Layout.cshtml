@@ -312,7 +312,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="top_nav_left">Hotline: @SettingHelper.GetValue("SettingHotline")</div>
+                            @*<div class="top_nav_left">Hotline: @SettingHelper.GetValue("SettingHotline")</div>*@
                         </div>
                         <div class="col-md-6 text-right">
                             <div class="top_nav_right">
@@ -371,7 +371,14 @@
                                 <a href="/">MIHGO<span>SHOP</span></a>
                             </div>
                             <nav class="navbar">
-                                @Html.Action("MenuTop", "Menu")
+                                @*@Html.Action("MenuTop", "Menu")*@
+                                <ul class="navbar_menu">
+                                    <li><a href="/">Trang chủ</a></li>
+                                    <li><a href="/san-pham">Sản phẩm</a></li>
+                                    <li><a href="/tin-tuc">Tin tức</a></li>
+                                    <li><a href="/lien-he">Liên hệ</a></li>
+                                </ul>
+
                                 <ul class="navbar_user">
                                     <li style="position: relative;">
                                         <div class="search-bar d-flex align-items-center" style="background-color: #f2f2f2; border-radius: 20px; padding: 5px 10px;">

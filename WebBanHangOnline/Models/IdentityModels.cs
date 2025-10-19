@@ -31,16 +31,16 @@ namespace WebBanHangOnline.Models
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<ReviewProduct> Reviews { get; set; }
         public DbSet<ThongKe> ThongKes { get; set; }
-        public DbSet<Category> Categories { get; set; }
+      
         public DbSet<Adv> Advs { get; set; }
         public DbSet<AccessStat> AccessStats { get; set; }
 
         public DbSet<News> News { get; set; }
-        public DbSet<SystemSetting> SystemSettings { get; set; }
+        
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<Contact> Contacts { get; set; }
+       
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Subscribe> Subscribes { get; set; }

@@ -193,7 +193,6 @@
     <Compile Include="Areas\Admin\Controllers\AccountController.cs" />
     <Compile Include="Areas\Admin\Controllers\AdvController.cs" />
     <Compile Include="Areas\Admin\Controllers\AdvEmailController.cs" />
-    <Compile Include="Areas\Admin\Controllers\CategoryController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\ImportOrderController.cs" />
     <Compile Include="Areas\Admin\Controllers\NewsController.cs" />
@@ -203,12 +202,10 @@
     <Compile Include="Areas\Admin\Controllers\ProductsController.cs" />
     <Compile Include="Areas\Admin\Controllers\ReviewController.cs" />
     <Compile Include="Areas\Admin\Controllers\RoleController.cs" />
-    <Compile Include="Areas\Admin\Controllers\SettingSystemController.cs" />
     <Compile Include="Areas\Admin\Controllers\StatisticalController.cs" />
     <Compile Include="Areas\Admin\Controllers\StatsController.cs" />
     <Compile Include="Areas\Admin\Controllers\SupplierController.cs" />
     <Compile Include="Common\Common.cs" />
-    <Compile Include="Common\SettingHelper.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -231,6 +228,18 @@
     <Compile Include="Migrations\202510190706504_CreateAccessStats.Designer.cs">
       <DependentUpon>202510190706504_CreateAccessStats.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202510190742070_xoasetting.cs" />
+    <Compile Include="Migrations\202510190742070_xoasetting.Designer.cs">
+      <DependentUpon>202510190742070_xoasetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202510190746495_xoacontac.cs" />
+    <Compile Include="Migrations\202510190746495_xoacontac.Designer.cs">
+      <DependentUpon>202510190746495_xoacontac.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202510190755581_xoacata.cs" />
+    <Compile Include="Migrations\202510190755581_xoacata.Designer.cs">
+      <DependentUpon>202510190755581_xoacata.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdvCreateViewModel.cs" />
@@ -242,8 +251,6 @@
     <Compile Include="Models\CustomerViewModel.cs" />
     <Compile Include="Models\EF\AccessStats.cs" />
     <Compile Include="Models\EF\Adv.cs" />
-    <Compile Include="Models\EF\Category.cs" />
-    <Compile Include="Models\EF\Contact.cs" />
     <Compile Include="Models\EF\ImportOrder.cs" />
     <Compile Include="Models\EF\ImportOrderDetail.cs" />
     <Compile Include="Models\EF\News.cs" />
@@ -255,7 +262,6 @@
     <Compile Include="Models\EF\ReviewProduct.cs" />
     <Compile Include="Models\EF\Subscribe.cs" />
     <Compile Include="Models\EF\Supplier.cs" />
-    <Compile Include="Models\EF\SystemSetting.cs" />
     <Compile Include="Models\EF\ThongKe.cs" />
     <Compile Include="Models\EF\Wishlist.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -3618,7 +3624,6 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Menu\_MenuTop.cshtml" />
     <Content Include="Views\Menu\_MenuProductCategory.cshtml" />
     <Content Include="Views\Menu\_MenuArrivals.cshtml" />
     <Content Include="Views\Products\Partial_ItemsByCateId.cshtml" />
@@ -3667,6 +3672,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202510190706504_CreateAccessStats.resx">
       <DependentUpon>202510190706504_CreateAccessStats.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510190742070_xoasetting.resx">
+      <DependentUpon>202510190742070_xoasetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510190746495_xoacontac.resx">
+      <DependentUpon>202510190746495_xoacontac.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510190755581_xoacata.resx">
+      <DependentUpon>202510190755581_xoacata.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
