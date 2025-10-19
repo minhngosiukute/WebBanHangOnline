@@ -8,6 +8,7 @@ using WebBanHangOnline.Models.EF;
 
 namespace WebBanHangOnline.Areas.Admin.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ImportOrderController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

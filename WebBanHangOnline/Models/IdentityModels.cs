@@ -33,7 +33,8 @@ namespace WebBanHangOnline.Models
         public DbSet<ThongKe> ThongKes { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Adv> Advs { get; set; }
-        
+        public DbSet<AccessStat> AccessStats { get; set; }
+
         public DbSet<News> News { get; set; }
         public DbSet<SystemSetting> SystemSettings { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
