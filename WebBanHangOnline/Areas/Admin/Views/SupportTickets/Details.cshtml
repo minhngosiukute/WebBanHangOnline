@@ -113,17 +113,20 @@
                         <h3 class="card-title">Gửi phản hồi</h3>
                     </div>
                     <div class="card-body">
-                        @using (Html.BeginForm("Reply", "SupportTickets", FormMethod.Post, new { area = "Admin" }))
+                        @using (Html.BeginForm("Reply", "SupportTickets", new { area = "Admin" }, FormMethod.Post, new { }))
                         {
                             @Html.AntiForgeryToken()
-                            @Html.HiddenFor(m => m.Reply.TicketId)
+                            @Html.Hidden("TicketId", Model.Ticket.Id)
+
                             <div class="form-group">
-                                @Html.LabelFor(m => m.Reply.Message)
-                                @Html.TextAreaFor(m => m.Reply.Message, 5, 20, new { @class = "form-control", placeholder = "Nhập nội dung phản hồi..." })
-                                @Html.ValidationMessageFor(m => m.Reply.Message, null, new { @class = "text-danger" })
+                                @Html.Label("Message", "Nội dung phản hồi")
+                                @Html.TextArea("Message", null, 5, 20, new { @class = "form-control", placeholder = "Nhập nội dung phản hồi..." })
+                                @Html.ValidationMessage("Message", null, new { @class = "text-danger" })
                             </div>
+
                             <button type="submit" class="btn btn-success btn-block">Gửi phản hồi</button>
                         }
+
                     </div>
                 </div>
             </div>

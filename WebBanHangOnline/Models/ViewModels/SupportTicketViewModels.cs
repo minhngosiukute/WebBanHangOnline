@@ -27,6 +27,16 @@ namespace WebBanHangOnline.Models.ViewModels
         [Display(Name = "Nội dung yêu cầu")]
         public string Message { get; set; }
     }
+    // ViewModels liệt kê ticket theo email (MyTickets)
+    public class MyTicketRowVM
+    {
+        public int Id { get; set; }
+        public string TicketCode { get; set; }
+        public string Subject { get; set; }
+        public string Status { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+    }
 
     public class SupportTicketDetailViewModel
     {

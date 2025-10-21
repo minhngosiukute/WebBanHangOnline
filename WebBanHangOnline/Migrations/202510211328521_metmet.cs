@@ -1,12 +1,28 @@
-namespace WebBanHangOnline.Migrations
+﻿namespace WebBanHangOnline.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-
-    public partial class CreateSupportCenter : DbMigration
+    
+    public partial class metmet : DbMigration
     {
         public override void Up()
         {
+            CreateTable(
+                "dbo.tb_SupportTicketMessage",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        TicketId = c.Int(nullable: false),
+                        Message = c.String(nullable: false),
+                        SenderId = c.String(maxLength: 256),
+                        SenderName = c.String(maxLength: 150),
+                        IsFromStaff = c.Boolean(nullable: false),
+                        CreatedDate = c.DateTime(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.tb_SupportTicket", t => t.TicketId, cascadeDelete: true)
+                .Index(t => t.TicketId);
+            
             CreateTable(
                 "dbo.tb_SupportTicket",
                 c => new
@@ -26,30 +42,15 @@ namespace WebBanHangOnline.Migrations
                         LastRepliedBy = c.String(maxLength: 256),
                     })
                 .PrimaryKey(t => t.Id);
-
-            CreateTable(
-                "dbo.tb_SupportTicketMessage",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        TicketId = c.Int(nullable: false),
-                        Message = c.String(nullable: false),
-                        SenderId = c.String(maxLength: 256),
-                        SenderName = c.String(maxLength: 150),
-                        IsFromStaff = c.Boolean(nullable: false),
-                        CreatedDate = c.DateTime(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.tb_SupportTicket", t => t.TicketId, cascadeDelete: true)
-                .Index(t => t.TicketId);
+            
         }
-
+        
         public override void Down()
         {
             DropForeignKey("dbo.tb_SupportTicketMessage", "TicketId", "dbo.tb_SupportTicket");
             DropIndex("dbo.tb_SupportTicketMessage", new[] { "TicketId" });
-            DropTable("dbo.tb_SupportTicketMessage");
             DropTable("dbo.tb_SupportTicket");
+            DropTable("dbo.tb_SupportTicketMessage");
         }
     }
 }

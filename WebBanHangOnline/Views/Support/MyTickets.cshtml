@@ -1,0 +1,63 @@
+﻿@model IEnumerable<WebBanHangOnline.Models.ViewModels.MyTicketRowVM>
+@{
+    ViewBag.Title = "Yêu cầu đã gửi";
+    var email = ViewBag.Email as string;
+}
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
+<section class="content" style="padding-top: 160px; padding-bottom: 130px;">
+    <div class="container">
+        <h3 class="mb-3">Yêu cầu đã gửi của: <span class="text-primary">@email</span></h3>
+
+        <form method="get" action="@Url.Action("MyTickets","Support")" class="mb-3">
+            <div class="form-row">
+                <div class="col-md-8">
+                    <input type="email" name="email" class="form-control" value="@email" placeholder="Nhập email của bạn" required />
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-primary btn-block">Tìm</button>
+                </div>
+            </div>
+        </form>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-info">Chưa có yêu cầu nào cho email này.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Mã hỗ trợ</th>
+                            <th>Tiêu đề</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày tạo</th>
+                            <th>Cập nhật</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model)
+                        {
+                            <tr>
+                                <td><strong>@t.TicketCode</strong></td>
+                                <td>@t.Subject</td>
+                                <td><span class="badge badge-info">@t.Status</span></td>
+                                <td>@t.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@(t.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                                <td style="width:160px">
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       href="@Url.Action("Track","Support", new { code = t.TicketCode, email = email })">
+                                        Xem & trao đổi
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</section>

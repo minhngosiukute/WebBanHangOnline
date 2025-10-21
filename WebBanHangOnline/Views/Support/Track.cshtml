@@ -1,65 +1,109 @@
 @model WebBanHangOnline.Models.ViewModels.SupportTicketDetailViewModel
 @{
-    ViewBag.Title = "Theo dõi yêu cầu hỗ trợ";
+    ViewBag.Title = "Theo dõi yêu cầu";
+    var code = ViewBag.Code as string;
+    var email = ViewBag.Email as string;
 }
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
+<section class="content">
+    <div class="container">
+        <h3>Theo dõi yêu cầu</h3>
 
-<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h2 class="mb-4 text-center">Theo dõi trạng thái yêu cầu</h2>
-            @using (Html.BeginForm("Track", "Support", FormMethod.Get, new { @class = "card p-4 shadow-sm mb-4" }))
-            {
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="code">Mã hỗ trợ</label>
-                        <input type="text" class="form-control" id="code" name="code" value="@Request["code"]" placeholder="VD: ABC1234567" required />
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="@Request["email"]" placeholder="email@domain.com" required />
-                    </div>
+        <form method="get" action="@Url.Action("Track","Support")" class="mb-3">
+            <div class="form-row">
+                <div class="col-md-4">
+                    <input type="text" name="code" class="form-control" value="@code" placeholder="Mã hỗ trợ" required />
                 </div>
-                <button type="submit" class="btn btn-primary">Xem trạng thái</button>
-            }
+                <div class="col-md-5">
+                    <input type="email" name="email" class="form-control" value="@email" placeholder="Email" required />
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary btn-block">Xem</button>
+                </div>
+            </div>
+        </form>
 
-            @if (ViewBag.NotFound == true)
-            {
-                <div class="alert alert-danger">Không tìm thấy yêu cầu khớp với thông tin bạn cung cấp. Vui lòng kiểm tra lại.</div>
-            }
-            else if (Model != null && Model.Ticket != null)
-            {
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <h4 class="card-title">@Model.Ticket.Subject</h4>
-                        <p class="mb-1"><strong>Người gửi:</strong> @Model.Ticket.FullName (@Model.Ticket.Email)</p>
-                        @if (!string.IsNullOrEmpty(Model.Ticket.PhoneNumber))
-                        {
-                            <p class="mb-1"><strong>Số điện thoại:</strong> @Model.Ticket.PhoneNumber</p>
-                        }
-                        <p class="mb-1"><strong>Trạng thái:</strong> @Model.Ticket.Status</p>
-                        <p class="mb-3"><strong>Tạo lúc:</strong> @Model.Ticket.CreatedDate.ToString("dd/MM/yyyy HH:mm")</p>
+        @if (ViewBag.NotFound == true)
+        {
+            <div class="alert alert-danger">Không tìm thấy yêu cầu. Vui lòng kiểm tra Mã hỗ trợ & Email.</div>
+        }
+        else if (Model != null)
+        {
+            if (TempData["Success"] != null)
+            { <div class="alert alert-success">@TempData["Success"]</div> }
+        if (TempData["Error"] != null)
+        { <div class="alert alert-danger">@TempData["Error"]</div> }
 
-                        <h5>Lịch sử trao đổi</h5>
-                        <hr />
-                        <div class="timeline">
-                            @foreach (var message in Model.Messages)
-                            {
-                                <div class="media mb-3">
-                                    <div class="media-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <strong>@message.SenderName</strong>
-                                            <small class="text-muted">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
-                                        </div>
-                                        <div class="mt-2">@Html.Raw(Html.Encode(message.Message).Replace("\n", "<br />"))</div>
-                                        <span class="badge badge-@((message.IsFromStaff ? "success" : "secondary")) mt-2">@(message.IsFromStaff ? "Hỗ trợ viên" : "Khách hàng")</span>
-                                    </div>
-                                </div>
-                                <hr />
-                            }
+    <div class="card mb-3">
+        <div class="card-header"><strong>Thông tin yêu cầu</strong></div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Mã hỗ trợ</dt>
+                <dd class="col-sm-8"><strong>@Model.Ticket.TicketCode</strong></dd>
+                <dt class="col-sm-4">Tiêu đề</dt>
+                <dd class="col-sm-8">@Model.Ticket.Subject</dd>
+                <dt class="col-sm-4">Trạng thái</dt>
+                <dd class="col-sm-8"><span class="badge badge-info">@Model.Ticket.Status</span></dd>
+                <dt class="col-sm-4">Ngày tạo</dt>
+                <dd class="col-sm-8">@Model.Ticket.CreatedDate.ToString("dd/MM/yyyy HH:mm")</dd>
+                <dt class="col-sm-4">Cập nhật gần nhất</dt>
+                <dd class="col-sm-8">@(Model.Ticket.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header"><strong>Lịch sử trao đổi</strong></div>
+        <div class="card-body">
+            @if (Model.Messages == null || !Model.Messages.Any())
+            {
+                <p class="text-muted mb-0">Chưa có phản hồi nào.</p>
+            }
+            else
+            {
+                foreach (var message in Model.Messages)
+                {
+                    <div class="callout @(message.IsFromStaff ? "callout-success" : "callout-secondary")">
+                        <div class="d-flex justify-content-between">
+                            <strong>@message.SenderName</strong>
+                            <span class="text-muted">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
                         </div>
+                        <div class="mt-2">@Html.Raw(Html.Encode(message.Message).Replace("\n", "<br/>"))</div>
+                        <span class="badge @(message.IsFromStaff ? "badge-success" : "badge-secondary") mt-2">
+                            @(message.IsFromStaff ? "Hỗ trợ viên" : "Khách hàng")
+                        </span>
                     </div>
-                </div>
+                }
             }
         </div>
     </div>
-</div>
+
+    <div class="card">
+        <div class="card-header"><strong>Gửi phản hồi</strong></div>
+        <div class="card-body">
+            @using (Html.BeginForm("Reply", "Support", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+                @Html.HiddenFor(m => m.Reply.TicketId) <!-- TicketId -->
+                <input type="hidden" name="code" value="@code" /> <!-- để xác thực -->
+                <input type="hidden" name="email" value="@email" /> <!-- để xác thực -->
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Reply.Message)
+                    @Html.TextAreaFor(m => m.Reply.Message, 5, 40, new { @class = "form-control", placeholder = "Nhập nội dung phản hồi..." })
+                    @Html.ValidationMessageFor(m => m.Reply.Message, null, new { @class = "text-danger" })
+                </div>
+                <button type="submit" class="btn btn-success">Gửi phản hồi</button>
+            }
+        </div>
+    </div>
+}
+    </div>
+</section>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
