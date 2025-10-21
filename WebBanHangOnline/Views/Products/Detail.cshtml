@@ -38,7 +38,7 @@
     .lb-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,.85);
+        background: rgba(0,0,0,.45);
         display: none;
         align-items: center;
         justify-content: center;
@@ -198,6 +198,32 @@
             height: 28px;
         }
     }
+    .product-policy {
+        display: flex;
+        justify-content: flex-start;
+        gap: 40px;
+        margin-top: 35px;
+    }
+
+    .policy-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #dd2611; /* đỏ nhạt sang */
+    }
+
+        .policy-item i {
+            font-size: 26px;
+            color: #dd2611;
+        }
+
+        .policy-item p {
+            font-size: 15px;
+            color: #ff5a5f;
+            line-height: 1.4;
+            margin: 0;
+        }
+
 </style>
 
 
@@ -268,7 +294,7 @@
                 <div class="product_details">
                     <div class="product_details_title">
                         <h2>@Model.Title</h2>
-                        <p>@Model.Description</p>
+
                         <p>Lượt xem: <b>@Model.ViewCount</b></p>
                     </div>
 
@@ -316,6 +342,23 @@
                         }
                     </div>
                 </div>
+                <div></div>
+                <!-- ===== CAM KẾT - GIAO HÀNG - THANH TOÁN ===== -->
+                <div class="product-policy">
+                    <div class="policy-item">
+                        <i class="fa fa-check-circle"></i>
+                        <p>Cam kết<br>chất lượng</p>
+                    </div>
+                    <div class="policy-item">
+                        <i class="fa fa-motorcycle"></i>
+                        <p>Giao hàng<br>miễn phí</p>
+                    </div>
+                    <div class="policy-item">
+                        <i class="fa fa-hand-holding-usd"></i>
+                        <p>Thanh toán<br>dễ dàng</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

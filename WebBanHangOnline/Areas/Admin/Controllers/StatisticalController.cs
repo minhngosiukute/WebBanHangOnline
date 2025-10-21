@@ -62,7 +62,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                                .AsEnumerable()
                                .Select(x => new
                                {
-                                   Label = x.Date.HasValue ? x.Date.Value.ToString("yyyy-MM-dd") : "",
+                                   Label = x.Date.HasValue ? x.Date.Value.ToString("dd-MM-yyyy") : "",
                                    DoanhThu = x.TotalSell,
                                    LoiNhuan = x.TotalSell - x.TotalBuy
                                })

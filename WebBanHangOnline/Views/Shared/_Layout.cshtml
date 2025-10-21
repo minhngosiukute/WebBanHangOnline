@@ -265,39 +265,48 @@
         }
     </style>
     <style>
-  /* Spinner tròn nhỏ dùng cho nút */
-  .btn-spinner {
-    display:inline-block;
-    width:18px;height:18px;
-    border:2px solid rgba(255,255,255,.35);
-    border-top-color: currentColor;
-    border-radius:50%;
-    margin-right:8px;
-    vertical-align:-3px;
-    animation: spin .8s linear infinite;
-  }
-  @@keyframes spin { to { transform: rotate(360deg); } }
+        /* Spinner tròn nhỏ dùng cho nút */
+        .btn-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,.35);
+            border-top-color: currentColor;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: -3px;
+            animation: spin .8s linear infinite;
+        }
 
-  /* Trạng thái đang loading cho nút */
-  .btn-loading {
-    pointer-events:none;
-    opacity:.9;
-  }
+        @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
-  /* Spinner lớn cho overlay */
-  .overlay-spinner {
-    width:38px;height:38px;
-    border:3px solid rgba(0,0,0,.15);
-    border-top-color:#db7093;
-    border-radius:50%;
-    animation: spin .9s linear infinite;
-    margin:auto;
-  }
+        /* Trạng thái đang loading cho nút */
+        .btn-loading {
+            pointer-events: none;
+            opacity: .9;
+        }
 
-  /* Hiệu ứng “ấn xuống” rất nhẹ khi click */
-  .btn:active { transform: translateY(1px); }
+        /* Spinner lớn cho overlay */
+        .overlay-spinner {
+            width: 38px;
+            height: 38px;
+            border: 3px solid rgba(0,0,0,.15);
+            border-top-color: #db7093;
+            border-radius: 50%;
+            animation: spin .9s linear infinite;
+            margin: auto;
+        }
+
+        /* Hiệu ứng “ấn xuống” rất nhẹ khi click */
+        .btn:active {
+            transform: translateY(1px);
+        }
     </style>
-
+   
 </head>
 
 <body>
@@ -338,10 +347,23 @@
                                                 <i class="fa fa-angle-down"></i>
                                             </a>
                                             <ul class="account_selection">
-                                                <li><a href="/account/profile"><i class="fa fa-sign-in" aria-hidden="true"></i>Hồ sơ</a></li>
-                                                <li><a href="/wishlist/index"><i class="fa fa-sign-in" aria-hidden="true"></i>Sản phẩm yêu thích</a></li>
-                                                <li><a href="javascript:document.getElementById('logOffForm').submit()"><i class="fa fa-user-plus" aria-hidden="true"></i>Đăng xuất</a></li>
+                                                <li>
+                                                    <a href="/account/profile">
+                                                        <i class="fa fa-user" aria-hidden="true"></i> Hồ sơ
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/wishlist/index">
+                                                        <i class="fa fa-heart" aria-hidden="true"></i> Sản phẩm yêu thích
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:document.getElementById('logOffForm').submit()">
+                                                        <i class="fa fa-sign-out" aria-hidden="true"></i> Đăng xuất
+                                                    </a>
+                                                </li>
                                             </ul>
+
                                         }
 
                                     </li>
@@ -446,54 +468,8 @@
             </div>
         </div>
 
-        <div class="fs_menu_overlay"></div>
-        <div class="hamburger_menu">
-            <div class="hamburger_close"><i class="fa fa-times" aria-hidden="true"></i></div>
-            <div class="hamburger_menu_content text-right">
-                <ul class="menu_top_nav">
-                    <li class="menu_item has-children">
-                        <a href="#">
-                            usd
-                            <i class="fa fa-angle-down"></i>
-                        </a>
-                        <ul class="menu_selection">
-                            <li><a href="#">cad</a></li>
-                            <li><a href="#">aud</a></li>
-                            <li><a href="#">eur</a></li>
-                            <li><a href="#">gbp</a></li>
-                        </ul>
-                    </li>
-                    <li class="menu_item has-children">
-                        <a href="#">
-                            English
-                            <i class="fa fa-angle-down"></i>
-                        </a>
-                        <ul class="menu_selection">
-                            <li><a href="#">French</a></li>
-                            <li><a href="#">Italian</a></li>
-                            <li><a href="#">German</a></li>
-                            <li><a href="#">Spanish</a></li>
-                        </ul>
-                    </li>
-                    <li class="menu_item has-children">
-                        <a href="#">
-                            Tài khoản
-                            <i class="fa fa-angle-down"></i>
-                        </a>
-                        <ul class="menu_selection">
-                            <li><a href="#"><i class="fa fa-sign-in" aria-hidden="true"></i>Đăng nhập </a></li>
-                            <li><a href="#"><i class="fa fa-user-plus" aria-hidden="true"></i>Đăng ký</a></li>
-                        </ul>
-                    </li>
-                    <li class="menu_item"><a href="#">home</a></li>
-                    <li class="menu_item"><a href="#">shop</a></li>
-                    <li class="menu_item"><a href="#">promotion</a></li>
-                    <li class="menu_item"><a href="#">pages</a></li>
-                    <li class="menu_item"><a href="#">blog</a></li>
-                    <li class="menu_item"><a href="#">contact</a></li>
-                </ul>
-            </div>
-        </div>
+       
+        
 
         @RenderBody()
 

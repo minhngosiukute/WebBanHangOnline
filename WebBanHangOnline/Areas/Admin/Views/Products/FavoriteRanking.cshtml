@@ -107,9 +107,9 @@
                                 </td>
 
                                 <td>
-                                    <img src="@(!string.IsNullOrEmpty(item.Image) ? item.Image : Url.Content("~/Uploads/images/no-image.png"))"
-                                         alt="@item.Title"
+                                    <img src="@Url.Content(item.Image)" alt="@item.Title"
                                          style="width:90px;height:80px;object-fit:cover;border-radius:6px" />
+
                                 </td>
 
                                 <td>@item.Title</td>

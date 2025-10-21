@@ -73,11 +73,12 @@
                                             @Html.TextBoxFor(x => x.Title, new { @class = "form-control", @placeholder = "Tên sản phẩm" })
                                             @Html.ValidationMessageFor(x => x.Title, null, new { @class = "text-danger" })
                                         </div>
-                                        <div class="form-group">
+                                        @*<div class="form-group">
                                             <label for="exampleInputEmail1">Alias</label>
                                             @Html.TextBoxFor(x => x.Alias, new { @class = "form-control", @placeholder = "Alias" })
                                             @Html.ValidationMessageFor(x => x.Alias, null, new { @class = "text-danger" })
-                                        </div>
+                                        </div>*@
+                                        @Html.HiddenFor(m => m.Alias)
                                         @*<div class="form-group">
                                                 <label for="exampleInputEmail1">SKU</label>
                                                 @Html.TextBoxFor(x => x.ProductCode, new { @class = "form-control", @placeholder = "Mã mã phẩm" })
@@ -90,7 +91,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="exampleInputEmail1">Mô tả</label>
-                                            @Html.TextAreaFor(x => x.Description, new { @class = "form-control", @placeholder = "Mã mã phẩm" })
+                                            @Html.TextAreaFor(x => x.Description, new { @class = "form-control", @placeholder = "Mô tả sản phẩm" })
                                             @Html.ValidationMessageFor(x => x.Description, null, new { @class = "text-danger" })
                                         </div>
                                         @*<div class="form-group">
