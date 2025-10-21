@@ -1,0 +1,65 @@
+@model WebBanHangOnline.Models.ViewModels.SupportTicketDetailViewModel
+@{
+    ViewBag.Title = "Theo dõi yêu cầu hỗ trợ";
+}
+
+<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4 text-center">Theo dõi trạng thái yêu cầu</h2>
+            @using (Html.BeginForm("Track", "Support", FormMethod.Get, new { @class = "card p-4 shadow-sm mb-4" }))
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="code">Mã hỗ trợ</label>
+                        <input type="text" class="form-control" id="code" name="code" value="@Request["code"]" placeholder="VD: ABC1234567" required />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="@Request["email"]" placeholder="email@domain.com" required />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Xem trạng thái</button>
+            }
+
+            @if (ViewBag.NotFound == true)
+            {
+                <div class="alert alert-danger">Không tìm thấy yêu cầu khớp với thông tin bạn cung cấp. Vui lòng kiểm tra lại.</div>
+            }
+            else if (Model != null && Model.Ticket != null)
+            {
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 class="card-title">@Model.Ticket.Subject</h4>
+                        <p class="mb-1"><strong>Người gửi:</strong> @Model.Ticket.FullName (@Model.Ticket.Email)</p>
+                        @if (!string.IsNullOrEmpty(Model.Ticket.PhoneNumber))
+                        {
+                            <p class="mb-1"><strong>Số điện thoại:</strong> @Model.Ticket.PhoneNumber</p>
+                        }
+                        <p class="mb-1"><strong>Trạng thái:</strong> @Model.Ticket.Status</p>
+                        <p class="mb-3"><strong>Tạo lúc:</strong> @Model.Ticket.CreatedDate.ToString("dd/MM/yyyy HH:mm")</p>
+
+                        <h5>Lịch sử trao đổi</h5>
+                        <hr />
+                        <div class="timeline">
+                            @foreach (var message in Model.Messages)
+                            {
+                                <div class="media mb-3">
+                                    <div class="media-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong>@message.SenderName</strong>
+                                            <small class="text-muted">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                                        </div>
+                                        <div class="mt-2">@Html.Raw(Html.Encode(message.Message).Replace("\n", "<br />"))</div>
+                                        <span class="badge badge-@((message.IsFromStaff ? "success" : "secondary")) mt-2">@(message.IsFromStaff ? "Hỗ trợ viên" : "Khách hàng")</span>
+                                    </div>
+                                </div>
+                                <hr />
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

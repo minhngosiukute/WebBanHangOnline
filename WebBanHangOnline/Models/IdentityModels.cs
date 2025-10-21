@@ -48,6 +48,9 @@ namespace WebBanHangOnline.Models
         public DbSet<ImportOrder> ImportOrders { get; set; }
         public DbSet<ImportOrderDetail> ImportOrderDetails { get; set; }
 
+        public DbSet<SupportTicket> SupportTickets { get; set; }
+        public DbSet<SupportTicketMessage> SupportTicketMessages { get; set; }
+
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();
