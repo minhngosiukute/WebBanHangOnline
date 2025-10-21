@@ -16,7 +16,7 @@ namespace WebBanHangOnline.Controllers
     public class ShoppingCartController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-
+        private readonly MomoGateway _momo = new MomoGateway(MomoOptions.FromConfig());
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -198,7 +198,7 @@ namespace WebBanHangOnline.Controllers
                     order.Phone = req.Phone;
                     order.Address = req.Address;
                     order.Email = req.Email;
-                    order.Status = 1;//chưa thanh toán / 2/đã thanh toán, 3/Hoàn thành, 4/hủy
+                    order.Status = 1;//1: chưa thanh toán, 2: đã thanh toán, 3: hoàn thành, 4: hủy
                     cart.Items.ForEach(x => order.OrderDetails.Add(new OrderDetail
                     {
                         ProductId = x.ProductId,
@@ -214,10 +214,24 @@ namespace WebBanHangOnline.Controllers
                         order.CustomerId = User.Identity.GetUserId();
                     Random rd = new Random();
                     order.Code = "DH" + rd.Next(0, 9) + rd.Next(0, 9) + rd.Next(0, 9) + rd.Next(0, 9);
-                    //order.E = req.CustomerName;
+
                     db.Orders.Add(order);
                     db.SaveChanges();
-                    //send mail cho khachs hang
+
+                    // === Trừ tồn ngay (như cũ của bạn) ===
+                    foreach (var sp in cart.Items)
+                    {
+                        var product = db.Products.Find(sp.ProductId);
+                        if (product != null)
+                        {
+                            var newQty = product.Quantity - sp.Quantity;
+                            product.Quantity = newQty < 0 ? 0 : newQty;
+                            db.Entry(product).State = System.Data.Entity.EntityState.Modified;
+                        }
+                    }
+                    db.SaveChanges();
+
+                    // === Gửi mail cho khách và admin (giữ nguyên toàn bộ) ===
                     var strSanPham = "";
                     var thanhtien = decimal.Zero;
                     var TongTien = decimal.Zero;
@@ -231,6 +245,7 @@ namespace WebBanHangOnline.Controllers
                         thanhtien += sp.Price * sp.Quantity;
                     }
                     TongTien = thanhtien;
+
                     string contentCustomer = System.IO.File.ReadAllText(Server.MapPath("~/Content/templates/send2.html"));
                     contentCustomer = contentCustomer.Replace("{{MaDon}}", order.Code);
                     contentCustomer = contentCustomer.Replace("{{SanPham}}", strSanPham);
@@ -254,21 +269,37 @@ namespace WebBanHangOnline.Controllers
                     contentAdmin = contentAdmin.Replace("{{ThanhTien}}", WebBanHangOnline.Common.Common.FormatNumber(thanhtien, 0));
                     contentAdmin = contentAdmin.Replace("{{TongTien}}", WebBanHangOnline.Common.Common.FormatNumber(TongTien, 0));
                     WebBanHangOnline.Common.Common.SendMail("ShopOnline", "Đơn hàng mới #" + order.Code, contentAdmin.ToString(), ConfigurationManager.AppSettings["EmailAdmin"]);
-                    cart.ClearCart();
+
+                    // === Phân nhánh thanh toán ===
+                    cart.ClearCart(); // vẫn clear sau khi tạo đơn (theo logic cũ)
                     code = new { Success = true, Code = req.TypePayment, Url = "" };
-                    //var url = "";
+
+                    // --- VNPAY ---
                     if (req.TypePayment == 2)
                     {
                         var url = UrlPayment(req.TypePaymentVN, order.Code);
                         code = new { Success = true, Code = req.TypePayment, Url = url };
                     }
 
-                    //code = new { Success = true, Code = 1, Url = url };
-                    //return RedirectToAction("CheckOutSuccess");
+                    // --- MoMo (thêm mới) ---
+                    if (req.TypePayment == 3)
+                    {
+                        try
+                        {
+                            var payUrl = _momo.CreatePaymentUrl(order.Code, (long)order.TotalAmount);
+                            code = new { Success = true, Code = req.TypePayment, Url = payUrl };
+                        }
+                        catch
+                        {
+                            code = new { Success = false, Code = -1, Url = "" };
+                        }
+                    }
+
                 }
             }
             return Json(code);
         }
+
 
 
         [AllowAnonymous]
@@ -437,6 +468,105 @@ namespace WebBanHangOnline.Controllers
             //log.InfoFormat("VNPAY URL: {0}", paymentUrl);
             return urlPayment;
         }
+        // ===== MoMo helpers (Controller level) =====
+        private static string HmacSHA256(string rawData, string secretKey)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA256(
+                System.Text.Encoding.UTF8.GetBytes(secretKey)))
+            {
+                var hash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(rawData));
+                return BitConverter.ToString(hash).Replace("-", "").ToLower();
+            }
+        }
+        private static string NV(string v) => v ?? ""; // null → "" cho rawSignature
+
+        // ===== DTO MoMo =====
+       
+
+        // ===== Return (redirect về site) =====
+        [AllowAnonymous]
+        public ActionResult MomoReturn()
+        {
+            var q = Request.QueryString;
+
+            // xác thực chữ ký
+            var rawSig = _momo.BuildReturnRawSignature(q);
+            if (!_momo.VerifySignature(rawSig, q["signature"]))
+            {
+                ViewBag.InnerText = "Chữ ký không hợp lệ (MoMo)!";
+                return View("VnpayReturn");
+            }
+
+            var resultCode = q["resultCode"];
+            var orderId = q["orderId"];
+            var amount = q["amount"];
+
+            if (resultCode == "0")
+            {
+                var order = db.Orders.FirstOrDefault(x => x.Code == orderId);
+                if (order != null)
+                {
+                    // đối chiếu số tiền
+                    if (((long)order.TotalAmount).ToString() != amount)
+                    {
+                        ViewBag.InnerText = "Sai lệch số tiền thanh toán!";
+                        return View("VnpayReturn");
+                    }
+
+                    if (order.Status != 2)
+                    {
+                        order.Status = 2;
+                        db.Entry(order).State = System.Data.Entity.EntityState.Modified;
+                        db.SaveChanges();
+                    }
+
+                    ViewBag.InnerText = "Thanh toán MoMo thành công!";
+                    ViewBag.ThanhToanThanhCong = "Số tiền thanh toán (VND): " + amount;
+                }
+            }
+            else
+            {
+                ViewBag.InnerText = "Thanh toán MoMo thất bại. Mã lỗi: " + resultCode;
+            }
+
+            ViewBag.Gateway = "MoMo";
+            return View("VnpayReturn");
+        }
+
+
+        // ===== IPN (server-to-server) =====
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult MomoIpn()
+        {
+            string body;
+
+            using (var reader = new System.IO.StreamReader(Request.InputStream))
+                body = reader.ReadToEnd();
+
+            var payload = Newtonsoft.Json.JsonConvert.DeserializeObject<MomoIpnPayload>(body);
+            if (payload == null) return Content("{\"status\":0}");
+
+            var rawSig = _momo.BuildIpnRawSignature(payload);
+            if (!_momo.VerifySignature(rawSig, payload.signature))
+                return Content("{\"status\":0,\"message\":\"invalid signature\"}");
+
+            var order = db.Orders.FirstOrDefault(x => x.Code == payload.orderId);
+            if (order == null) return Content("{\"status\":0,\"message\":\"order not found\"}");
+
+            if (order.Status == 2) return Content("{\"status\":1}");
+
+            if (payload.resultCode == 0 && (long)order.TotalAmount == payload.amount)
+            {
+                order.Status = 2;
+                db.Entry(order).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+                return Content("{\"status\":1}");
+            }
+            return Content("{\"status\":0}");
+        }
+
+
         #endregion
     }
 }

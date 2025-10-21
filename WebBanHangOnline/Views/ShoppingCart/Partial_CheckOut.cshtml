@@ -1,11 +1,9 @@
 ﻿@model WebBanHangOnline.Models.OrderViewModel
+@using Ajax = System.Web.Mvc.Ajax
 @{
-    if (ViewBag.User != null)
-    {
-
-    }
-
+    ViewBag.Title = "Thanh toán";
 }
+
 @using (Ajax.BeginForm("CheckOut", "Shoppingcart", new AjaxOptions
 {
     HttpMethod = "POST",
@@ -13,45 +11,83 @@
     OnSuccess = "OnSuccessCO",
     OnFailure = "OnFailure",
     OnBegin = "OnBeginCO"
-
-}, new { @Id = "myForm" }))
+}, new { id = "myForm" }))
 {
-    <script>
-        function OnBeginCO() {
-            $('#btnCheckOut').attr("disabled", "disabled");
-            $('#load_send').html('<h2>Tiến hành đặt hàng....</h2>');
-        }
-        function OnSuccessCO(res) {
-            if (res.Success) {
-                if (res.Code == 1) {
-                    location.href = "/ShoppingCart/CheckOutSuccess";
-                }
-                else {
-                    location.href = res.Url;
-                }
-            }
-        }
-                                            //function OnFailure() {
-
-                                            //}
-    </script>
     @Html.AntiForgeryToken()
 
+    <style>
+        /* ====== Khung tổng thể ====== */
+        .checkout-section { margin-top: 14px; }
+        .pay-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 10px; }
+        @@media (max-width: 768px){ .pay-methods { grid-template-columns: 1fr; } }
+
+        /* ====== Card phương thức ====== */
+        .method-card {
+            position: relative;
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px; border: 1px solid #e9ecef; border-radius: 12px;
+            background: #fff; cursor: pointer; transition: all .2s ease;
+            box-shadow: 0 1px 0 rgba(16,24,40,.04);
+        }
+        .method-card:hover { border-color: #c5e3ff; box-shadow: 0 6px 18px rgba(56,189,248,.15); transform: translateY(-1px); }
+        .method-card.active { border-color: #0d6efd; box-shadow: 0 8px 22px rgba(13,110,253,.18); outline: 2px solid rgba(13,110,253,.12); }
+
+        .method-icon {
+            width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+            background: linear-gradient(180deg,#f8fafc, #eef2ff); font-size: 20px;
+        }
+        .method-body { line-height: 1.2; }
+        .method-title { font-weight: 700; }
+        .method-desc  { font-size: 12px; color: #64748b; margin-top: 2px; }
+
+        /* ====== Khối chi tiết động ====== */
+        .method-detail {
+            margin-top: 16px; padding: 14px; border: 1px dashed #e2e8f0; border-radius: 12px; background: #f8fafc;
+            display: none;
+        }
+        .method-detail.show { display: block; animation: fadeIn .2s ease; }
+        @@keyframes fadeIn { from{ opacity:0; transform: translateY(4px);} to{opacity:1; transform:none;} }
+
+        /* ====== VNPAY bank grid ====== */
+        .bank-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
+        @@media (max-width: 992px){ .bank-grid { grid-template-columns: repeat(4, 1fr); } }
+        @@media (max-width: 600px){ .bank-grid { grid-template-columns: repeat(3, 1fr); } }
+        .bank-item {
+            height: 44px; border: 1px solid #e5e7eb; border-radius: 10px; background:#fff;
+            display:flex; align-items:center; justify-content:center; padding:6px; cursor:pointer; transition: all .2s ease;
+            user-select: none;
+        }
+        .bank-item:hover { border-color:#0ea5e9; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(14,165,233,.15); }
+        .bank-item.active { outline: 2px solid rgba(14,165,233,.25); }
+
+        /* ====== Tips ====== */
+        .pay-tip { font-size: 16px; color:#475569; background:#ecfeff; border:1px solid #bae6fd; padding:8px 10px; border-radius: 10px; display:inline-flex; gap:8px; align-items:center; }
+        .pay-tip i { opacity:.8; }
+
+        /* ====== Spinner khi submit ====== */
+        .processing {
+            display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px;
+            background:#f1f5f9; border:1px solid #e2e8f0; margin-top:10px;
+        }
+        .spinner {
+            width: 18px; height: 18px; border: 2px solid #94a3b8; border-top-color: transparent;
+            border-radius: 50%; animation: spin .7s linear infinite;
+        }
+        @@keyframes spin { to { transform: rotate(360deg);} }
+    </style>
+
     <h3>Thông tin khách hàng</h3>
+
     if (!Request.IsAuthenticated)
     {
         <div class="form-group">
             <label>Họ tên khách hàng</label>
             <input type="text" name="CustomerName" required class="form-control" autocomplete="off" />
         </div>
-
-
         <div class="form-group">
             <label>Số điện thoại</label>
             <input type="text" name="Phone" class="form-control" autocomplete="off" />
         </div>
-
-
         <div class="form-group">
             <label>Địa chỉ</label>
             <input type="text" name="Address" class="form-control" autocomplete="off" />
@@ -82,25 +118,169 @@
         </div>
     }
 
-
+    <!-- ======= PHƯƠNG THỨC THANH TOÁN (giữ dropdown gốc để post) ======= -->
     <div class="form-group">
         <label>Hình thức thanh toán</label>
         <select class="form-control" name="TypePayment" id="drTypePayment">
-            <option value="1" selected>COD(Thanh toán khi nhận hàng)</option>
-            <option value="2">Chuyển khoản</option>
+            <option value="1" selected>COD (Thanh toán khi nhận hàng)</option>
+            <option value="2">VNPAY (Chuyển khoản)</option>
+            <option value="3">MoMo (Ví điện tử)</option>
         </select>
     </div>
-    <div class="form-group" id="load_form_payment" style="display:none;">
-        <h4> <label>Chọn phương thức thanh toán:</label><br /></h4>
-        <h5>Chuyển hướng sang VNPAY chọn phương thức thanh toán</h5>
-        @*<label><input type="radio" name="TypePaymentVN" value="0" checked /> Cổng thanh toán VNPAYQR </label>
-        <h5>Cách 2: Tách phương thức thanh toán tại site của Merchant</h5>
-        <label><input type="radio" name="TypePaymentVN" value="1" /> Thanh toán qua ứng dụng hỗ trợ VNPAYQR </label><br />
-        <label><input type="radio" name="TypePaymentVN" value="2" /> ATM-Tài khoản ngân hàng nội địa </label><br />
-        <label><input type="radio" name="TypePaymentVN" value="3" /> Thanh toán qua thẻ quốc tế </label><br />*@
+
+    <!-- ======= Cards hiển thị đẹp cho 3 phương thức ======= -->
+    <div class="checkout-section">
+        <div class="pay-methods" id="payCards">
+            <div class="method-card" data-value="1">
+                <div class="method-icon"><i class="fa fa-box"></i></div>
+                <div class="method-body">
+                    <div class="method-title">COD</div>
+                    <div class="method-desc">Thanh toán khi nhận hàng</div>
+                </div>
+            </div>
+
+            <div class="method-card" data-value="2">
+                <div class="method-icon"><i class="fa fa-qrcode"></i></div>
+                <div class="method-body">
+                    <div class="method-title">VNPAY</div>
+                    <div class="method-desc">Chuyển hướng đến cổng VNPAY</div>
+                </div>
+            </div>
+
+            <div class="method-card" data-value="3">
+                <div class="method-icon"><i class="fa fa-mobile"></i></div>
+                <div class="method-body">
+                    <div class="method-title">MoMo</div>
+                    <div class="method-desc">Ví điện tử / quét QR</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chi tiết động cho từng phương thức -->
+        <div id="detail-cod" class="method-detail">
+            <div class="pay-tip"><i class="fa fa-info-circle"></i> Đơn hàng sẽ được xác nhận & thu tiền khi giao.</div>
+        </div>
+
+        <div id="detail-vnpay" class="method-detail">
+            @*<h4 style="margin-top:4px;">Chọn phương thức thanh toán VNPAY</h4>*@
+            <div class="pay-tip"><i class="fa fa-shield"></i> Bạn sẽ được chuyển sang VNPAY để chọn ngân hàng/thẻ.</div>
+
+            <!-- (tuỳ chọn) radio phụ nếu cần post TypePaymentVN -->
+            <!--<div style="margin-top:10px;">
+                <label style="margin-right:14px;"><input type="radio" name="TypePaymentVN" value="0" > VNPAYQR</label>
+                <label style="margin-right:14px;"><input type="radio" name="TypePaymentVN" value="2" checked> ATM nội địa</label>
+                
+            </div>-->
+
+            <!-- Grid ngân hàng demo (thay bằng logo ảnh thật nếu muốn) -->
+            @*<div class="bank-grid" id="bankGrid" style="margin-top:10px;">
+                <div class="bank-item">VCB</div>
+                <div class="bank-item">TPB</div>
+                <div class="bank-item">ACB</div>
+                <div class="bank-item">BIDV</div>
+                <div class="bank-item">VIB</div>
+                <div class="bank-item">MB</div>
+                <div class="bank-item">VPB</div>
+                <div class="bank-item">Tech</div>
+                <div class="bank-item">Agribank</div>
+                <div class="bank-item">SCB</div>
+            </div>*@
+        </div>
+
+        <div id="detail-momo" class="method-detail">
+            <div class="pay-tip"><i class="fa fa-qrcode"></i> Sau khi đặt hàng, bạn sẽ được chuyển sang trang thanh toán MoMo.</div>
+        </div>
     </div>
+
+    <!-- Khối tương thích cũ: VNPAY options (ẩn/hiện khi chọn TypePayment=2) -->
+    <!--<div class="form-group" id="load_form_payment" style="display:none;">
+        <h4><label name="TypePaymentVN" value="2">Chọn phương thức thanh toán VNPAY:</label></h4>
+        <h5>Chuyển hướng sang cổng thanh toán VNPAY để chọn ngân hàng</h5>-->
+        @* Giữ lại cho tương thích, có thể bỏ radio bên dưới nếu đã dùng khối trên *@
+    <!--</div>-->
+
+    <!-- (tuỳ chọn) nếu muốn submit kèm ngân hàng đã chọn -->
+    <input type="hidden" id="SelectedBank" name="SelectedBank" value="" />
+
     <div class="form-group" id="load_send"></div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-block btn-success" id="btnCheckOut">Đặt hàng</button>
     </div>
+
+    <div id="load_data"><!-- Ajax UpdateTargetId --></div>
+
+    <script>
+        // ====== Helpers ======
+        function setActiveCard(val) {
+            $('#payCards .method-card').removeClass('active');
+            $('#payCards .method-card[data-value="' + val + '"]').addClass('active');
+        }
+        function toggleDetails(val) {
+            // Ẩn tất cả, show theo lựa chọn
+            $('#detail-cod, #detail-vnpay, #detail-momo').removeClass('show');
+            if (val === "1") $('#detail-cod').addClass('show');
+            if (val === "2") $('#detail-vnpay').addClass('show');
+            if (val === "3") $('#detail-momo').addClass('show');
+
+            // Đồng bộ khối cũ (giữ lại cho tương thích)
+            if (val === "2") { $('#load_form_payment').slideDown(); }
+            else { $('#load_form_payment').slideUp(); }
+        }
+
+        // ====== Init & events ======
+        $(document).ready(function () {
+            // Khi đổi dropdown (giữ logic cũ)
+            $('#drTypePayment').on('change', function () {
+                var val = $(this).val();
+                setActiveCard(val);
+                toggleDetails(val);
+            });
+
+            // Click vào card -> đổi dropdown & trigger change
+            $('#payCards').on('click', '.method-card', function () {
+                var val = $(this).data('value') + "";
+                $('#drTypePayment').val(val).trigger('change');
+                // Cuộn nhẹ tới phần chi tiết
+                $('html, body').animate({ scrollTop: $('.checkout-section').offset().top - 20 }, 220);
+            });
+
+            // Chọn bank (demo UI)
+            $('#bankGrid').on('click', '.bank-item', function () {
+                $('#bankGrid .bank-item').removeClass('active');
+                $(this).addClass('active');
+                // Nếu muốn set vào hidden để submit:
+                $('#SelectedBank').val($(this).text());
+            });
+
+            // Khởi tạo theo giá trị mặc định của dropdown
+            setActiveCard($('#drTypePayment').val());
+            toggleDetails($('#drTypePayment').val());
+        });
+
+        // ====== Ajax hooks (spinner + điều hướng) ======
+        function OnBeginCO() {
+            $('#btnCheckOut').attr('disabled', 'disabled');
+            $('#load_send').html(
+                '<div class="processing" role="status" aria-live="polite">' +
+                '<div class="spinner"></div>' +
+                '<div><strong>Đang xử lý đơn hàng...</strong><br><span>Vui lòng đợi trong giây lát.</span></div>' +
+                '</div>'
+            );
+        }
+        function OnSuccessCO(res) {
+            if (res.Success) {
+                // 1 = COD, 2 = VNPAY, 3 = MoMo
+                if (res.Code == 1) window.location.href = "/ShoppingCart/CheckOutSuccess";
+                else window.location.href = res.Url;
+            } else {
+                $('#btnCheckOut').prop('disabled', false);
+                alert("Có lỗi khi xử lý đơn hàng. Vui lòng thử lại!");
+            }
+        }
+        function OnFailure() {
+            $('#btnCheckOut').prop('disabled', false);
+            alert("Mạng không ổn định. Vui lòng thử lại!");
+        }
+    </script>
 }

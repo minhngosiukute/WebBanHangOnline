@@ -102,7 +102,13 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                     model.Alias = WebBanHangOnline.Models.Common.Filter.FilterChar(model.Title);
                 db.Products.Add(model);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                int pageSize = 5; // nhớ đồng bộ với Index
+                int countGreater = db.Products.Count(p => p.Id > model.Id);
+                int pageOfProduct = (countGreater / pageSize) + 1;
+
+                // quay lại đúng trang & nhảy tới hàng của sản phẩm
+                var url = Url.Action("Index", new { page = pageOfProduct });
+                return Redirect(url + $"#p{model.Id}");
             }
             ViewBag.ProductCategory = new SelectList(db.ProductCategories.ToList(), "Id", "Title");
             return View(model);
@@ -118,19 +124,46 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Product model)
+        public ActionResult Edit(Product model, List<string> Images, List<int> rDefault)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+
+            var entity = db.Products.Find(model.Id);
+            if (entity == null) return HttpNotFound();
+
+            // cập nhật các trường cần thiết
+            entity.Title = model.Title;
+            entity.Alias = WebBanHangOnline.Models.Common.Filter.FilterChar(model.Title);
+            entity.Description = model.Description;
+            entity.OriginalPrice = model.OriginalPrice;
+            entity.Price = model.Price;
+            entity.PriceSale = model.PriceSale;
+            entity.Quantity = model.Quantity;
+            entity.IsActive = model.IsActive;
+            entity.IsHome = model.IsHome;
+            entity.ProductCategoryId = model.ProductCategoryId;
+            entity.ModifiedDate = DateTime.Now;
+
+            // CHỐT: chỉ thay ảnh khi có chọn ảnh mặc định mới
+            if (Images != null && Images.Count > 0 && rDefault != null && rDefault.Count > 0)
             {
-                model.ModifiedDate = DateTime.Now;
-                model.Alias = WebBanHangOnline.Models.Common.Filter.FilterChar(model.Title);
-                db.Products.Attach(model);
-                db.Entry(model).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                var defIndex = rDefault[0] - 1;
+                if (defIndex >= 0 && defIndex < Images.Count)
+                    entity.Image = Images[defIndex];   // cập nhật ảnh đại diện
+                                                       // (tuỳ) đồng bộ bảng ProductImage nếu bạn muốn
             }
-            return View(model);
+            // nếu không có Images/rDefault -> giữ nguyên entity.Image
+
+            db.SaveChanges();
+
+            int pageSize = 5;
+            int countGreater = db.Products.Count(p => p.Id > entity.Id);
+            int pageOfProduct = (countGreater / pageSize) + 1;
+
+            var url = Url.Action("Index", new { page = pageOfProduct });
+            return Redirect(url + $"#p{entity.Id}");
         }
+
 
         [HttpPost]
         public ActionResult Delete(int id)
@@ -218,8 +251,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
         public ActionResult FavoriteRanking(int? page)
         {
-            var query = db.Products
-                .AsNoTracking()
+            var query = db.Products.AsNoTracking()
                 .Select(p => new FavoriteRow
                 {
                     ProductId = p.Id,
@@ -227,22 +259,24 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                     CategoryName = p.ProductCategory.Title,
                     ViewCount = p.ViewCount,
                     LikeCount = p.Wishlists.Count(),
-                    Image = p.Image // thêm dòng này
+                    Image = p.ProductImage
+                                .Where(pi => pi.IsDefault)
+                                .Select(pi => pi.Image)
+                                .FirstOrDefault()
+                            ?? p.Image
+                            ?? "/Uploads/images/no-image.png"
                 })
                 .OrderByDescending(x => x.LikeCount)
                 .ThenByDescending(x => x.ViewCount);
 
             var top = query.FirstOrDefault();
-            ViewBag.TopFavoriteMessage = top == null
-                ? null
+            ViewBag.TopFavoriteMessage = top == null ? null
                 : $"Sản phẩm được yêu thích nhất: {top.Title} (Lượt thích: {top.LikeCount}, Lượt xem: {top.ViewCount})";
 
-            int pageSize = 6;
-            int pageIndex = page ?? 1;
-            var model = query.ToPagedList(pageIndex, pageSize);   // IPagedList<FavoriteRow>
-
+            var model = query.ToPagedList(page ?? 1, 5);
             return View(model);
         }
+
         // ======================= TOP SẢN PHẨM BÁN CHẠY =======================
         public class BestSellingRow
         {
@@ -257,33 +291,33 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
         public ActionResult BestSelling(int? page)
         {
             var query = db.OrderDetails
-                .Include("Product.ProductCategory") // nạp cả thông tin product và category
+                .Include("Product.ProductCategory")
                 .GroupBy(x => x.ProductId)
                 .Select(g => new BestSellingRow
                 {
                     ProductId = g.Key,
                     Title = g.FirstOrDefault().Product.Title,
                     CategoryName = g.FirstOrDefault().Product.ProductCategory.Title,
-                    Image = g.FirstOrDefault().Product.Image,
                     TotalSold = g.Sum(x => x.Quantity),
-                    Price = g.FirstOrDefault().Product.Price
+                    Price = g.FirstOrDefault().Product.Price,
+                    Image = g.FirstOrDefault().Product.ProductImage
+                                .Where(pi => pi.IsDefault)
+                                .Select(pi => pi.Image)
+                                .FirstOrDefault()
+                            ?? g.FirstOrDefault().Product.Image
+                            ?? "/Uploads/images/no-image.png"
                 })
                 .OrderByDescending(x => x.TotalSold);
 
-            int pageSize = 8;
-            int pageIndex = page ?? 1;
-            var model = query.ToPagedList(pageIndex, pageSize);
-
-            ViewBag.PageSize = pageSize;
-            ViewBag.Page = pageIndex;
+            var model = query.ToPagedList(page ?? 1, 5);
 
             var top = query.FirstOrDefault();
-            ViewBag.TopBestSelling = top == null
-                ? null
+            ViewBag.TopBestSelling = top == null ? null
                 : $"🔥 Sản phẩm bán chạy nhất: {top.Title} ({top.TotalSold} lượt mua)";
 
             return View(model);
         }
+
 
     }
 }

@@ -266,6 +266,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\OrderViewModel.cs" />
+    <Compile Include="Models\Payments\MomoGateway.cs" />
     <Compile Include="Models\Payments\VnPayLibrary.cs" />
     <Compile Include="Models\ReviewListViewModel.cs" />
     <Compile Include="Models\SearchItem.cs" />

@@ -85,6 +85,7 @@
         border: 0;
         height: auto
     }
+
     #dialog {
         padding: 0;
     }
@@ -106,6 +107,16 @@
         border: 0;
         display: block;
         height: auto;
+    }
+</style>
+<style>
+    /* ... style cũ ... */
+
+    /* NEW: highlight hàng được anchor (#p123) */
+    tr:target {
+        outline: 2px solid #fe4c50;
+        background: #fff6f6;
+        transition: background .6s;
     }
 </style>
 
@@ -205,7 +216,7 @@
                             {
                                 strImg = CheckImage.Image;
                             }
-                            <tr id="trow_@item.Id">
+                            <tr id="p@item.Id">
                                 @*<td><input type="checkbox" class="cbkItem" value="@item.Id" /></td>*@
                                 <td>@i</td>
                                 <td><img class="imgproduct" data-id="@item.Id" src="@strImg" width="80" /></td>
@@ -297,14 +308,14 @@
                     $doc.find("body").css("margin", "0"); // xoá margin 8px mặc định
                     // (tuỳ chọn) CSS gọn cho thumbnail ở trang con
                     var css = `
-  /* Thumbnail gọn, không vỡ bố cục */
-  .glImage{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}
-  .glImage li{position:relative;display:inline-block;width:160px}   /* ↓ 220 → 160 */
-  .glImage li img{width:100%;height:120px;object-fit:contain;border-radius:6px;display:block} /* ↓ 180 → 120 */
-  .box-btn{position:absolute;left:6px;bottom:6px;display:flex;gap:6px}
-  .card-body{padding:10px 12px 6px !important}
-  .card-footer{display:none !important}
-  .card{margin-bottom:0 !important}
+      /* Thumbnail gọn, không vỡ bố cục */
+      .glImage{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}
+      .glImage li{position:relative;display:inline-block;width:160px}   /* ↓ 220 → 160 */
+      .glImage li img{width:100%;height:120px;object-fit:contain;border-radius:6px;display:block} /* ↓ 180 → 120 */
+      .box-btn{position:absolute;left:6px;bottom:6px;display:flex;gap:6px}
+      .card-body{padding:10px 12px 6px !important}
+      .card-footer{display:none !important}
+      .card{margin-bottom:0 !important}
 `;
 
                     $doc.find("head").append("<style>" + css + "</style>");
