@@ -5,30 +5,171 @@
 }
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
-<section class="content" style="padding-top: 160px; padding-bottom: 130px;">
-    <div class="container">
-        <h3 class="mb-3">Yêu cầu đã gửi của: <span class="text-primary">@email</span></h3>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-        <form method="get" action="@Url.Action("MyTickets","Support")" class="mb-3">
-            <div class="form-row">
+<style>
+    .tickets-wrap {
+        padding-top: 160px;
+        padding-bottom: 130px;
+    }
+
+    h3 span.text-primary {
+        color: #fe4c50 !important; /* đỏ thương hiệu */
+    }
+
+    /* Form tìm kiếm */
+    .search-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.03);
+    }
+
+        .search-box input {
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            padding: 10px 14px;
+            font-size: 15px;
+        }
+
+            .search-box input:focus {
+                border-color: #fe4c50;
+                box-shadow: 0 0 0 4px rgba(254,76,80,.15);
+                outline: none;
+            }
+
+        .search-box button {
+            background: #fe4c50;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            width: 100%;
+            height: 42px;
+            transition: all .2s ease;
+        }
+
+            .search-box button:hover {
+                background: #ef233c;
+                transform: translateY(-1px);
+            }
+
+    /* Bảng */
+    .table {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        border-collapse: separate;
+        border-spacing: 0;
+        box-shadow: 0 3px 10px rgba(0,0,0,.04);
+    }
+
+        .table th {
+            background: #0ea5e9;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .table td {
+            vertical-align: middle;
+            color: #1f2937;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(254,76,80,.06);
+        }
+
+    /* Badge trạng thái */
+    .badge {
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 999px;
+        text-transform: capitalize;
+    }
+
+    .badge-info {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-warning {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .badge-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    /* Nút xem */
+    .btn-outline-primary {
+        color: #fe4c50;
+        border-color: #fe4c50;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all .2s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background: #fe4c50;
+            color: #fff;
+        }
+
+    .alert-info {
+        background: #e0f2fe;
+        border: none;
+        color: #0369a1;
+        border-radius: 12px;
+        padding: 18px;
+        font-size: 15px;
+    }
+</style>
+
+<section class="content tickets-wrap">
+    <div class="container">
+        <h3 class="mb-3">
+            <i class="fa-solid fa-envelope-open-text me-1 text-primary"></i>
+            Yêu cầu đã gửi của: <span class="text-primary">@email</span>
+        </h3>
+
+        <form method="get" action="@Url.Action("MyTickets","Support")" class="search-box">
+            <div class="form-row row g-2">
                 <div class="col-md-8">
-                    <input type="email" name="email" class="form-control" value="@email" placeholder="Nhập email của bạn" required />
+                    <input type="email" name="email" class="form-control"
+                           value="@email"
+                           placeholder="Nhập email của bạn"
+                           required />
                 </div>
                 <div class="col-md-4">
-                    <button class="btn btn-primary btn-block">Tìm</button>
+                    <button type="submit"><i class="fa-solid fa-magnifying-glass me-1"></i> Tìm</button>
                 </div>
             </div>
         </form>
 
         @if (Model == null || !Model.Any())
         {
-            <div class="alert alert-info">Chưa có yêu cầu nào cho email này.</div>
+            <div class="alert alert-info text-center">
+                <i class="fa-regular fa-circle-question me-1"></i>
+                Chưa có yêu cầu nào cho email này.
+            </div>
         }
         else
         {
-            <div class="table-responsive">
+            <div class="table-responsive mt-3">
                 <table class="table table-bordered table-hover">
-                    <thead class="thead-light">
+                    <thead class="text-center">
                         <tr>
                             <th>Mã hỗ trợ</th>
                             <th>Tiêu đề</th>
@@ -41,16 +182,21 @@
                     <tbody>
                         @foreach (var t in Model)
                         {
+                            var badgeClass = "badge-info";
+                            if (t.Status?.Contains("Hoàn tất") == true) { badgeClass = "badge-success"; }
+                            else if (t.Status?.Contains("Đang") == true) { badgeClass = "badge-warning"; }
+                            else if (t.Status?.Contains("Hủy") == true) { badgeClass = "badge-danger"; }
+
                             <tr>
                                 <td><strong>@t.TicketCode</strong></td>
                                 <td>@t.Subject</td>
-                                <td><span class="badge badge-info">@t.Status</span></td>
+                                <td><span class="badge @badgeClass">@t.Status</span></td>
                                 <td>@t.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
                                 <td>@(t.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
-                                <td style="width:160px">
+                                <td class="text-center" style="width: 170px;">
                                     <a class="btn btn-sm btn-outline-primary"
                                        href="@Url.Action("Track","Support", new { code = t.TicketCode, email = email })">
-                                        Xem & trao đổi
+                                        <i class="fa-solid fa-comments me-1"></i> Xem & trao đổi
                                     </a>
                                 </td>
                             </tr>

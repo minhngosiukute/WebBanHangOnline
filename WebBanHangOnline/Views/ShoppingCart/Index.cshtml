@@ -26,7 +26,7 @@
 
             <div class="row">
                 <div class="col-md-12" id="load_data">
-                  @Html.Action("Partial_Item_Cart", "ShoppingCart")
+                    @Html.Action("Partial_Item_Cart", "ShoppingCart")
                 </div>
                 <div class="col-md-12">
                     @if (ViewBag.CheckCart != null)
@@ -46,122 +46,123 @@
 @section scripts{
     <script src="~/Content/assets/js/categories_custom.js"></script>
     <script>
+        // cập nhật tất cả badge (nếu có nhiều chỗ hiển thị)
+        function setCartCount(n) {
+            $('#checkout_items').html(n);         // nếu chỉ có 1 chỗ
+            // $('.js-cart-count').text(n);      // nếu bạn dùng class chung cho nhiều badge
+        }
+
         $(document).ready(function () {
             ShowCount();
+
             $('body').on('click', '.btnAddToCart', function (e) {
                 e.preventDefault();
                 var id = $(this).data('id');
                 var quantity = 1;
                 var tQuantity = $('#quantity_value').text();
-                if (tQuantity != '') {
-                    quantity = parseInt(tQuantity);
-                }
+                if (tQuantity !== '') quantity = parseInt(tQuantity);
 
                 $.ajax({
                     url: '/shoppingcart/addtocart',
                     type: 'POST',
+                    dataType: 'json',
                     data: { id: id, quantity: quantity },
                     success: function (rs) {
-                        if (rs.Success) {
-                            $('#checkout_items').html(rs.Count);
+                        if (rs && rs.Success) {
+                            if (typeof rs.Count !== 'undefined') setCartCount(rs.Count);
+                            else ShowCount(); // fallback
                             alert(rs.msg);
                         } else {
-                            if (rs.code == -2) {
-                                alert(rs.msg); // Hiển thị thông báo lỗi về số lượng
-                            } else {
-                                alert("Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.");
-                            }
+                            if (rs && rs.code == -2) alert(rs.msg);
+                            else alert("Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.");
                         }
                     }
                 });
             });
-            //$('body').on('click', '.btnUpdate', function (e) {
-            //    e.preventDefault();
-            //    var id = $(this).data("id");
-            //    var quantity = $('#Quantity_' + id).val();
-            //    Update(id, quantity);
 
-            //});
+            // Xóa tất cả
             $('body').on('click', '.btnDeleteAll', function (e) {
                 e.preventDefault();
                 
-                //debugger;
-                if (conf == true) {
-                    DeleteAll();
-                }
+                if (!conf) return;
 
+                DeleteAll();
             });
 
+            // Xóa 1 dòng
             $('body').on('click', '.btnDelete', function (e) {
                 e.preventDefault();
                 var id = $(this).data('id');
                 
-                if (conf == true) {
-                    $.ajax({
-                        url: '/shoppingcart/Delete',
-                        type: 'POST',
-                        data: { id: id },
-                        success: function (rs) {
-                            if (rs.Success) {
-                                $('#checkout_items').html(rs.Count);
-                                $('#trow_' + id).remove();
-                                LoadCart();
-                            }
-                        }
-                    });
-                }
+                if (!conf) return;
 
+                $.ajax({
+                    url: '/shoppingcart/Delete',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { id: id },
+                    success: function (rs) {
+                        if (rs && rs.Success) {
+                            if (typeof rs.Count !== 'undefined') setCartCount(rs.Count);
+                            else ShowCount(); // fallback
+                            $('#trow_' + id).remove();
+                            LoadCart();
+                        }
+                    }
+                });
             });
         });
-
-
 
         function ShowCount() {
             $.ajax({
                 url: '/shoppingcart/ShowCount',
                 type: 'GET',
+                dataType: 'json',
+                cache: false, // tránh cache
                 success: function (rs) {
-                    $('#checkout_items').html(rs.Count);
+                    var count = (rs && typeof rs.Count !== 'undefined') ? rs.Count : 0;
+                    setCartCount(count);
+                },
+                error: function () {
+                    setCartCount(0);
                 }
             });
         }
+
         function DeleteAll() {
             $.ajax({
                 url: '/shoppingcart/DeleteAll',
                 type: 'POST',
+                dataType: 'json',
                 success: function (rs) {
-                    if (rs.Success) {
+                    if (rs && rs.Success) {
+                        // nếu server trả Count thì dùng, không thì set 0
+                        if (typeof rs.Count !== 'undefined') setCartCount(rs.Count);
+                        else setCartCount(0);
                         LoadCart();
+                        // gọi thêm để “chắc cú” đồng bộ giữa client/server
+                        ShowCount();
                     }
+                },
+                error: function () {
+                    // vẫn cố làm sạch UI để tránh kẹt trạng thái
+                    setCartCount(0);
+                    LoadCart();
+                    ShowCount();
                 }
             });
         }
-        //function Update(id, quantity) {
-        //    $.ajax({
-        //        url: '/shoppingcart/Update',
-        //        type: 'POST',
-        //        data: { id: id, quantity: quantity },
-        //        success: function (rs) {
-        //            if (rs.Success) {
-        //                LoadCart();
-        //            } else {
-        //                alert(rs.msg || "Có lỗi xảy ra khi cập nhật số lượng.");
-        //                LoadCart();
-        //            }
-        //        }
-        //    });
-        //}
 
         function LoadCart() {
             $.ajax({
                 url: '/shoppingcart/Partial_Item_Cart',
                 type: 'GET',
+                cache: false,
                 success: function (rs) {
                     $('#load_data').html(rs);
                 }
             });
         }
-
-
     </script>
+
 }

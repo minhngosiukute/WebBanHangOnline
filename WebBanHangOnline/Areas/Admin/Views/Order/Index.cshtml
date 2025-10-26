@@ -27,6 +27,19 @@
             <h3 class="card-title text-center">Danh sách đơn hàng</h3>
         </div>
         <div class="card-body aurora-background">
+            @using (Html.BeginForm("Index", "Order", FormMethod.Get, new { @class = "form-inline mb-3" }))
+            {
+                <label for="status" class="mr-2">Lọc theo trạng thái:</label>
+                <select id="status" name="status" class="form-control mr-2">
+                    <option value="">-- Tất cả --</option>
+                    <option value="1" @(ViewBag.Status == 1 ? "selected" : "")>Chưa thanh toán</option>
+                    <option value="2" @(ViewBag.Status == 2 ? "selected" : "")>Đã thanh toán</option>
+                    <option value="3" @(ViewBag.Status == 3 ? "selected" : "")>Hoàn thành</option>
+                    <option value="4" @(ViewBag.Status == 4 ? "selected" : "")>Hủy</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Lọc</button>
+            }
+
             <table class="table table-bordered table-striped table-hover">
                 <thead>
                     <tr>
@@ -34,7 +47,7 @@
                         <th class="text-center">Mã đơn hàng</th>
                         <th class="text-center">Tên Khách hàng</th>
                         @*<th class="text-center">Phone</th>
-                        <th class="text-center">Tiền</th>*@
+                    <th class="text-center">Tiền</th>*@
                         <th class="text-center">Phương thức thanh toán</th>
                         <th class="text-center">Trạng thái</th>
                         <th class="text-center">Ngày tạo</th>

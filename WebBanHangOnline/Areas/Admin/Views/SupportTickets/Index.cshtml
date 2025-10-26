@@ -35,15 +35,15 @@
         <div class="card-body aurora-background">
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
+                    <thead class="text-center">
+                        <tr >
                             <th>Mã hỗ trợ</th>
-                            <th>Khách hàng</th>
+                            @*<th>Khách hàng</th>*@
                             <th>Email</th>
                             <th>Tiêu đề</th>
                             <th>Trạng thái</th>
                             <th>Ngày tạo</th>
-                            <th></th>
+                            <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,24 +57,58 @@
                         {
                             foreach (var item in Model)
                             {
-                                <tr>
-                                    <td><strong>@item.TicketCode</strong></td>
-                                    <td>@item.FullName</td>
-                                    <td>@item.Email</td>
-                                    <td>@item.Subject</td>
-                                    <td><span class="badge badge-info">@item.Status</span></td>
-                                    <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td class="text-center">
-                                        <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details", new { id = item.Id })"><i class="fas fa-eye"></i> Xem</a>
-                                    </td>
-                                </tr>
+                    <tr>
+                        <td><strong>@item.TicketCode</strong></td>
+                        @*<td>@item.FullName</td>*@
+                        <td>@item.Email</td>
+                        <td>@item.Subject</td>
+                        <td class="text-center">
+                            @{
+                                string badgeClass = "";
+                                switch (item.Status)
+                                {
+                                    case "Chờ xử lý":
+                                        badgeClass = "badge-warning";
+                                        break;
+                                    case "Đang xử lý":
+                                        badgeClass = "badge-danger";
+                                        break;
+                                    case "Đã giải quyết":
+                                        badgeClass = "badge-success"; 
+                                        break;
+                                    case "Đã đóng":
+                                        badgeClass = "badge-danger"; 
+                                        break;
+                                    default:
+                                        badgeClass = "badge-info"; 
+                                        break;
+                                }
+                            }
+                            <span class="badge @badgeClass" style="min-width:90px; font-size:14px;">@item.Status</span>
+                        </td>
+
+                        <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="text-center">
+                            <a class="btn btn-sm btn-info" href="@Url.Action("Details", "SupportTickets", new { area = "Admin", id = item.Id })">
+                                <i class="fa fa-eye"></i> Chi tiết
+                            </a>
+
+                            @using (Html.BeginForm("Delete", "SupportTickets", new { area = "Admin", id = item.Id }, FormMethod.Post, new { onsubmit = "return confirm('Xóa yêu cầu này? Hành động không thể hoàn tác.');", style = "display:inline-block;margin-left:6px" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fa fa-trash"></i> Xóa
+                                </button>
+                            }
+                        </td>
+                    </tr>
                             }
                         }
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="card-footer clearfix">
+        <div class="card-footer clearfix aurora-background text-right">
             @Html.PagedListPager(Model, page => Url.Action("Index", new { page, status = ViewBag.Status, keyword = ViewBag.Keyword }))
         </div>
     </div>

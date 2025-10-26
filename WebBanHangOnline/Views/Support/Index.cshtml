@@ -7,111 +7,240 @@
 
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-<div class="container" style="padding-top:160px; padding-bottom:130px;">
+<style>
+    /* ====== Layout tổng thể ====== */
+    .support-wrap { padding-top:160px; padding-bottom:130px; }
+    .support-hero {
+        background: linear-gradient(135deg,#ffe9ef, #e7f6ff);
+        
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex; align-items: center; gap: 14px;
+    }
+    .support-hero .ico {
+        width: 44px; height: 44px; border-radius: 12px;
+        background:#fff; display:flex; align-items:center; justify-content:center;
+        
+        flex: 0 0 44px;
+    }
+   
+    .support-hero p  { margin:0; color:#667085; }
+
+    /* ====== Card & form ====== */
+    .card { border-radius: 14px; border: 1px solid #eef0f3; overflow: hidden; }
+    .card-header {
+        background:#fff; border-bottom: 1px solid #eef0f3; font-weight: 700;
+        padding: 14px 16px;
+    }
+    .card-body { padding: 16px; }
+    .form-label { font-weight: 600; color:#344054; }
+    .input-icon {
+        position: relative;
+    }
+    .input-icon i {
+        position:absolute; left:12px; top:50%; transform: translateY(-50%); opacity:.6;
+        pointer-events: none;
+    }
+    .input-icon .form-control, .input-icon textarea {
+        padding-left: 40px !important;
+    }
+
+    .form-control, textarea {
+        border-radius: 10px !important;
+        border:1px solid #d0d5dd;
+        transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    .form-control:focus, textarea:focus {
+        border-color:#7c3aed;
+        box-shadow: 0 0 0 4px rgba(124,58,237,.15);
+        outline: none;
+    }
+
+    /* Nhóm 2 cột trên màn hình >= md */
+    @@media (min-width: 768px) {
+        .row-compact .col-md-6 { margin-bottom: 0; }
+    }
+
+    .btn {
+        border-radius: 10px;
+        font-weight: 700;
+        padding: 10px 16px;
+    }
+    .btn-primary   { background:#0ea5e9; border-color:#0ea5e9; }
+    
+    .btn-secondary { background:#0ea5e9; border-color:#0ea5e9; }
+    .btn-secondary:hover { background:#0284c7; border-color:#0284c7; }
+    .btn-outline-primary {
+        border-color:#7c3aed; color:#7c3aed; background:#fff;
+    }
+    .btn-outline-primary:hover { background:#f3e8ff; }
+
+    /* Sidebar dính */
+    .support-sticky { position: sticky; top: 88px; }
+
+    /* Nhãn đếm ký tự */
+    .char-hint { font-size: 12px; color:#667085; }
+</style>
+
+<div class="container support-wrap">
     <div class="row">
         <!-- ========== CỘT TRÁI: FORM GỬI YÊU CẦU (8) ========== -->
         <div class="col-md-8">
-            <h2 class="mb-4">Gửi yêu cầu hỗ trợ</h2>
-            <p class="text-muted">
-                Hãy mô tả chi tiết vấn đề bạn gặp phải. Đội ngũ chăm sóc khách hàng sẽ phản hồi trong thời gian sớm nhất.
-            </p>
+            <div class="support-hero">
+                <div class="ico"><i class="fa-solid fa-life-ring"></i></div>
+                <div>
+                    <h4>Gửi yêu cầu hỗ trợ</h4>
+                    <p>Hãy mô tả chi tiết vấn đề bạn gặp phải. Đội ngũ CSKH sẽ phản hồi sớm nhất.</p>
+                </div>
+            </div>
 
-            @using (Html.BeginForm("Index", "Support", FormMethod.Post, new { @class = "card p-4 shadow-sm" }))
+            @using (Html.BeginForm("Index", "Support", FormMethod.Post, new { @class = "card shadow-sm" }))
             {
-                @Html.AntiForgeryToken()
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="card-body">
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.FullName)
-                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Nguyễn Văn A" })
-                    @Html.ValidationMessageFor(m => m.FullName, null, new { @class = "text-danger" })
+                    <div class="row row-compact">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.FullName, new { @class = "form-label" })
+                            <div class="input-icon">
+                                <i class="fa-regular fa-user"></i>
+                                @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Nguyễn Văn A", autocomplete = "name" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.FullName, null, new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label" })
+                            <div class="input-icon">
+                                <i class="fa-solid fa-phone"></i>
+                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "0987 654 321", inputmode = "tel", autocomplete = "tel" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.PhoneNumber, null, new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <div class="row row-compact">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                            <div class="input-icon">
+                                <i class="fa-regular fa-envelope"></i>
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "email@domain.com", inputmode = "email", autocomplete = "email" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Email, null, new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Subject, new { @class = "form-label" })
+                            <div class="input-icon">
+                                <i class="fa-regular fa-note-sticky"></i>
+                                @Html.TextBoxFor(m => m.Subject, new { @class = "form-control", placeholder = "VD: Tôi cần hỗ trợ về đơn hàng #123" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Subject, null, new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        @Html.LabelFor(m => m.Message, new { @class = "form-label" })
+                        <div class="input-icon">
+                            <i class="fa-regular fa-comment-dots"></i>
+                            @Html.TextAreaFor(m => m.Message, 8, 50, new { @class = "form-control", placeholder = "Vui lòng cung cấp thông tin chi tiết...", maxlength = "2000", id = "MessageBox" })
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            @Html.ValidationMessageFor(m => m.Message, null, new { @class = "text-danger small" })
+                            <span class="char-hint"><span id="msgCount">0</span>/2000 ký tự</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Email)
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "email@domain.com" })
-                    @Html.ValidationMessageFor(m => m.Email, null, new { @class = "text-danger" })
+                <div class="card-body pt-0 pb-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Gửi yêu cầu
+                    </button>
                 </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(m => m.PhoneNumber)
-                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "0987 654 321" })
-                    @Html.ValidationMessageFor(m => m.PhoneNumber, null, new { @class = "text-danger" })
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Subject)
-                    @Html.TextBoxFor(m => m.Subject, new { @class = "form-control", placeholder = "Ví dụ: Tôi cần hỗ trợ về đơn hàng #123" })
-                    @Html.ValidationMessageFor(m => m.Subject, null, new { @class = "text-danger" })
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Message)
-                    @Html.TextAreaFor(m => m.Message, 6, 50, new { @class = "form-control", placeholder = "Vui lòng cung cấp thông tin chi tiết..." })
-                    @Html.ValidationMessageFor(m => m.Message, null, new { @class = "text-danger" })
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-block">Gửi yêu cầu</button>
             }
         </div>
 
         <!-- ========== CỘT PHẢI: TRA CỨU & THEO DÕI (4) ========== -->
-        <!-- ========== CỘT PHẢI: TRA CỨU & THEO DÕI (4) ========== -->
-        <!-- CỘT PHẢI -->
         <div class="col-md-4">
             <div class="support-sticky">
                 <!-- Card: Danh sách đã gửi -->
-                <div class="card mt-4 mt-md-0">
+                <div class="card mt-4 mt-md-0 shadow-sm">
                     <div class="card-header">
-                        <strong>Đã gửi yêu cầu trước đó?</strong>
+                        <i class="fa-regular fa-clock me-1"></i> Đã gửi yêu cầu trước đó?
                     </div>
                     <div class="card-body">
-                        <form method="get" action="@Url.Action("MyTickets","Support")">
-                            <div class="form-group">
-                                <label>Email đã dùng để gửi yêu cầu</label>
-                                <input type="email" name="email" class="form-control"
-                                       placeholder="nhap@email.com"
-                                       value="@(Model?.Email ?? "")" required />
+                        <form method="get" action="@Url.Action("MyTickets","Support")" class="mb-0">
+                            <div class="mb-3">
+                                <label class="form-label">Email đã dùng để gửi yêu cầu</label>
+                                <div class="input-icon">
+                                    <i class="fa-regular fa-envelope"></i>
+                                    <input type="email" name="email" class="form-control"
+                                           placeholder="nhap@email.com"
+                                           value="@(Model?.Email ?? "")" required />
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-outline-primary btn-block">Xem danh sách yêu cầu</button>
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="fa-solid fa-list-ul me-1"></i> Xem danh sách yêu cầu
+                            </button>
                         </form>
                     </div>
                 </div>
 
                 <!-- Card: Theo dõi bằng Mã + Email -->
-                <div class="card mt-3">
+                <div class="card mt-3 shadow-sm">
                     <div class="card-header">
-                        <strong>Theo dõi yêu cầu</strong>
+                        <i class="fa-solid fa-hashtag me-1"></i> Theo dõi yêu cầu
                     </div>
                     <div class="card-body">
                         <small class="text-muted d-block mb-2">
                             Nhập <em>Mã hỗ trợ</em> và <em>Email</em> để xem chi tiết và trao đổi.
                         </small>
-                        <form method="get" action="@Url.Action("Track","Support")">
-                            <div class="form-group">
-                                <label for="code">Mã hỗ trợ</label>
-                                <input type="text" id="code" name="code" class="form-control"
-                                       placeholder="VD: ST-20251021-ABCD" />
+                        <form method="get" action="@Url.Action("Track","Support")" class="mb-0">
+                            <div class="mb-3">
+                                <label for="code" class="form-label">Mã hỗ trợ</label>
+                                <div class="input-icon">
+                                    <i class="fa-solid fa-ticket"></i>
+                                    <input type="text" id="code" name="code" class="form-control"
+                                           placeholder="VD: ST-20251021-ABCD" />
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="emailTrack">Email</label>
-                                <input type="email" id="emailTrack" name="email" class="form-control"
-                                       placeholder="email@domain.com"
-                                       value="@(Model?.Email ?? "")" />
+                            <div class="mb-3">
+                                <label for="emailTrack" class="form-label">Email</label>
+                                <div class="input-icon">
+                                    <i class="fa-regular fa-envelope"></i>
+                                    <input type="email" id="emailTrack" name="email" class="form-control"
+                                           placeholder="email@domain.com"
+                                           value="@(Model?.Email ?? "")" />
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-secondary btn-block">Theo dõi</button>
+                            <button type="submit" class="btn btn-secondary w-100">
+                                <i class="fa-solid fa-magnifying-glass me-1"></i> Theo dõi
+                            </button>
                         </form>
                     </div>
                 </div>
+
             </div>
         </div>
-
-
         <!-- /CỘT PHẢI -->
     </div>
 </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        // Đếm ký tự nội dung
+        (function () {
+            var box = document.getElementById('MessageBox');
+            if (!box) return;
+            var count = document.getElementById('msgCount');
+            var update = function () { count.textContent = box.value.length; };
+            box.addEventListener('input', update);
+            update();
+        })();
+    </script>
 }
