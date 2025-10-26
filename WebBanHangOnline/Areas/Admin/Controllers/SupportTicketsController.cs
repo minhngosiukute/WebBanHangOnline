@@ -31,7 +31,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
                                          || t.Email.Contains(keyword));
             }
 
-            var pageSize = 10;
+            var pageSize = 5;
             var pageNumber = page ?? 1;
 
             var model = query
@@ -134,6 +134,42 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
             TempData["Success"] = "Cập nhật trạng thái thành công.";
 
             return RedirectToAction("Details", new { id });
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id)
+        {
+            // Lấy ticket kèm toàn bộ message để xóa gọn gàng
+            var ticket = _db.SupportTickets
+                            .Include(t => t.Messages)
+                            .FirstOrDefault(t => t.Id == id);
+
+            if (ticket == null)
+            {
+                TempData["Error"] = "Yêu cầu hỗ trợ không tồn tại hoặc đã bị xóa.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                // Nếu chưa bật cascade delete ở DB/EF, mình xóa thủ công Messages trước
+                if (ticket.Messages != null && ticket.Messages.Any())
+                {
+                    _db.SupportTicketMessages.RemoveRange(ticket.Messages);
+                }
+
+                _db.SupportTickets.Remove(ticket);
+                _db.SaveChanges();
+
+                TempData["Success"] = $"Đã xóa yêu cầu #{ticket.TicketCode}.";
+            }
+            catch (Exception ex)
+            {
+                // Có thể log ex nếu cần
+                TempData["Error"] = "Không thể xóa yêu cầu. Vui lòng thử lại.";
+            }
+
+            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)

@@ -51,25 +51,33 @@ namespace WebBanHangOnline.Common
             return rs;
         }
 
-        public static string FormatNumber(object value, int SoSauDauPhay = 2, bool useFixedDecimals = false, string culture = "vi-VN")
+        public static string FormatNumber(object value, int SoSauDauPhay = 0, bool useFixedDecimals = false)
         {
-            if (value == null) return "0";
-
-            // Parse mềm dẻo: nhận mọi object chuyển được sang chuỗi số
-            if (!decimal.TryParse(Convert.ToString(value),
-                                  NumberStyles.Any,
-                                  CultureInfo.InvariantCulture,
-                                  out var number))
-            {
+            if (value == null)
                 return "0";
-            }
 
-            // Tạo pattern: "#,##0.##" (mặc định linh hoạt) hoặc "#,##0.00" (cố định)
+            decimal number;
+
+            // Parse mềm dẻo: chấp nhận mọi kiểu số, kể cả string chứa dấu phẩy hoặc chấm
+            if (value is decimal d)
+                number = d;
+            else if (value is double db)
+                number = (decimal)db;
+            else if (value is float f)
+                number = (decimal)f;
+            else if (decimal.TryParse(Convert.ToString(value), NumberStyles.Any, new CultureInfo("vi-VN"), out var parsed))
+                number = parsed;
+            else
+                return "0";
+
+            // pattern format
             string decimals = new string(useFixedDecimals ? '0' : '#', Math.Max(0, SoSauDauPhay));
             string pattern = SoSauDauPhay > 0 ? $"#,##0.{decimals}" : "#,##0";
 
-            return number.ToString(pattern, new CultureInfo(culture));
+            // format theo chuẩn Việt Nam
+            return number.ToString(pattern, new CultureInfo("vi-VN"));
         }
+
         //public static string FormatNumber(object value, int SoSauDauPhay = 2)
         //{
         //    bool isNumber = IsNumeric(value);

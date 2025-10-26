@@ -3,7 +3,6 @@
 @{
     ViewBag.Title = "Chi tiết yêu cầu";
 }
-
 @section naviheader {
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -21,16 +20,215 @@
     </ul>
 }
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+    :root {
+        --brand-red: #fe4c50;
+        --brand-blue: #0ea5e9;
+        --ink: #111827;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --bg: #f8fafc;
+        --white: #fff;
+    }
+
+    .content {
+        padding: 8px 12px;
+    }
+
+    .action-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin: 8px 0 14px;
+        box-shadow: 0 4px 14px rgba(2,6,23,.06);
+    }
+
+        .action-bar .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    .btn-rounded {
+        border-radius: 10px;
+    }
+
+    .btn-soft {
+        background: #0ea5e9;
+        border: 1px solid var(--border);
+        color: #0f172a;
+        transition: .2s;
+    }
+
+       
+
+    /* Card */
+    .aurora-background {
+        background: linear-gradient(90deg,#e9d5ff,#ffe4e6,#fef9c3) !important;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .card.aurora-backrougnt, .card.aurora-background {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .card-body {
+        background: #fff;
+    }
+
+    /* Thông tin dạng cặp nhãn-giá trị */
+    .kv dt {
+        width: 180px;
+        color: #334155;
+        font-weight: 700;
+    }
+
+    .kv dd {
+        color: var(--ink);
+    }
+
+    /* Badge trạng thái */
+    .badge-info {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-warning {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .badge-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    /* Lịch sử trao đổi tối giản */
+    .simple-thread {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .simple-msg {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px 18px;
+        box-shadow: 0 2px 12px rgba(2,6,23,.06);
+    }
+
+        .simple-msg.user {
+            border-left: 6px solid #9ca3af;
+        }
+
+        .simple-msg.staff {
+            border-left: 6px solid #22c55e;
+        }
+
+    .simple-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .simple-name {
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .simple-time {
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .simple-body {
+        color: #111827;
+        line-height: 1.6;
+        word-break: break-word;
+    }
+
+    .simple-role {
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 999px;
+        color: #fff;
+    }
+
+    .role-user {
+        background: #6b7280;
+    }
+
+    .role-staff {
+        background: #22c55e;
+    }
+
+    /* Form */
+    .form-control {
+        border-radius: 10px;
+    }
+
+    .btn-primary {
+        background: var(--brand-red);
+        border-color: var(--brand-red);
+    }
+
+        .btn-primary:hover {
+            background: #ef233c;
+            border-color: #ef233c;
+        }
+
+    .btn-success {
+        background: var(--brand-blue);
+        border-color: var(--brand-blue);
+    }
+
+        .btn-success:hover {
+            background: #0284c7;
+            border-color: #0284c7;
+        }
+</style>
+
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
+
+        <!-- Thanh hành động -->
+        <div class="action-bar aurora-background ">
+            <div class="left">
+                <a href="@Url.Action("Index","SupportTickets", new { area="Admin" })"
+                   class="btn btn-soft btn-rounded ">
+                    <i class="fa-solid fa-arrow-left-long me-1"></i> Về danh sách
+                </a>
+                
+            </div>
+            
+        </div>
+
+        <div class="row aurora-background ">
             <div class="col-md-8">
-                <div class="card aurora-backrougnt">
-                    <div class="card-header aurora-background">
+                <!-- Thông tin yêu cầu -->
+                <div class="card aurora-background ">
+                    <div class="card-header ">
                         <h3 class="card-title">Thông tin yêu cầu</h3>
                     </div>
-                    <div class="card-body">
-                        <dl class="row">
+                    <div class="card-body aurora-background  ">
+                        <dl class="row kv">
                             <dt class="col-sm-4">Mã hỗ trợ</dt>
                             <dd class="col-sm-8"><strong>@Model.Ticket.TicketCode</strong></dd>
 
@@ -47,43 +245,63 @@
                             <dd class="col-sm-8">@Model.Ticket.Subject</dd>
 
                             <dt class="col-sm-4">Trạng thái</dt>
-                            <dd class="col-sm-8"><span class="badge badge-info">@Model.Ticket.Status</span></dd>
+                            <dd class="col-sm-8">
+                                @{
+                                    var s = Model.Ticket.Status ?? "";
+                                    var b = "badge-info";
+                                    if (s.Contains("Hoàn tất")) { b = "badge-success"; }
+                                    else if (s.Contains("Đang")) { b = "badge-warning"; }
+                                    else if (s.Contains("Hủy")) { b = "badge-danger"; }
+                                }
+                                <span class="badge @b">@Model.Ticket.Status</span>
+                            </dd>
 
                             <dt class="col-sm-4">Ngày tạo</dt>
                             <dd class="col-sm-8">@Model.Ticket.CreatedDate.ToString("dd/MM/yyyy HH:mm")</dd>
 
                             <dt class="col-sm-4">Cập nhật gần nhất</dt>
-                            <dd class="col-sm-8">@(Model.Ticket.UpdatedDate.HasValue ? Model.Ticket.UpdatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "-")</dd>
+                            <dd class="col-sm-8">@(Model.Ticket.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</dd>
                         </dl>
                     </div>
                 </div>
 
+                <!-- Lịch sử trao đổi -->
                 <div class="card aurora-backrougnt">
                     <div class="card-header aurora-background">
                         <h3 class="card-title">Lịch sử trao đổi</h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body aurora-background ">
                         @if (!Model.Messages.Any())
                         {
-                            <p class="text-muted">Chưa có phản hồi nào.</p>
+                            <p class="text-muted mb-0">Chưa có phản hồi nào.</p>
                         }
                         else
                         {
-                            foreach (var message in Model.Messages)
-                            {
-                                <div class="callout callout-@((message.IsFromStaff ? "success" : "secondary"))">
-                                    <div class="d-flex justify-content-between">
-                                        <strong>@message.SenderName</strong>
-                                        <span class="text-muted">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                            <div class="simple-thread">
+                                @foreach (var message in Model.Messages)
+                                {
+                                    var isStaff = message.IsFromStaff;
+                                    var msgCls = isStaff ? "simple-msg staff" : "simple-msg user";
+                                    var roleCls = isStaff ? "simple-role role-staff" : "simple-role role-user";
+                                    var roleTxt = isStaff ? "Hỗ trợ viên" : "Khách hàng";
+                                    <div class="@msgCls">
+                                        <div class="simple-meta">
+                                            <div class="simple-name">@message.SenderName</div>
+                                            <div class="simple-time">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                        </div>
+                                        <div class="simple-body">
+                                            @Html.Raw(Html.Encode(message.Message).Replace("\n", "<br/>"))
+                                        </div>
+                                        <span class="@roleCls">@roleTxt</span>
                                     </div>
-                                    <div class="mt-2">@Html.Raw(Html.Encode(message.Message).Replace("\n", "<br />"))</div>
-                                    <span class="badge badge-@((message.IsFromStaff ? "success" : "secondary")) mt-2">@(message.IsFromStaff ? "Hỗ trợ viên" : "Khách hàng")</span>
-                                </div>
-                            }
+                                }
+                            </div>
                         }
                     </div>
                 </div>
             </div>
+
+            <!-- Cột phải -->
             <div class="col-md-4">
                 @if (TempData["Success"] != null)
                 {
@@ -93,26 +311,34 @@
                 {
                     <div class="alert alert-danger">@TempData["Error"]</div>
                 }
+
+                <!-- Cập nhật trạng thái -->
                 <div class="card aurora-backrougnt">
                     <div class="card-header aurora-background">
                         <h3 class="card-title">Cập nhật trạng thái</h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body aurora-background ">
                         @using (Html.BeginForm("UpdateStatus", "SupportTickets", FormMethod.Post, new { area = "Admin" }))
                         {
                             @Html.AntiForgeryToken()
                             @Html.Hidden("id", Model.Ticket.Id)
-                            @Html.DropDownList("status", new SelectList(SupportTicketStatus.All(), Model.Ticket.Status), "-- Chọn trạng thái --", new { @class = "form-control mb-3" })
-                            <button type="submit" class="btn btn-primary btn-block">Cập nhật</button>
+                            @Html.DropDownList("status",
+                                new SelectList(SupportTicketStatus.All(), Model.Ticket.Status),
+                                "-- Chọn trạng thái --",
+                                new { @class = "form-control mb-3" })
+                            <button type="submit" class="btn btn-primary btn-block btn-rounded">
+                                <i class="fa-solid fa-rotate me-1"></i> Cập nhật
+                            </button>
                         }
                     </div>
                 </div>
 
+                <!-- Gửi phản hồi -->
                 <div class="card aurora-backrougnt mt-3">
                     <div class="card-header aurora-background">
                         <h3 class="card-title">Gửi phản hồi</h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body aurora-background ">
                         @using (Html.BeginForm("Reply", "SupportTickets", new { area = "Admin" }, FormMethod.Post, new { }))
                         {
                             @Html.AntiForgeryToken()
@@ -124,9 +350,10 @@
                                 @Html.ValidationMessage("Message", null, new { @class = "text-danger" })
                             </div>
 
-                            <button type="submit" class="btn btn-success btn-block">Gửi phản hồi</button>
+                            <button type="submit" class="btn btn-success btn-block btn-rounded">
+                                <i class="fa-regular fa-paper-plane me-1"></i> Gửi phản hồi
+                            </button>
                         }
-
                     </div>
                 </div>
             </div>
@@ -136,4 +363,6 @@
 
 @section scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    
 }
+

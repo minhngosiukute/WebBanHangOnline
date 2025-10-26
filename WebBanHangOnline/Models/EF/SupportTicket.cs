@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -63,10 +63,10 @@ namespace WebBanHangOnline.Models.EF
 
     public static class SupportTicketStatus
     {
-        public const string Pending = "Pending";
-        public const string InProgress = "InProgress";
-        public const string Resolved = "Resolved";
-        public const string Closed = "Closed";
+        public const string Pending = "Chờ xử lý";
+        public const string InProgress = "Đang xử lý";
+        public const string Resolved = "Đã giải quyết";
+        public const string Closed = "Đã đóng";
 
         public static IEnumerable<string> All()
         {

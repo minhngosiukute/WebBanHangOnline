@@ -6,12 +6,242 @@
 }
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
-<section class="content">
-    <div class="container">
-        <h3>Theo dõi yêu cầu</h3>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-        <form method="get" action="@Url.Action("Track","Support")" class="mb-3">
-            <div class="form-row">
+<style>
+    :root {
+        --brand-red: #fe4c50;
+        --brand-red-dark: #ef233c;
+        --brand-blue: #0ea5e9;
+        --ink: #111827;
+        --muted: #64748b;
+        --border: #e5e7eb;
+        --bg: #f8fafc;
+        --white: #fff;
+    }
+
+    .track-wrap {
+        padding-top: 160px;
+        padding-bottom: 130px;
+    }
+
+    /* Tiêu đề + form tra cứu */
+    .page-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+        .page-head .ico {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 18px rgba(2,6,23,.06);
+        }
+
+        .page-head h3 {
+            margin: 0;
+            font-weight: 800;
+        }
+
+    .find-box {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 18px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.03);
+    }
+
+        .find-box input {
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            padding: 10px 12px;
+        }
+
+            .find-box input:focus {
+                border-color: var(--brand-red);
+                box-shadow: 0 0 0 4px rgba(254,76,80,.15);
+                outline: none;
+            }
+
+        .find-box .btn {
+            background: var(--brand-red);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            height: 42px;
+            width: 100%;
+            transition: .2s;
+        }
+
+            .find-box .btn:hover {
+                background: var(--brand-red-dark);
+                transform: translateY(-1px);
+            }
+
+    /* Thẻ/card chung */
+    .card {
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(2,6,23,.06);
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
+
+    .card-header {
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        padding: 12px 16px;
+        font-weight: 700;
+    }
+
+    .card-body {
+        padding: 16px;
+    }
+
+    /* Info ticket */
+    .kv {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+        .kv dt {
+            width: 180px;
+            color: #334155;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .kv dd {
+            margin: 0;
+            color: var(--ink);
+        }
+
+    .badge {
+        font-size: 13px;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 999px;
+    }
+
+    .badge-info {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-warning {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .badge-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    
+    /* ===== Lịch sử trao đổi tối giản (theo ảnh) ===== */
+    .simple-thread {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .simple-msg {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px 18px;
+        box-shadow: 0 2px 12px rgba(2,6,23,.06);
+    }
+
+        .simple-msg.user {
+            border-left: 6px solid #9ca3af;
+        }
+        /* xám cho Khách hàng */
+        .simple-msg.staff {
+            border-left: 6px solid #22c55e;
+        }
+    /* xanh lá cho Hỗ trợ viên */
+
+    .simple-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .simple-name {
+        font-weight: 800;
+        font-size: 18px;
+        color: #111827;
+    }
+
+    .simple-time {
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .simple-body {
+        color: #111827;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .simple-role {
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 999px;
+    }
+
+    .role-user {
+        background: #6b7280;
+        color: #fff;
+    }
+    /* Khách hàng: nền xám */
+    .role-staff {
+        background: #22c55e;
+        color: #fff;
+    }
+    /* Hỗ trợ viên: nền xanh */
+
+    /* Header của card lịch sử: dải gradient nhẹ như hình */
+    .card-header.simple-gradient {
+        background: #6b7280;
+    }
+
+
+</style>
+
+<section class="content track-wrap">
+    <div class="container">
+
+        <div class="page-head">
+            <div class="ico"><i class="fa-solid fa-headset" style="color:var(--brand-blue)"></i></div>
+            <h3>Theo dõi yêu cầu</h3>
+        </div>
+
+        <form method="get" action="@Url.Action("Track","Support")" class="find-box">
+            <div class="form-row row g-2">
                 <div class="col-md-4">
                     <input type="text" name="code" class="form-control" value="@code" placeholder="Mã hỗ trợ" required />
                 </div>
@@ -19,42 +249,65 @@
                     <input type="email" name="email" class="form-control" value="@email" placeholder="Email" required />
                 </div>
                 <div class="col-md-3">
-                    <button class="btn btn-primary btn-block">Xem</button>
+                    <button class="btn btn-block"><i class="fa-solid fa-magnifying-glass me-1"></i> Xem</button>
                 </div>
             </div>
         </form>
 
         @if (ViewBag.NotFound == true)
         {
-            <div class="alert alert-danger">Không tìm thấy yêu cầu. Vui lòng kiểm tra Mã hỗ trợ & Email.</div>
+            <div class="alert alert-danger">
+                <i class="fa-regular fa-circle-xmark me-1"></i>
+                Không tìm thấy yêu cầu. Vui lòng kiểm tra Mã hỗ trợ &amp; Email.
+            </div>
         }
         else if (Model != null)
         {
             if (TempData["Success"] != null)
-            { <div class="alert alert-success">@TempData["Success"]</div> }
+            { <div class="alert alert-success"><i class="fa-regular fa-circle-check me-1"></i> @TempData["Success"]</div> }
         if (TempData["Error"] != null)
-        { <div class="alert alert-danger">@TempData["Error"]</div> }
+        { <div class="alert alert-danger"><i class="fa-regular fa-circle-xmark me-1"></i> @TempData["Error"]</div> }
 
-    <div class="card mb-3">
-        <div class="card-header"><strong>Thông tin yêu cầu</strong></div>
+    <!-- Thông tin yêu cầu -->
+    <div class="card">
+        <div class="card-header"><i class="fa-solid fa-ticket me-1"></i> Thông tin yêu cầu</div>
         <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-4">Mã hỗ trợ</dt>
-                <dd class="col-sm-8"><strong>@Model.Ticket.TicketCode</strong></dd>
-                <dt class="col-sm-4">Tiêu đề</dt>
-                <dd class="col-sm-8">@Model.Ticket.Subject</dd>
-                <dt class="col-sm-4">Trạng thái</dt>
-                <dd class="col-sm-8"><span class="badge badge-info">@Model.Ticket.Status</span></dd>
-                <dt class="col-sm-4">Ngày tạo</dt>
-                <dd class="col-sm-8">@Model.Ticket.CreatedDate.ToString("dd/MM/yyyy HH:mm")</dd>
-                <dt class="col-sm-4">Cập nhật gần nhất</dt>
-                <dd class="col-sm-8">@(Model.Ticket.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</dd>
+            <dl class="kv">
+                <dt>Mã hỗ trợ</dt>
+                <dd><strong>@Model.Ticket.TicketCode</strong></dd>
+            </dl>
+            <dl class="kv">
+                <dt>Tiêu đề</dt>
+                <dd>@Model.Ticket.Subject</dd>
+            </dl>
+            <dl class="kv">
+                <dt>Trạng thái</dt>
+                <dd>
+                    @{
+                        var s = Model.Ticket.Status ?? "";
+                        var b = "badge-info";
+                        if (s.Contains("Hoàn tất")) { b = "badge-success"; }
+                        else if (s.Contains("Đang")) { b = "badge-warning"; }
+                        else if (s.Contains("Hủy")) { b = "badge-danger"; }
+                    }
+                    <span class="badge @b">@Model.Ticket.Status</span>
+                </dd>
+            </dl>
+            <dl class="kv">
+                <dt>Ngày tạo</dt>
+                <dd>@Model.Ticket.CreatedDate.ToString("dd/MM/yyyy HH:mm")</dd>
+            </dl>
+            <dl class="kv">
+                <dt>Cập nhật gần nhất</dt>
+                <dd>@(Model.Ticket.UpdatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</dd>
             </dl>
         </div>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-header"><strong>Lịch sử trao đổi</strong></div>
+    <!-- Lịch sử trao đổi -->
+    <!-- Lịch sử trao đổi -->
+    <div class="card">
+        <div class="card-header simple-gradient"><i class="fa-regular fa-comments me-1"></i> Lịch sử trao đổi</div>
         <div class="card-body">
             @if (Model.Messages == null || !Model.Messages.Any())
             {
@@ -62,41 +315,52 @@
             }
             else
             {
-                foreach (var message in Model.Messages)
-                {
-                    <div class="callout @(message.IsFromStaff ? "callout-success" : "callout-secondary")">
-                        <div class="d-flex justify-content-between">
-                            <strong>@message.SenderName</strong>
-                            <span class="text-muted">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                <div class="simple-thread">
+                    @foreach (var message in Model.Messages)
+                    {
+                        var isStaff = message.IsFromStaff;
+                        var msgCls = isStaff ? "simple-msg staff" : "simple-msg user";
+                        var roleCls = isStaff ? "simple-role role-staff" : "simple-role role-user";
+                        var roleTxt = isStaff ? "Hỗ trợ viên" : "Khách hàng";
+
+                        <div class="@msgCls">
+                            <div class="simple-meta">
+                                <div class="simple-name">@message.SenderName</div>
+                                <div class="simple-time">@message.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                            <div class="simple-body">
+                                @Html.Raw(Html.Encode(message.Message).Replace("\n", "<br/>"))
+                            </div>
+                            <span class="@roleCls">@roleTxt</span>
                         </div>
-                        <div class="mt-2">@Html.Raw(Html.Encode(message.Message).Replace("\n", "<br/>"))</div>
-                        <span class="badge @(message.IsFromStaff ? "badge-success" : "badge-secondary") mt-2">
-                            @(message.IsFromStaff ? "Hỗ trợ viên" : "Khách hàng")
-                        </span>
-                    </div>
-                }
+                    }
+                </div>
             }
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header"><strong>Gửi phản hồi</strong></div>
+
+    <!-- Gửi phản hồi -->
+    <div class="card reply">
+        <div class="card-header"><i class="fa-regular fa-paper-plane me-1"></i> Gửi phản hồi</div>
         <div class="card-body">
             @using (Html.BeginForm("Reply", "Support", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                @Html.ValidationSummary(false, "", new { @class = "text-danger mb-2" })
 
                 @Html.HiddenFor(m => m.Reply.TicketId) <!-- TicketId -->
                 <input type="hidden" name="code" value="@code" /> <!-- để xác thực -->
                 <input type="hidden" name="email" value="@email" /> <!-- để xác thực -->
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Reply.Message)
+                <div class="form-group mb-2">
+                    @Html.LabelFor(m => m.Reply.Message, new { @class = "fw-bold mb-1" })
                     @Html.TextAreaFor(m => m.Reply.Message, 5, 40, new { @class = "form-control", placeholder = "Nhập nội dung phản hồi..." })
                     @Html.ValidationMessageFor(m => m.Reply.Message, null, new { @class = "text-danger" })
                 </div>
-                <button type="submit" class="btn btn-success">Gửi phản hồi</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Gửi phản hồi
+                </button>
             }
         </div>
     </div>

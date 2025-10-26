@@ -17,22 +17,28 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
         private ApplicationDbContext db = new ApplicationDbContext();
         // GET: Admin/Order
-        public ActionResult Index(int? page)
+        public ActionResult Index(int? page, int? status)
         {
-            var items = db.Orders.OrderByDescending(x => x.CreatedDate).ToList();
+            var query = db.Orders.AsQueryable();
 
-            if (page == null)
+            // nếu có lọc trạng thái
+            if (status.HasValue)
             {
-                page = 1;
+                query = query.Where(x => x.Status == status.Value);
+                ViewBag.Status = status; // để nhớ trạng thái đã chọn
             }
-            var pageNumber = page ?? 1;
-            var pageSize = 8;
+
+            var items = query.OrderByDescending(x => x.CreatedDate).ToList();
+
+            int pageSize = 8;
+            int pageNumber = page ?? 1;
+
             ViewBag.PageSize = pageSize;
             ViewBag.Page = pageNumber;
             return View(items.ToPagedList(pageNumber, pageSize));
         }
 
-      
+
 
         public ActionResult View(int id)
         {

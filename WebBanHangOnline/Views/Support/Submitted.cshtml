@@ -5,13 +5,117 @@
 }
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
 <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
-<div class="alert alert-success">
-    <h5>Gửi yêu cầu thành công!</h5>
-    <p>Mã hỗ trợ của bạn: <strong>@code</strong></p>
-    <p>Chúng tôi đã ghi nhận email: <strong>@email</strong></p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+  .sent-wrap { padding-top:160px; padding-bottom:130px; }
+  .success-hero{
+    background: linear-gradient(135deg,#e6fffa,#eef2ff);
+    border:1px solid #edf2f7; border-radius:16px; padding:20px 22px; display:flex; gap:14px; align-items:center;
+    box-shadow: 0 6px 20px rgba(17,24,39,.04);
+    margin-bottom:18px;
+  }
+  .success-hero .ico{
+    width:48px;height:48px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 20px rgba(0,0,0,.06); flex:0 0 48px;
+  }
+  .success-hero h5{ margin:0 0 4px; font-size:20px; font-weight:800; color:#14532d;}
+  .success-hero p{ margin:0; color:#475467;}
+  .card{
+    border-radius:14px; border:1px solid #e5e7eb; overflow:hidden; background:#fff;
+    box-shadow: 0 8px 24px rgba(2,6,23,.06);
+  }
+  .card-header{ background:#fff; border-bottom:1px solid #e5e7eb; padding:12px 16px; font-weight:700;}
+  .card-body{ padding:16px; }
+  .kv{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:#f9fafb; border:1px dashed #d1d5db; border-radius:12px; padding:10px 12px;
+  }
+  .kv .label{ color:#6b7280; font-weight:600; display:flex; align-items:center; gap:8px;}
+  .kv .value{ font-weight:800; font-size:18px; color:#111827; word-break:break-all;}
+  .btn{ border-radius:10px; font-weight:700; padding:10px 14px; }
+  .btn-primary{ background:#dc2222; border-color:#dc2222; }
+  .btn-primary:hover{ background:#dc2222; border-color:#dc2222; }
+  .btn-outline-secondary{ border-color:#94a3b8; color:#334155; }
+  .btn-outline-secondary:hover{ background:#f1f5f9; }
+  .btn-ghost{ background:#fff; border:1px solid #e5e7eb; color:#374151; }
+  .btn-ghost:hover{ background:#f9fafb; }
+  .actions{ display:flex; flex-wrap:wrap; gap:10px; }
+  .tips{ font-size:14px; color:#475467; }
+  .tag{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+    background:#f1f5f9; border:1px solid #e2e8f0; color:#0f172a; font-weight:600; font-size:13px;
+  }
+  .fade-in{ animation:fade .35s ease-out; } @@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+</style>
+
+<div class="container sent-wrap">
+    <div class="success-hero fade-in">
+        <div class="ico"><i class="fa-solid fa-check fa-lg" style="color:#10b981"></i></div>
+        <div>
+            <h5>Gửi yêu cầu thành công!</h5>
+            <p>Chúng tôi đã nhận được thông tin và sẽ phản hồi sớm nhất.</p>
+        </div>
+    </div>
+
+    <div class="card fade-in">
+        <div class="card-header"><i class="fa-solid fa-ticket me-1"></i> Thông tin tóm tắt</div>
+        <div class="card-body">
+            <div class="mb-3">
+                <div class="kv">
+                    <div class="label"><i class="fa-solid fa-hashtag"></i> Mã hỗ trợ</div>
+                    <div class="value" id="ticketCode">@code</div>
+                </div>
+                <div class="mt-2 actions">
+                    <button type="button" class="btn btn-ghost" id="btnCopyCode">
+                        <i class="fa-regular fa-copy me-1"></i> Sao chép mã
+                    </button>
+                    <a class="btn btn-primary" href="@Url.Action("Track","Support", new { code = code, email = email })">
+                        <i class="fa-solid fa-comment-dots me-1"></i> Theo dõi & trao đổi
+                    </a>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="kv">
+                    <div class="label"><i class="fa-regular fa-envelope"></i> Email đã ghi nhận</div>
+                    <div class="value" id="userEmail">@email</div>
+                </div>
+                <div class="mt-2 actions">
+                    <a class="btn btn-outline-secondary" href="@Url.Action("MyTickets","Support", new { email = email })">
+                        <i class="fa-solid fa-list-ul me-1"></i> Xem tất cả yêu cầu của tôi
+                    </a>
+                    
+                </div>
+            </div>
+
+            <div class="tips">
+                <span class="tag"><i class="fa-regular fa-lightbulb"></i> Gợi ý</span>
+                <ul class="mt-2 mb-0">
+                    <li>Lưu lại <strong>Mã hỗ trợ</strong> để tra cứu nhanh về sau.</li>
+                    <li>Nếu cần bổ sung thông tin/ảnh, dùng nút <em>Theo dõi & trao đổi</em> ở trên.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="d-flex gap-2">
-    <a class="btn btn-primary" href="@Url.Action("Track","Support", new { code = code, email = email })">Theo dõi & trao đổi</a>
-    <a class="btn btn-outline-secondary" href="@Url.Action("MyTickets","Support", new { email = email })">Xem tất cả yêu cầu của tôi</a>
-</div>
+@section Scripts{
+    <script>
+    (function(){
+      var btn = document.getElementById('btnCopyCode');
+      if(!btn) return;
+      btn.addEventListener('click', function(){
+        var codeEl = document.getElementById('ticketCode');
+        var val = (codeEl && codeEl.textContent || '').trim();
+        if(!val) return;
+        navigator.clipboard.writeText(val).then(function(){
+          btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Đã sao chép';
+          setTimeout(function(){
+            btn.innerHTML = '<i class="fa-regular fa-copy me-1"></i> Sao chép mã';
+          }, 1800);
+        });
+      });
+    })();
+    </script>
+}
