@@ -246,6 +246,10 @@
     <Compile Include="Migrations\202510211328521_metmet.Designer.cs">
       <DependentUpon>202510211328521_metmet.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202510311825533_xoaproducca.cs" />
+    <Compile Include="Migrations\202510311825533_xoaproducca.Designer.cs">
+      <DependentUpon>202510311825533_xoaproducca.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdvCreateViewModel.cs" />
@@ -3798,6 +3802,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202510211328521_metmet.resx">
       <DependentUpon>202510211328521_metmet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510311825533_xoaproducca.resx">
+      <DependentUpon>202510311825533_xoaproducca.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
