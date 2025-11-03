@@ -61,43 +61,50 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
             }
             return View();
         }
-       
+        private bool IsCategoryInUse(int categoryId)
+        {
+            return db.Products.Any(p => p.ProductCategoryId == categoryId);
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
             var item = db.ProductCategories.Find(id);
-            if (item != null)
-            {
-                db.ProductCategories.Remove(item);
-                db.SaveChanges();
-                return Json(new { success = true });
-            }
-            return Json(new { success = false });
+            if (item == null)
+                return Json(new { success = false, message = "Không tìm thấy danh mục." });
+
+            if (IsCategoryInUse(id))
+                return Json(new { success = false, message = "Không thể xóa: Danh mục đang được sử dụng bởi sản phẩm." });
+
+            db.ProductCategories.Remove(item);
+            db.SaveChanges();
+            return Json(new { success = true, message = "Đã xóa danh mục." });
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteAll(string ids)
-        {
-            if (!string.IsNullOrEmpty(ids))
-            {
-                var items = ids.Split(',');
-                if (items != null && items.Any())
-                {
-                    foreach (var id in items)
-                    {
-                        var item = db.ProductCategories.Find(Convert.ToInt32(id));
-                        if (item != null)
-                        {
-                            db.ProductCategories.Remove(item);
-                        }
-                    }
-                    db.SaveChanges();
-                    return Json(new { success = true });
-                }
-            }
-            return Json(new { success = false });
-        }
+
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult DeleteAll(string ids)
+        //{
+        //    if (!string.IsNullOrEmpty(ids))
+        //    {
+        //        var items = ids.Split(',');
+        //        if (items != null && items.Any())
+        //        {
+        //            foreach (var id in items)
+        //            {
+        //                var item = db.ProductCategories.Find(Convert.ToInt32(id));
+        //                if (item != null)
+        //                {
+        //                    db.ProductCategories.Remove(item);
+        //                }
+        //            }
+        //            db.SaveChanges();
+        //            return Json(new { success = true });
+        //        }
+        //    }
+        //    return Json(new { success = false });
+        //}
 
     }
 }

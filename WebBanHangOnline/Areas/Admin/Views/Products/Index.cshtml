@@ -210,16 +210,23 @@
                             var strCheck = item.IsActive ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";
                             var strCheckHome = item.IsHome ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";
                             //var strCheckSale = item.IsSale ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";
-                            var strImg = "";
+                            var strImg = Url.Content("~/Content/assets/images/no-image.jpg"); // ảnh placeholder của bạn
                             var CheckImage = item.ProductImage.FirstOrDefault(x => x.IsDefault);
-                            if (CheckImage != null)
+                            if (CheckImage != null && !string.IsNullOrWhiteSpace(CheckImage.Image))
                             {
                                 strImg = CheckImage.Image;
                             }
                             <tr id="p@item.Id">
                                 @*<td><input type="checkbox" class="cbkItem" value="@item.Id" /></td>*@
                                 <td>@i</td>
-                                <td><img class="imgproduct" data-id="@item.Id" src="@strImg" width="80" /></td>
+                                <td>
+                                    <img class="imgproduct"
+                                         data-id="@item.Id"
+                                         src="@strImg"
+                                         width="80"
+                                         style="cursor:pointer; object-fit:cover; border-radius:8px;"
+                                         onerror="this.onerror=null; this.src='@Url.Content("~/Content/assets/images/no-image.jpg")';" />
+                                </td>
                                 <td>@item.Title</td>
                                 <td>@item.ProductCategory.Title</td>
                                 <td>@item.Quantity</td>

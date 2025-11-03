@@ -443,6 +443,7 @@
     <Content Include="Content\assets\images\desc_2.jpg" />
     <Content Include="Content\assets\images\desc_3.jpg" />
     <Content Include="Content\assets\images\map_marker.png" />
+    <Content Include="Content\assets\images\no-image.jpg" />
     <Content Include="Content\assets\images\product_1.png" />
     <Content Include="Content\assets\images\product_10.png" />
     <Content Include="Content\assets\images\product_2.png" />

@@ -149,12 +149,17 @@
                     $.ajax({
                         url: '/admin/ProductCategory/Delete',
                         type: 'POST',
-                        data: { id: id, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                        data: {
+                            id: id,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
                         success: function (rs) {
                             if (rs.success) {
+                                alert(rs.message || 'Đã xóa thành công!');
                                 $('#trow_' + id).remove();
                             } else {
-                                alert('Xóa thất bại!');
+                                // nếu có message chi tiết (VD: danh mục đang được sử dụng)
+                                alert(rs.message || 'Xóa thất bại!');
                             }
                         },
                         error: function (xhr, status, error) {
@@ -163,6 +168,7 @@
                     });
                 }
             });
+
         });
     </script>
 }
