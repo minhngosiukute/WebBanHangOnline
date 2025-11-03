@@ -16,7 +16,10 @@ public class SearchController : Controller
     public async Task<ActionResult> Image(HttpPostedFileBase file)
     {
         if (file == null || file.ContentLength == 0)
+        {
+            TempData["SearchMessage"] = "Vui lòng chọn một hình ảnh để tìm kiếm.";
             return RedirectToAction("Index", "Products");
+        }
 
         using (var http = new HttpClient())
         using (var content = new MultipartFormDataContent())
@@ -35,8 +38,7 @@ public class SearchController : Controller
             var data = JsonConvert.DeserializeObject<SearchApiResponse>(json)
                        ?? new SearchApiResponse { results = new List<SearchApiItem>() };
 
-            // 🔍 Tăng ngưỡng độ tương tự lên 0.85 (hoặc 0.8)
-            //    và chỉ hiển thị nếu có ít nhất 1 kết quả đạt ngưỡng
+            // 🔍 Ngưỡng độ tương tự
             const double THRESHOLD = 0.7;
 
             var filtered = (data.results ?? new List<SearchApiItem>())
@@ -45,16 +47,12 @@ public class SearchController : Controller
                 .Take(4)
                 .ToList();
 
-            // ⚠️ Nếu không có kết quả nào đủ giống thì trả view trống
+            // ⚠️ Nếu không có kết quả nào đủ giống
             if (!filtered.Any())
             {
-                ViewBag.Message = "Không tìm thấy sản phẩm phù hợp với hình đã chọn.";
-                return View("~/Views/Products/Index.cshtml", new List<Product>());
+                TempData["SearchMessage"] = "❌ Không tìm thấy sản phẩm phù hợp với hình đã chọn.";
+                return RedirectToAction("Index", "Products");
             }
-
-
-            if (filtered.Count == 0)
-                return View("~/Views/Products/Index.cshtml", new List<Product>());
 
             // Lấy danh sách ID theo thứ tự độ giống
             var orderedIds = filtered

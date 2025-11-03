@@ -481,7 +481,7 @@
             string currentController = ViewContext.RouteData.Values["controller"].ToString().ToLower();
         }
 
-        @if (!(currentController == "account" && (currentAction == "login" || currentAction == "register")))
+        @if (!(currentController == "account" && (currentAction == "login" || currentAction == "register" || currentAction == "resetpassword" )))
         {
             <!-- Newsletter -->
             @Html.Action("Partial_Subcrice", "Home")
