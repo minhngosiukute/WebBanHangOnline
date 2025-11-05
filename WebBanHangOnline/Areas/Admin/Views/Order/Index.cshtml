@@ -2,6 +2,12 @@
 @using PagedList.Mvc;
 @{
     ViewBag.Title = "Danh sách đơn hàng";
+
+    // Bind lại giá trị ngày theo dd-MM-yyyy
+    string fd = ViewBag.FromDate as string;
+    string td = ViewBag.ToDate as string;
+    string fdVal = DateTime.TryParse(fd, out var _fd) ? _fd.ToString("dd-MM-yyyy") : fd;
+    string tdVal = DateTime.TryParse(td, out var _td) ? _td.ToString("dd-MM-yyyy") : td;
 }
 
 @section naviheader {
@@ -26,18 +32,33 @@
         <div class="card-header aurora-background">
             <h3 class="card-title text-center">Danh sách đơn hàng</h3>
         </div>
+
         <div class="card-body aurora-background">
             @using (Html.BeginForm("Index", "Order", FormMethod.Get, new { @class = "form-inline mb-3" }))
             {
-                <label for="status" class="mr-2">Lọc theo trạng thái:</label>
-                <select id="status" name="status" class="form-control mr-2">
-                    <option value="">-- Tất cả --</option>
-                    <option value="1" @(ViewBag.Status == 1 ? "selected" : "")>Chưa thanh toán</option>
-                    <option value="2" @(ViewBag.Status == 2 ? "selected" : "")>Đã thanh toán</option>
-                    <option value="3" @(ViewBag.Status == 3 ? "selected" : "")>Hoàn thành</option>
-                    <option value="4" @(ViewBag.Status == 4 ? "selected" : "")>Hủy</option>
-                </select>
-                <button type="submit" class="btn btn-primary">Lọc</button>
+                <div class="form-group mr-2">
+                    <label for="fromDate" class="mr-2">Từ ngày:</label>
+                    <input type="text" id="fromDate" name="fromDate" value="@fdVal" class="form-control datepicker" autocomplete="off" />
+                </div>
+
+                <div class="form-group mr-2">
+                    <label for="toDate" class="mr-2">Đến ngày:</label>
+                    <input type="text" id="toDate" name="toDate" value="@tdVal" class="form-control datepicker" autocomplete="off" />
+                </div>
+
+                <div class="form-group mr-2">
+                    <label for="status" class="mr-2">Trạng thái:</label>
+                    <select id="status" name="status" class="form-control">
+                        <option value="">-- Tất cả --</option>
+                        <option value="1" @(ViewBag.Status == 1 ? "selected" : "")>Chưa thanh toán</option>
+                        <option value="2" @(ViewBag.Status == 2 ? "selected" : "")>Đã thanh toán</option>
+                        <option value="3" @(ViewBag.Status == 3 ? "selected" : "")>Hoàn thành</option>
+                        <option value="4" @(ViewBag.Status == 4 ? "selected" : "")>Hủy</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary mr-2">Lọc</button>
+                <a class="btn btn-secondary" href="@Url.Action("Index","Order", new { area="Admin" })">Xóa lọc</a>
             }
 
             <table class="table table-bordered table-striped table-hover">
@@ -47,7 +68,7 @@
                         <th class="text-center">Mã đơn hàng</th>
                         <th class="text-center">Tên Khách hàng</th>
                         @*<th class="text-center">Phone</th>
-                    <th class="text-center">Tiền</th>*@
+                            <th class="text-center">Tiền</th>*@
                         <th class="text-center">Phương thức thanh toán</th>
                         <th class="text-center">Trạng thái</th>
                         <th class="text-center">Ngày tạo</th>
@@ -69,23 +90,15 @@
                                 <td class="text-center">@(item.TypePayment == 1 ? "COD" : "Chuyển khoản")</td>
                                 <td class="text-center">
                                     @if (item.Status == 1)
-                                    {
-                                        <span class="badge badge-warning">Chưa thanh toán</span>
-                                    }
+                                    {<span class="badge badge-warning">Chưa thanh toán</span>}
                                     @if (item.Status == 2)
-                                    {
-                                        <span class="badge badge-info">Đã thanh toán</span>
-                                    }
+                                    {<span class="badge badge-info">Đã thanh toán</span>}
                                     @if (item.Status == 3)
-                                    {
-                                        <span class="badge badge-success">Hoàn thành</span>
-                                    }
+                                    {<span class="badge badge-success">Hoàn thành</span>}
                                     @if (item.Status == 4)
-                                    {
-                                        <span class="badge badge-danger">Hủy</span>
-                                    }
+                                    {<span class="badge badge-danger">Hủy</span>}
                                 </td>
-                                <td class="text-center">@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
                                 <td class="text-center">
                                     <a href="/admin/order/view/@item.Id" class="btn btn-sm btn-outline-success"><i class="fas fa-eye"></i> Xem</a>
                                     <a href="#" class="btn btn-sm btn-outline-primary btnCapNhat ml-2" data-id="@item.Id"><i class="fas fa-sync-alt"></i> Cập nhật</a>
@@ -109,18 +122,20 @@
             <div class="row mt-3">
                 <div class="col-6"></div>
                 <div class="col-6" style="text-align:right;">
-                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new
+                    {
+                        page,
+                        status = ViewBag.Status,
+                        fromDate = ViewBag.FromDate,
+                        toDate = ViewBag.ToDate
+                    }))
                 </div>
             </div>
         </div>
-        <!-- /.card-body -->
-        <div class="card-footer text-center">
-        </div>
-        <!-- /.card-footer-->
+
+        <div class="card-footer text-center"></div>
     </div>
-    <!-- /.card -->
 </section>
-<!-- /.content -->
 
 <div class="modal fade" id="modal-default">
     <div class="modal-dialog">
@@ -148,13 +163,44 @@
                 <button type="button" class="btn btn-primary" id="btnLuu"><i class="fas fa-save"></i> Lưu</button>
             </div>
         </div>
-        <!-- /.modal-content -->
     </div>
-    <!-- /.modal-dialog -->
 </div>
-<!-- /.modal -->
 
 @section scripts {
+    <!-- Bootstrap Datepicker (VN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/locales/bootstrap-datepicker.vi.min.js"></script>
+
+    <script>
+        // Khởi tạo lịch tiếng Việt, format dd-MM-yyyy
+        $(function () {
+            $('.datepicker').datepicker({
+                format: 'dd-mm-yyyy',
+                language: 'vi',
+                todayHighlight: true,
+                autoclose: true,
+                weekStart: 1
+            });
+        });
+
+        // Check nhanh: từ ngày không lớn hơn đến ngày (dd-MM-yyyy)
+        document.addEventListener('submit', function (e) {
+            var f = e.target;
+            if (f.action && f.action.toLowerCase().indexOf('/order/index') !== -1) {
+                var from = f.fromDate ? f.fromDate.value : '';
+                var to = f.toDate ? f.toDate.value : '';
+                if (from && to) {
+                    const [fd, fm, fy] = from.split('-').map(Number);
+                    const [td, tm, ty] = to.split('-').map(Number);
+                    const d1 = new Date(fy, fm - 1, fd);
+                    const d2 = new Date(ty, tm - 1, td);
+                    if (d1 > d2) { alert('Từ ngày không được lớn hơn Đến ngày'); e.preventDefault(); }
+                }
+            }
+        });
+    </script>
+
     <script>
         $(document).ready(function () {
             $('body').on('click', '.btnCapNhat', function () {
@@ -177,10 +223,7 @@
                     }
                 });
             });
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
+
             $('body').on('click', '.btnDelete', function () {
                 var id = $(this).data("id");
                 if (confirm('Bạn có chắc chắn muốn xóa đơn hàng này không?')) {
@@ -206,49 +249,49 @@
 <style>
     /* Tùy chỉnh giao diện bảng và nút */
     .table th, .table td {
-        vertical-align: middle; /* Căn giữa theo chiều dọc */
+        vertical-align: middle;
     }
 
     .badge {
-        font-size: 0.9rem; /* Kích thước chữ của badge */
-        padding: 0.4em 0.8em; /* Khoảng cách bên trong badge */
+        font-size: 0.9rem;
+        padding: 0.4em 0.8em;
     }
 
     .btn-sm {
-        padding: 0.25rem 0.75rem; /* Điều chỉnh padding để đồng nhất kích thước */
-        font-size: 0.875rem; /* Kích thước chữ đồng đều */
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
     }
 
     .ml-2 {
-        margin-left: 0.5rem; /* Khoảng cách giữa các nút cố định */
+        margin-left: 0.5rem;
     }
 
     .mt-3 {
-        margin-top: 1rem; /* Khoảng cách trên phân trang */
+        margin-top: 1rem;
     }
 
     .btn-primary:hover {
-        background-color: #0056b3 !important; /* Tối màu hơn khi hover */
+        background-color: #0056b3 !important;
     }
 
     .btn-danger:hover {
-        background-color: #c82333 !important; /* Tối màu hơn khi hover */
+        background-color: #c82333 !important;
     }
 
     .btn-success:hover {
-        background-color: #218838 !important; /* Tối màu hơn khi hover */
+        background-color: #218838 !important;
     }
 
     .modal-content {
-        border-radius: 0.5rem; /* Bo góc modal */
+        border-radius: 0.5rem;
     }
 
     .modal-header {
-        background-color: #f8f9fa; /* Màu nền header modal */
+        background-color: #f8f9fa;
         border-bottom: 1px solid #dee2e6;
     }
 
     .modal-footer .btn {
-        min-width: 100px; /* Độ rộng tối thiểu của nút trong modal */
+        min-width: 100px;
     }
 </style>

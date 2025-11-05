@@ -56,46 +56,46 @@
                     @Html.AntiForgeryToken()
                     @Html.ValidationSummary(true)
                     <!-- your steps content here -->
-                <div id="logins-part" class="content active dstepper-block" role="tabpanel" aria-labelledby="logins-part-trigger">
-                    <div class="form-group">
-                        <label for="exampleInputEmail1">Tiêu đề</label>
-                        @Html.TextBoxFor(x => x.Title, new { @class = "form-control", @placeholder = "Tiêu đề" })
-                        @Html.ValidationMessageFor(x => x.Title, null, new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputEmail1">Alias</label>
-                        @Html.TextBoxFor(x => x.Alias, new { @class = "form-control", @placeholder = "Alias" })
-                        @Html.ValidationMessageFor(x => x.Alias, null, new { @class = "text-danger" })
-                    </div>
-                    @*<div class="form-group">
-                        <label for="exampleInputFile">Ảnh</label>
-                        <div class="input-group">
-                            <div class="custom-file">
-                                @Html.TextBoxFor(x => x.Icon, new { @id = "txtImage", @class = "form-control" })
-                            </div>
-                            <div class="input-group-append">
-                                <input type="button" value="Tải ảnh" onclick="BrowseServer('txtImage');" />
-                            </div>
+                    <div id="logins-part" class="content active dstepper-block" role="tabpanel" aria-labelledby="logins-part-trigger">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Tiêu đề</label>
+                            @Html.TextBoxFor(x => x.Title, new { @class = "form-control", @placeholder = "Tiêu đề" })
+                            @Html.ValidationMessageFor(x => x.Title, null, new { @class = "text-danger" })
                         </div>
-                    </div>*@
-                    @*<div class="form-group">
-                        <label for="exampleInputPassword1">Seo title</label>
-                        @Html.TextAreaFor(x => x.SeoTitle, new { @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">SeoDescription</label>
-                        @Html.TextAreaFor(x => x.SeoDescription, new { @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">SeoKeywords</label>
-                        @Html.TextAreaFor(x => x.SeoKeywords, new { @class = "form-control" })
-                    </div>*@
-                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Alias</label>
+                            @Html.TextBoxFor(x => x.Alias, new { @class = "form-control", @placeholder = "Alias" })
+                            @Html.ValidationMessageFor(x => x.Alias, null, new { @class = "text-danger" })
+                        </div>
+                        @*<div class="form-group">
+                                <label for="exampleInputFile">Ảnh</label>
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        @Html.TextBoxFor(x => x.Icon, new { @id = "txtImage", @class = "form-control" })
+                                    </div>
+                                    <div class="input-group-append">
+                                        <input type="button" value="Tải ảnh" onclick="BrowseServer('txtImage');" />
+                                    </div>
+                                </div>
+                            </div>*@
+                        @*<div class="form-group">
+                                <label for="exampleInputPassword1">Seo title</label>
+                                @Html.TextAreaFor(x => x.SeoTitle, new { @class = "form-control" })
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">SeoDescription</label>
+                                @Html.TextAreaFor(x => x.SeoDescription, new { @class = "form-control" })
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">SeoKeywords</label>
+                                @Html.TextAreaFor(x => x.SeoKeywords, new { @class = "form-control" })
+                            </div>*@
+                        <div class="form-group">
 
-                        <button type="submit" class="btn btn-primary">Lưu</button>
-                        <a href="/Admin/ProductCategory" class="btn btn-danger">Quay lại</a>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                            <a href="/Admin/ProductCategory" class="btn btn-danger">Quay lại</a>
+                        </div>
                     </div>
-                </div>
 
                 }
 
@@ -114,19 +114,57 @@
 
 @section  scripts{
     <script>
-          $(document).ready(function () {
-              CKEDITOR.replace('txtDetail', {
-                  customConfig: '/content/ckeditor/config.js',
-                  extraAllowedContent: 'span',
-              });
-          });
-          function BrowseServer(field) {
-              var finder = new CKFinder();
-              finder.selectActionFunction = function (fileUrl) {
-                  document.getElementById(field).value = fileUrl;
-              };
-              finder.popup();
-          }
+        // Chuyển "Tiêu đề" thành alias không dấu, gạch ngang
+        function toAlias(str) {
+            return (str || "")
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // bỏ dấu
+                .replace(/đ/g, 'd').replace(/Đ/g, 'd')           // đ → d
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s-]/g, '')                    // bỏ ký tự lạ
+                .replace(/\s+/g, '-')                            // space → -
+                .replace(/-+/g, '-');                            // gộp ---
+        }
+
+        $(function () {
+            // Tìm theo id hoặc theo name để khỏi lệ thuộc helper
+            var $title = $('#Title, input[name="Title"]');
+            var $alias = $('#Alias, input[name="Alias"]');
+
+            // Nếu user gõ vào Alias thì ngừng tự-điền (để họ chủ động sửa)
+            var userEditedAlias = false;
+            $alias.on('input', function () { userEditedAlias = true; });
+
+            // Khi gõ tiêu đề, nếu Alias chưa bị user sửa thì tự sinh
+            $title.on('input change', function () {
+                if (!userEditedAlias || !$alias.val()) {
+                    $alias.val(toAlias($(this).val()));
+                }
+            });
+
+            // Nếu Alias đang đúng theo Title, cho phép tự-điền tiếp
+            $alias.on('blur', function () {
+                if ($(this).val() === toAlias($title.val())) {
+                    userEditedAlias = false;
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            CKEDITOR.replace('txtDetail', {
+                customConfig: '/content/ckeditor/config.js',
+                extraAllowedContent: 'span',
+            });
+        });
+        function BrowseServer(field) {
+            var finder = new CKFinder();
+            finder.selectActionFunction = function (fileUrl) {
+                document.getElementById(field).value = fileUrl;
+            };
+            finder.popup();
+        }
 
     </script>
 }
