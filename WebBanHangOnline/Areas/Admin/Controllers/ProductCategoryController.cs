@@ -78,7 +78,7 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
             db.ProductCategories.Remove(item);
             db.SaveChanges();
-            return Json(new { success = true, message = "Đã xóa danh mục." });
+            return Json(new { success = true});
         }
 
 

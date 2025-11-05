@@ -17,26 +17,56 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
 
         private ApplicationDbContext db = new ApplicationDbContext();
         // GET: Admin/Order
-        public ActionResult Index(int? page, int? status)
+        // GET: Admin/Order
+        public ActionResult Index(int? page, int? status, string fromDate, string toDate)
         {
             var query = db.Orders.AsQueryable();
 
-            // nếu có lọc trạng thái
+            // Lọc trạng thái (nếu có)
             if (status.HasValue)
             {
                 query = query.Where(x => x.Status == status.Value);
-                ViewBag.Status = status; // để nhớ trạng thái đã chọn
+                ViewBag.Status = status;
+            }
+
+            // Lọc theo thời gian (CreatedDate)
+            ViewBag.FromDate = fromDate;
+            ViewBag.ToDate = toDate;
+
+            // Hỗ trợ dd-MM-yyyy (mới), dd/MM/yyyy (cũ) và yyyy-MM-dd
+            var formats = new[] { "dd-MM-yyyy", "dd/MM/yyyy", "yyyy-MM-dd" };
+            var vi = new System.Globalization.CultureInfo("vi-VN");
+
+
+            DateTime startDate;
+            if (!string.IsNullOrWhiteSpace(fromDate) &&
+                DateTime.TryParseExact(fromDate.Trim(), formats, vi, System.Globalization.DateTimeStyles.None, out startDate))
+            {
+                // Lọc từ 00:00:00 của ngày bắt đầu
+                startDate = startDate.Date;
+                query = query.Where(x => DbFunctions.TruncateTime(x.CreatedDate) >= startDate);
+            }
+
+            DateTime endDate;
+            if (!string.IsNullOrWhiteSpace(toDate) &&
+                DateTime.TryParseExact(toDate.Trim(), formats, vi, System.Globalization.DateTimeStyles.None, out endDate))
+            {
+                // Lọc đến hết ngày (bao gồm) → < ngày kế tiếp
+                var nextDay = endDate.Date.AddDays(1);
+                query = query.Where(x => x.CreatedDate < nextDay);
             }
 
             var items = query.OrderByDescending(x => x.CreatedDate).ToList();
 
-            int pageSize = 8;
+            int pageSize = 5;
             int pageNumber = page ?? 1;
 
             ViewBag.PageSize = pageSize;
             ViewBag.Page = pageNumber;
+
             return View(items.ToPagedList(pageNumber, pageSize));
         }
+
 
 
 
