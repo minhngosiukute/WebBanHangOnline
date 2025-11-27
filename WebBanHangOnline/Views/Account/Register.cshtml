@@ -1,4 +1,5 @@
 ﻿@model WebBanHangOnline.Models.RegisterViewModel
+@using WebBanHangOnline.Models
 @{
     ViewBag.Title = "Đăng ký";
 }
@@ -113,7 +114,6 @@
             top: 50%;
             transform: translateY(-50%);
         }
-
 </style>
 
 <div class="register-page">
@@ -172,6 +172,8 @@
                             <input type="submit" class="btn btn-primary" value="Đăng ký" />
                         </div>
                     }
+                    <hr />
+                    @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
                 </div>
             </div>
         </div>

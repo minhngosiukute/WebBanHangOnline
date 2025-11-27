@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Configuration;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -63,6 +66,49 @@ namespace WebBanHangOnline
             //    ClientId = "",
             //    ClientSecret = ""
             //});
+            var googleClientId = ConfigurationManager.AppSettings["GoogleClientId"];
+            if (string.IsNullOrWhiteSpace(googleClientId))
+            {
+                googleClientId = Environment.GetEnvironmentVariable("GoogleClientId")
+                                  ?? Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            }
+
+            var googleClientSecret = ConfigurationManager.AppSettings["GoogleClientSecret"];
+            if (string.IsNullOrWhiteSpace(googleClientSecret))
+            {
+                googleClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret")
+                                     ?? Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
+            }
+
+            if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+            {
+                var googleOptions = new GoogleOAuth2AuthenticationOptions
+                {
+                    ClientId = googleClientId,
+                    ClientSecret = googleClientSecret,
+                    Provider = new GoogleOAuth2AuthenticationProvider
+                    {
+                        OnAuthenticated = context => Task.FromResult(0),
+
+                        // Ép Google luôn hiện hộp chọn tài khoản:
+                        OnApplyRedirect = ctx =>
+                        {
+                            var uri = ctx.RedirectUri;
+                            if (!uri.Contains("prompt="))
+                            {
+                                uri += (uri.Contains("?") ? "&" : "?") + "prompt=select_account";
+                            }
+                            ctx.Response.Redirect(uri);
+                        }
+                    }
+                };
+
+                googleOptions.Scope.Add("email");
+                googleOptions.Scope.Add("profile");
+
+                app.UseGoogleAuthentication(googleOptions);
+
+            }
         }
     }
 }

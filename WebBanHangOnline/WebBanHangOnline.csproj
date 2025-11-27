@@ -206,6 +206,7 @@
     <Compile Include="Areas\Admin\Controllers\StatsController.cs" />
     <Compile Include="Areas\Admin\Controllers\SupplierController.cs" />
     <Compile Include="Areas\Admin\Controllers\SupportTicketsController.cs" />
+    <Compile Include="Areas\Admin\Filter\AdminAuthorizeAttribute.cs" />
     <Compile Include="Common\Common.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
