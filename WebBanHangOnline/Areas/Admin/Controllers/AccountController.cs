@@ -8,11 +8,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using WebBanHangOnline.Areas.Admin.Filter;
 using WebBanHangOnline.Models;
 
 namespace WebBanHangOnline.Areas.Admin.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [AdminAuthorize(Roles = "Admin")]
     public class AccountController : Controller
     {
         private ApplicationSignInManager _signInManager;
@@ -122,8 +123,12 @@ namespace WebBanHangOnline.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+            HttpContext.GetOwinContext()
+                       .Authentication
+                       .SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+
+            // => Luôn quay về form đăng nhập của ADMIN
+            return RedirectToAction("Login", "Account", new { area = "Admin" });
         }
         //
         // GET: /Account/Register

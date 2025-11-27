@@ -145,8 +145,13 @@
 
                         <a href="Register" class="text-decoration-none">Đăng ký</a>
                         <a href="/account/ForgotPassword">Quên mật khẩu</a>
+
+
                     }
+                    <hr />
+
                 </section>
+                @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
             </div>
         </div>
     </div>

@@ -199,6 +199,7 @@ namespace WebBanHangOnline.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+            ViewBag.ReturnUrl = Url.Action("Index", "Home");
             return View();
         }
         //[HttpPost]
@@ -252,6 +253,7 @@ namespace WebBanHangOnline.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            ViewBag.ReturnUrl = Url.Action("Index", "Home");
             if (!ModelState.IsValid) return View(model);
 
             var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
@@ -473,6 +475,61 @@ namespace WebBanHangOnline.Controllers
                 case SignInStatus.Failure:
                 default:
                     // If the user does not have an account, then prompt the user to create an account
+                    if (!string.IsNullOrEmpty(loginInfo.Email))
+                    {
+                        var existingUser = await UserManager.FindByEmailAsync(loginInfo.Email);
+                        if (existingUser == null)
+                        {
+                            var newUser = new ApplicationUser
+                            {
+                                UserName = loginInfo.Email,
+                                Email = loginInfo.Email,
+                                EmailConfirmed = true,
+                                FullName = loginInfo.ExternalIdentity?.FindFirstValue(ClaimTypes.Name)
+                            };
+
+                            var createResult = await UserManager.CreateAsync(newUser);
+                            if (createResult.Succeeded)
+                            {
+                                await UserManager.AddToRoleAsync(newUser.Id, "Customer");
+                                var addLoginResult = await UserManager.AddLoginAsync(newUser.Id, loginInfo.Login);
+                                if (addLoginResult.Succeeded)
+                                {
+                                    await SignInManager.SignInAsync(newUser, isPersistent: false, rememberBrowser: false);
+                                    return RedirectToLocal(returnUrl);
+                                }
+
+                                AddErrors(addLoginResult);
+                            }
+                            else
+                            {
+                                AddErrors(createResult);
+                            }
+                        }
+                        else
+                        {
+                            if (!existingUser.EmailConfirmed)
+                            {
+                                existingUser.EmailConfirmed = true;
+                                await UserManager.UpdateAsync(existingUser);
+                            }
+
+                            var logins = await UserManager.GetLoginsAsync(existingUser.Id);
+                            var hasLogin = logins.Any(l => l.LoginProvider == loginInfo.Login.LoginProvider && l.ProviderKey == loginInfo.Login.ProviderKey);
+
+                            if (!hasLogin)
+                            {
+                                var addLoginResult = await UserManager.AddLoginAsync(existingUser.Id, loginInfo.Login);
+                                if (!addLoginResult.Succeeded)
+                                {
+                                    AddErrors(addLoginResult);
+                                }
+                            }
+
+                            await SignInManager.SignInAsync(existingUser, isPersistent: false, rememberBrowser: false);
+                            return RedirectToLocal(returnUrl);
+                        }
+                    }
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
                     return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
@@ -503,6 +560,10 @@ namespace WebBanHangOnline.Controllers
                 var result = await UserManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
+                    user.EmailConfirmed = true;
+                    await UserManager.UpdateAsync(user);
+                    await UserManager.AddToRoleAsync(user.Id, "Customer");
+
                     result = await UserManager.AddLoginAsync(user.Id, info.Login);
                     if (result.Succeeded)
                     {
