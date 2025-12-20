@@ -7,7 +7,7 @@ using WebBanHangOnline.Models;
 namespace WebBanHangOnline.Models.EF
 {
     [Table("tb_Cart")]
-    public class Cart : CommonAbstract
+    public class Cart 
     {
         public Cart()
         {
@@ -20,6 +20,8 @@ namespace WebBanHangOnline.Models.EF
 
         [Required]
         public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
 
         public virtual ICollection<CartItem> Items { get; set; }
     }

@@ -255,6 +255,14 @@
     <Compile Include="Migrations\202512201820167_cart.Designer.cs">
       <DependentUpon>202512201820167_cart.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202512202203280_xoacart.cs" />
+    <Compile Include="Migrations\202512202203280_xoacart.Designer.cs">
+      <DependentUpon>202512202203280_xoacart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202512202214564_xoacarts.cs" />
+    <Compile Include="Migrations\202512202214564_xoacarts.Designer.cs">
+      <DependentUpon>202512202214564_xoacarts.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdvCreateViewModel.cs" />
@@ -3816,6 +3824,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202512201820167_cart.resx">
       <DependentUpon>202512201820167_cart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202512202203280_xoacart.resx">
+      <DependentUpon>202512202203280_xoacart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202512202214564_xoacarts.resx">
+      <DependentUpon>202512202214564_xoacarts.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

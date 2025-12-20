@@ -276,17 +276,17 @@ namespace WebBanHangOnline.Controllers
                     contentCustomer = contentCustomer.Replace("{{TongTien}}", WebBanHangOnline.Common.Common.FormatNumber(TongTien, 0));
                     WebBanHangOnline.Common.Common.SendMail("ShopOnline", "Đơn hàng #" + order.Code, contentCustomer.ToString(), req.Email);
 
-                    string contentAdmin = System.IO.File.ReadAllText(Server.MapPath("~/Content/templates/send1.html"));
-                    contentAdmin = contentAdmin.Replace("{{MaDon}}", order.Code);
-                    contentAdmin = contentAdmin.Replace("{{SanPham}}", strSanPham);
-                    contentAdmin = contentAdmin.Replace("{{NgayDat}}", DateTime.Now.ToString("dd/MM/yyyy"));
-                    contentAdmin = contentAdmin.Replace("{{TenKhachHang}}", order.CustomerName);
-                    contentAdmin = contentAdmin.Replace("{{Phone}}", order.Phone);
-                    contentAdmin = contentAdmin.Replace("{{Email}}", req.Email);
-                    contentAdmin = contentAdmin.Replace("{{DiaChiNhanHang}}", order.Address);
-                    contentAdmin = contentAdmin.Replace("{{ThanhTien}}", WebBanHangOnline.Common.Common.FormatNumber(thanhtien, 0));
-                    contentAdmin = contentAdmin.Replace("{{TongTien}}", WebBanHangOnline.Common.Common.FormatNumber(TongTien, 0));
-                    WebBanHangOnline.Common.Common.SendMail("ShopOnline", "Đơn hàng mới #" + order.Code, contentAdmin.ToString(), ConfigurationManager.AppSettings["EmailAdmin"]);
+                    //string contentAdmin = System.IO.File.ReadAllText(Server.MapPath("~/Content/templates/send1.html"));
+                    //contentAdmin = contentAdmin.Replace("{{MaDon}}", order.Code);
+                    //contentAdmin = contentAdmin.Replace("{{SanPham}}", strSanPham);
+                    //contentAdmin = contentAdmin.Replace("{{NgayDat}}", DateTime.Now.ToString("dd/MM/yyyy"));
+                    //contentAdmin = contentAdmin.Replace("{{TenKhachHang}}", order.CustomerName);
+                    //contentAdmin = contentAdmin.Replace("{{Phone}}", order.Phone);
+                    //contentAdmin = contentAdmin.Replace("{{Email}}", req.Email);
+                    //contentAdmin = contentAdmin.Replace("{{DiaChiNhanHang}}", order.Address);
+                    //contentAdmin = contentAdmin.Replace("{{ThanhTien}}", WebBanHangOnline.Common.Common.FormatNumber(thanhtien, 0));
+                    //contentAdmin = contentAdmin.Replace("{{TongTien}}", WebBanHangOnline.Common.Common.FormatNumber(TongTien, 0));
+                    //WebBanHangOnline.Common.Common.SendMail("ShopOnline", "Đơn hàng mới #" + order.Code, contentAdmin.ToString(), ConfigurationManager.AppSettings["EmailAdmin"]);
 
                     // === Phân nhánh thanh toán ===
                     //cart.ClearCart(); // vẫn clear sau khi tạo đơn (theo logic cũ)
@@ -402,7 +402,7 @@ namespace WebBanHangOnline.Controllers
                 //item.TotalPrice = item.Quantity * item.Price;
                 //cart.AddToCart(item, quantity);
                 //Session["Cart"] = cart;
-                cart.ModifiedDate = DateTime.Now;
+                //cart.ModifiedDate = DateTime.Now;
                 db.SaveChanges();
                 code = new { Success = true, msg = "Thêm sản phẩm vào giỏ hàng thành công!", code = 1, Count = cart.Items.Count };
             }
@@ -436,7 +436,7 @@ namespace WebBanHangOnline.Controllers
 
                     cartItem.Quantity = quantity;
                     cartItem.TotalPrice = cartItem.Price * cartItem.Quantity;
-                    cart.ModifiedDate = DateTime.Now;
+                    //cart.ModifiedDate = DateTime.Now;
                     db.SaveChanges();
                     return Json(new { Success = true });
                 }
@@ -461,7 +461,7 @@ namespace WebBanHangOnline.Controllers
                     //cart.Remove(id);
                     db.CartItems.Remove(checkProduct);
                     cart.Items.Remove(checkProduct);
-                    cart.ModifiedDate = DateTime.Now;
+                    //cart.ModifiedDate = DateTime.Now;
                     db.SaveChanges();
                     code = new { Success = true, msg = "", code = 1, Count = cart.Items.Count };
                 }
@@ -656,8 +656,8 @@ namespace WebBanHangOnline.Controllers
             cart = new Cart
             {
                 UserId = userId,
-                CreatedDate = DateTime.Now,
-                ModifiedDate = DateTime.Now
+                //CreatedDate = DateTime.Now,
+                //ModifiedDate = DateTime.Now
             };
             db.Carts.Add(cart);
             db.SaveChanges();
@@ -669,7 +669,7 @@ namespace WebBanHangOnline.Controllers
             if (cart.Items.Any())
             {
                 db.CartItems.RemoveRange(cart.Items);
-                cart.ModifiedDate = DateTime.Now;
+                //cart.ModifiedDate = DateTime.Now;
                 db.SaveChanges();
             }
         }
