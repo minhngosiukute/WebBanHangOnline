@@ -50,6 +50,8 @@ namespace WebBanHangOnline.Models
 
         public DbSet<SupportTicket> SupportTickets { get; set; }
         public DbSet<SupportTicketMessage> SupportTicketMessages { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
 
         public static ApplicationDbContext Create()
         {

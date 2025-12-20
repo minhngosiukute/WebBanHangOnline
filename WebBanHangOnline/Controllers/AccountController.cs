@@ -584,7 +584,7 @@ namespace WebBanHangOnline.Controllers
         public ActionResult LogOff()
         {
             
-            Session.Remove("Cart");    
+            //Session.Remove("Cart");    
 
             
             Session.Clear();

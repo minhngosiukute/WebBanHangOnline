@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Configuration;
 using System.Linq;
 using System.Web;
@@ -58,7 +59,8 @@ namespace WebBanHangOnline.Controllers
         public ActionResult Index()
         {
 
-            ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            var cart = GetUserCart();
             if (cart != null && cart.Items.Any())
             {
                 ViewBag.CheckCart = cart;
@@ -128,7 +130,8 @@ namespace WebBanHangOnline.Controllers
         [AllowAnonymous]
         public ActionResult CheckOut()
         {
-            ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            var cart = GetUserCart();
             if (cart != null && cart.Items.Any())
             {
                 ViewBag.CheckCart = cart;
@@ -143,7 +146,8 @@ namespace WebBanHangOnline.Controllers
         [AllowAnonymous]
         public ActionResult Partial_Item_ThanhToan()
         {
-            ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            var cart = GetUserCart();
             if (cart != null && cart.Items.Any())
             {
                 return PartialView(cart.Items);
@@ -153,7 +157,8 @@ namespace WebBanHangOnline.Controllers
         [AllowAnonymous]
         public ActionResult Partial_Item_Cart()
         {
-            ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            var cart = GetUserCart();
             if (cart != null && cart.Items.Any())
             {
                 return PartialView(cart.Items);
@@ -164,7 +169,8 @@ namespace WebBanHangOnline.Controllers
         [AllowAnonymous]
         public ActionResult ShowCount()
         {
-            ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            var cart = GetUserCart();
             if (cart != null)
             {
                 return Json(new { Count = cart.Items.Count }, JsonRequestBehavior.AllowGet);
@@ -190,8 +196,10 @@ namespace WebBanHangOnline.Controllers
             var code = new { Success = false, Code = -1, Url = "" };
             if (ModelState.IsValid)
             {
-                ShoppingCart cart = (ShoppingCart)Session["Cart"];
-                if (cart != null)
+                //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+                //if (cart != null)
+                var cart = GetUserCart();
+                if (cart != null && cart.Items.Any())
                 {
                     Order order = new Order();
                     order.CustomerName = req.CustomerName;
@@ -199,12 +207,22 @@ namespace WebBanHangOnline.Controllers
                     order.Address = req.Address;
                     order.Email = req.Email;
                     order.Status = 1;//1: chưa thanh toán, 2: đã thanh toán, 3: hoàn thành, 4: hủy
-                    cart.Items.ForEach(x => order.OrderDetails.Add(new OrderDetail
+                    //cart.Items.ForEach(x => order.OrderDetails.Add(new OrderDetail
+                    //{
+                    //    ProductId = x.ProductId,
+                    //    Quantity = x.Quantity,
+                    //    Price = x.Price
+                    //}));
+                    foreach (var x in cart.Items)
                     {
-                        ProductId = x.ProductId,
-                        Quantity = x.Quantity,
-                        Price = x.Price
-                    }));
+                        order.OrderDetails.Add(new OrderDetail
+                        {
+                            ProductId = x.ProductId,
+                            Quantity = x.Quantity,
+                            Price = x.Price
+                        });
+                    }
+
                     order.TotalAmount = cart.Items.Sum(x => (x.Price * x.Quantity));
                     order.TypePayment = req.TypePayment;
                     order.CreatedDate = DateTime.Now;
@@ -271,7 +289,8 @@ namespace WebBanHangOnline.Controllers
                     WebBanHangOnline.Common.Common.SendMail("ShopOnline", "Đơn hàng mới #" + order.Code, contentAdmin.ToString(), ConfigurationManager.AppSettings["EmailAdmin"]);
 
                     // === Phân nhánh thanh toán ===
-                    cart.ClearCart(); // vẫn clear sau khi tạo đơn (theo logic cũ)
+                    //cart.ClearCart(); // vẫn clear sau khi tạo đơn (theo logic cũ)
+                    ClearCartItems(cart);
                     code = new { Success = true, Code = req.TypePayment, Url = "" };
 
                     // --- VNPAY ---
@@ -289,10 +308,12 @@ namespace WebBanHangOnline.Controllers
                             var payUrl = _momo.CreatePaymentUrl(order.Code, (long)order.TotalAmount);
                             code = new { Success = true, Code = req.TypePayment, Url = payUrl };
                         }
-                        catch
+                        catch (Exception ex)
                         {
-                            code = new { Success = false, Code = -1, Url = "" };
+                            // log ex.ToString() ra file/Console/Debug
+                            return Json(new { Success = false, Code = -1, Url = "", Message = ex.Message });
                         }
+
                     }
 
                 }
@@ -321,11 +342,12 @@ namespace WebBanHangOnline.Controllers
                     return Json(code);
                 }
 
-                ShoppingCart cart = (ShoppingCart)Session["Cart"];
-                if (cart == null)
-                {
-                    cart = new ShoppingCart();
-                }
+                //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+                //if (cart == null)
+                //{
+                //    cart = new ShoppingCart();
+                //}
+                var cart = GetOrCreateCart();
 
                 // Kiểm tra số lượng hiện tại trong giỏ hàng
                 var existingItem = cart.Items.FirstOrDefault(x => x.ProductId == id);
@@ -339,26 +361,49 @@ namespace WebBanHangOnline.Controllers
                     }
                 }
 
-                ShoppingCartItem item = new ShoppingCartItem
+                //ShoppingCartItem item = new ShoppingCartItem
+                //{
+                //    ProductId = checkProduct.Id,
+                //    ProductName = checkProduct.Title,
+                //    CategoryName = checkProduct.ProductCategory.Title,
+                //    Alias = checkProduct.Alias,
+                //    Quantity = quantity
+                //};
+                //if (checkProduct.ProductImage.FirstOrDefault(x => x.IsDefault) != null)
+                var price = checkProduct.PriceSale > 0 ? (decimal)checkProduct.PriceSale : checkProduct.Price;
+                var productImg = checkProduct.ProductImage.FirstOrDefault(x => x.IsDefault)?.Image;
+
+                if (existingItem != null)
                 {
-                    ProductId = checkProduct.Id,
-                    ProductName = checkProduct.Title,
-                    CategoryName = checkProduct.ProductCategory.Title,
-                    Alias = checkProduct.Alias,
-                    Quantity = quantity
-                };
-                if (checkProduct.ProductImage.FirstOrDefault(x => x.IsDefault) != null)
-                {
-                    item.ProductImg = checkProduct.ProductImage.FirstOrDefault(x => x.IsDefault).Image;
+                    //item.ProductImg = checkProduct.ProductImage.FirstOrDefault(x => x.IsDefault).Image;
+                    existingItem.Quantity += quantity;
+                    existingItem.Price = price;
+                    existingItem.TotalPrice = existingItem.Quantity * existingItem.Price;
                 }
-                item.Price = checkProduct.Price;
-                if (checkProduct.PriceSale > 0)
+                //item.Price = checkProduct.Price;
+                //if (checkProduct.PriceSale > 0)
+                else
                 {
-                    item.Price = (decimal)checkProduct.PriceSale;
+                    //item.Price = (decimal)checkProduct.PriceSale;
+                    var item = new CartItem
+                    {
+                        CartId = cart.Id,
+                        ProductId = checkProduct.Id,
+                        ProductName = checkProduct.Title,
+                        CategoryName = checkProduct.ProductCategory.Title,
+                        Alias = checkProduct.Alias,
+                        ProductImg = productImg,
+                        Quantity = quantity,
+                        Price = price,
+                        TotalPrice = quantity * price
+                    };
+                    cart.Items.Add(item);
                 }
-                item.TotalPrice = item.Quantity * item.Price;
-                cart.AddToCart(item, quantity);
-                Session["Cart"] = cart;
+                //item.TotalPrice = item.Quantity * item.Price;
+                //cart.AddToCart(item, quantity);
+                //Session["Cart"] = cart;
+                cart.ModifiedDate = DateTime.Now;
+                db.SaveChanges();
                 code = new { Success = true, msg = "Thêm sản phẩm vào giỏ hàng thành công!", code = 1, Count = cart.Items.Count };
             }
             return Json(code);
@@ -369,7 +414,8 @@ namespace WebBanHangOnline.Controllers
         [HttpPost]
         public ActionResult Update(int id, int quantity)
         {
-            ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            var cart = GetUserCart();
             if (cart != null)
             {
                 var checkProduct = db.Products.FirstOrDefault(x => x.Id == id);
@@ -381,7 +427,17 @@ namespace WebBanHangOnline.Controllers
                         return Json(new { Success = false, msg = $"Số lượng trong kho không đủ! Chỉ còn {checkProduct.Quantity} sản phẩm." });
                     }
 
-                    cart.UpdateQuantity(id, quantity);
+                    //cart.UpdateQuantity(id, quantity);
+                    var cartItem = cart.Items.FirstOrDefault(x => x.ProductId == id);
+                    if (cartItem == null)
+                    {
+                        return Json(new { Success = false, msg = "Sản phẩm không tồn tại trong giỏ hàng." });
+                    }
+
+                    cartItem.Quantity = quantity;
+                    cartItem.TotalPrice = cartItem.Price * cartItem.Quantity;
+                    cart.ModifiedDate = DateTime.Now;
+                    db.SaveChanges();
                     return Json(new { Success = true });
                 }
                 return Json(new { Success = false, msg = "Sản phẩm không tồn tại." });
@@ -395,13 +451,18 @@ namespace WebBanHangOnline.Controllers
         {
             var code = new { Success = false, msg = "", code = -1, Count = 0 };
 
-            ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            var cart = GetUserCart();
             if (cart != null)
             {
                 var checkProduct = cart.Items.FirstOrDefault(x => x.ProductId == id);
                 if (checkProduct != null)
                 {
-                    cart.Remove(id);
+                    //cart.Remove(id);
+                    db.CartItems.Remove(checkProduct);
+                    cart.Items.Remove(checkProduct);
+                    cart.ModifiedDate = DateTime.Now;
+                    db.SaveChanges();
                     code = new { Success = true, msg = "", code = 1, Count = cart.Items.Count };
                 }
             }
@@ -413,10 +474,12 @@ namespace WebBanHangOnline.Controllers
         [HttpPost]
         public ActionResult DeleteAll()
         {
-            ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            //ShoppingCart cart = (ShoppingCart)Session["Cart"];
+            var cart = GetUserCart();
             if (cart != null)
             {
-                cart.ClearCart();
+                //cart.ClearCart();
+                ClearCartItems(cart);
                 return Json(new { Success = true });
             }
             return Json(new { Success = false });
@@ -570,7 +633,46 @@ namespace WebBanHangOnline.Controllers
             return Content("{\"status\":0}");
         }
 
+        private Cart GetUserCart()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return null;
+            }
 
+            var userId = User.Identity.GetUserId();
+            return db.Carts.Include(c => c.Items).FirstOrDefault(x => x.UserId == userId);
+        }
+
+        private Cart GetOrCreateCart()
+        {
+            var userId = User.Identity.GetUserId();
+            var cart = db.Carts.Include(c => c.Items).FirstOrDefault(x => x.UserId == userId);
+            if (cart != null)
+            {
+                return cart;
+            }
+
+            cart = new Cart
+            {
+                UserId = userId,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now
+            };
+            db.Carts.Add(cart);
+            db.SaveChanges();
+            return cart;
+        }
+
+        private void ClearCartItems(Cart cart)
+        {
+            if (cart.Items.Any())
+            {
+                db.CartItems.RemoveRange(cart.Items);
+                cart.ModifiedDate = DateTime.Now;
+                db.SaveChanges();
+            }
+        }
         #endregion
     }
 }
