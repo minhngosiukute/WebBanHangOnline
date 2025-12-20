@@ -583,14 +583,14 @@ namespace WebBanHangOnline.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
-            // ✅ 1) Xoá giỏ hàng đang lưu trong Session
-            Session.Remove("Cart");     // hoặc Session["Cart"] = null;
+            
+            Session.Remove("Cart");    
 
-            // ✅ 2) Xoá toàn bộ session để tránh dính dữ liệu phiên cũ
+            
             Session.Clear();
             Session.Abandon();
 
-            // ✅ 3) Đăng xuất Identity cookie
+            
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
 
             return RedirectToAction("Index", "Home");
