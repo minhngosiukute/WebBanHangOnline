@@ -28,7 +28,8 @@ namespace WebBanHangOnline.Models.EF
         public decimal Price { get; set; }
 
         public decimal TotalPrice { get; set; }
-
+        [ForeignKey("ProductId")]
+        public virtual Product Product { get; set; }
         [ForeignKey("CartId")]
         public virtual Cart Cart { get; set; }
     }
