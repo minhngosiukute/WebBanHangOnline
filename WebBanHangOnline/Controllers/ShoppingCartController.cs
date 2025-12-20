@@ -302,10 +302,14 @@ namespace WebBanHangOnline.Controllers
 
 
 
-        [AllowAnonymous]
+        
         [HttpPost]
         public ActionResult AddToCart(int id, int quantity)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new { Success = false, msg = "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.", code = -3, Count = 0 });
+            }
             var code = new { Success = false, msg = "", code = -1, Count = 0 };
             var checkProduct = db.Products.FirstOrDefault(x => x.Id == id);
             if (checkProduct != null)
